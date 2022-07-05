@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ScriptHost",
+      "ESNext",
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/types",
+    ],
+    "allowJs": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "removeComments": true,
+    "forceConsistentCasingInFileNames": true,
+    /* Type Checking */
+    "strict": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "types": ["node"]
+  },
+  "exclude": [
+    "dist"
+  ]
+}
