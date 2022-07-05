@@ -1,0 +1,8 @@
+.vscode
+node_modules
+certs
+.env
+statics/*
+package-lock.json
+dist/*
+.gitmodules

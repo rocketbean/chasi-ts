@@ -1,0 +1,9 @@
+import Writer, { Writable } from "./Writer.js";
+export default class EndTraceFull extends Writer implements Writable {
+  public spacer: string = "-";
+  format(message: string) {
+    message = `| ${message} `;
+    let width: number = process.stdout.columns;
+    return message + this.fill(width - message.length);
+  }
+}
