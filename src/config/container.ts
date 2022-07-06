@@ -14,9 +14,9 @@ export default {
    * into the app container
    */
   LoadPack: {
-    Sessions: "package/framework/storage/session::init",
-    Compiler: "package/framework/chasi/Compiler::init",
-    FileManager: "container/modules/FileManager::init",
+    // Sessions: "package/framework/storage/session::init",
+    // Compiler: "package/framework/chasi/Compiler::init",
+    // FileManager: "container/modules/FileManager::init",
   },
 
   /**
@@ -30,12 +30,10 @@ export default {
      * this services is left outside the Chasi box due to the
      * interactions developers need to associate with this services,
      * therefore giving more versatility for dev's
-     *
      */
     routers: "container/services/RouterServiceProvider",
-    auth: "container/services/AuthServiceProvider",
-    sockets: "container/services/SocketServiceProvider",
-    // 'Mailer': 'container/services/MailerServiceProvider', // ->> enable this if you wish to provide email services
+    // auth: "container/services/AuthServiceProvider",
+    // sockets: "container/services/SocketServiceProvider",
   },
 
   /**

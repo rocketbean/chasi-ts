@@ -6,7 +6,7 @@ export default class Authorize extends Event implements EventInterface {
    * @param {params} recieves the Event parameters
    * declared when the event is emitted
    * @param {next} [DO NOT FORGET TO CALL]
-   * fired when validated
+   * next when validated
    */
   async validate(params, next) {
     next();

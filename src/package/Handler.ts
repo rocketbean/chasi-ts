@@ -1,10 +1,15 @@
 import Obsesrver from "./Observer/index.js";
 import horizon from "./statics/horizon/config.js";
+import Service from "./framework/Services/Service.js";
+import ServicesModule from "./framework/Services/ServicesModule.js";
 import App from "./framework/Server/App.js";
 import Base, { ProxyHandler } from "./Base.js";
-import { ModuleInterface } from "./framework/Interfaces.js";
 import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
+import {
+  ModuleInterface,
+  ServiceProviderInterface,
+} from "./framework/Interfaces.js";
 
 export class Handler extends Base {
   /***
@@ -46,19 +51,27 @@ export class Handler extends Base {
    */
   $app: App = new App();
 
+  $services: { [key: string]: Service };
+
   private constructor(private config: Iobject) {
     super();
-    this.config = Base.mergeObjects(horizon, config);
+    this.config = <Iobject>Base.mergeObjects(horizon, config);
     this.setup();
   }
 
   protected async start(): Promise<void> {
     await this.$observer.setup();
+    this.$modules["services"] = await ServicesModule.init(
+      this.config.container.ServiceBootstrap,
+    );
+    this.$services = (await (<ServicesModule>(
+      this.$modules["services"]
+    )).installServices()) as { [key: string]: Service };
+
     await this.$observer.emit("__before__", {
       next: this.$proxy.before,
       app: this.$proxy,
     });
-    this.loggers.system.endGroup("apex");
   }
 
   protected async before(): Promise<void> {
@@ -82,7 +95,7 @@ export class Handler extends Base {
   }
 
   protected async boot() {
-    this.loggers.system.write(this.$modules);
+    // this.loggers.system.write(this.$modules);
   }
 
   private installModule(module: ModuleInterface) {

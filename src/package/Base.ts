@@ -52,6 +52,12 @@ export default class Base {
     return _.merge(target, sources);
   }
 
+  static async _fetchFile(filepath: string) {
+    if (!filepath.includes(".js")) filepath += ".js";
+    let _fp = path.join(__filepath + filepath);
+    return (await import(_fp)).default;
+  }
+
   static async _fetchFilesFromDir(dir: string): Promise<object> {
     let _mods: { [key: string]: object } = {};
 
