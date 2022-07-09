@@ -7,7 +7,7 @@ export default abstract class Writer {
   log: Function = console.log;
 
   logType: { [key: string]: Function } = logStyles;
-
+  static groups: Group[] = [];
   spacer: string = " ";
   groups: Group[] = [];
 
@@ -85,4 +85,5 @@ export interface Writable {
   group(a: string): void;
   endGroup(a: string): void;
   endGroups(): void;
+  style(a: string): Writable;
 }

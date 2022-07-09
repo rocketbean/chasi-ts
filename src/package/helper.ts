@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 declare global {
-  var checkout: <T, U>(val: T, backup: U) => {};
+  var checkout: (val: any, backup: any) => {};
   var Logger: Logger;
   var __dirname: string;
   var __filepath: string;

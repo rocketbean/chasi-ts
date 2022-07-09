@@ -6,6 +6,7 @@ import App from "./framework/Server/App.js";
 import Base, { ProxyHandler } from "./Base.js";
 import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
+import { networkInterfaces } from "os";
 import {
   ModuleInterface,
   ServiceProviderInterface,
@@ -49,7 +50,7 @@ export class Handler extends Base {
   /***
    * [$app] Express App
    */
-  $app: App = new App();
+  $app: App;
 
   $services: { [key: string]: Service };
 
@@ -95,7 +96,24 @@ export class Handler extends Base {
   }
 
   protected async boot() {
-    // this.loggers.system.write(this.$modules);
+    this.$app.$server.listen(this.config.server.port, async () => {
+      this.loggers.system.group("BOOT");
+      this.loggers.full.write("SERVING IN: ", "cool");
+      let nets = networkInterfaces();
+      Object.keys(nets).forEach((key) => {
+        nets[key]
+          .filter((addr) => addr.family == "IPv4")
+          .forEach((net) => {
+            let protocol = this.$app.mode.protocol;
+            let ipv = net.address == "127.0.0.1" ? "localhost" : net.address;
+            this.loggers.EndTraceFull.write(
+              `  ${protocol}://${ipv}:${this.config.server.port}`,
+              "systemRead",
+            );
+          });
+      });
+      this.loggers.system.endGroup("BOOT");
+    });
   }
 
   private installModule(module: ModuleInterface) {
@@ -109,6 +127,7 @@ export class Handler extends Base {
    */
   protected setup(): void {
     this.setLoggers();
+    this.$app = new App(this.config.server);
     this.$observer = new Obsesrver(this.config.observer! as Iobject);
   }
 
@@ -117,13 +136,17 @@ export class Handler extends Base {
   }
 
   /***
-   * Set System-Display Logs
+   * Set System-Display Log
    * @return [void]
    */
   protected setLoggers(): void {
     this.loggers = {
       system: global.Logger.writer("Left").style("system"),
       subsystem: global.Logger.writer("Left").style("subsystem"),
+      center: global.Logger.writer("Center").style("cool"),
+      full: global.Logger.writer("Full").style("cool"),
+      LeftFull: global.Logger.writer("LeftFull").style("cool"),
+      EndTraceFull: global.Logger.writer("EndTraceFull").style("cool"),
     };
   }
 

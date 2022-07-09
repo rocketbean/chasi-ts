@@ -5,5 +5,15 @@ import EndTrace from "./EndTrace.js";
 import Left from "./Left.js";
 import Right from "./Right.js";
 import EndTraceFull from "./EndTraceFull.js";
+import LeftFull from "./LeftFull.js";
 
-export { Center, Full, StartTrace, EndTrace, EndTraceFull, Left, Right };
+export {
+  Center,
+  Full,
+  StartTrace,
+  EndTrace,
+  EndTraceFull,
+  Left,
+  Right,
+  LeftFull,
+};
