@@ -30,7 +30,23 @@ export default class Base {
           });
       }),
     );
+    return _mods;
+  }
 
+  async NamespacedfetchFilesFromDir(dir: string): Promise<object> {
+    let _mods: { [key: string]: object } = {};
+
+    let _fp = path.join(__filepath + dir);
+    await Promise.all(
+      fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
+        _mods[path.join(__dirname, dir) + "/" + file.replace(".js", "")] =
+          await import(path.join(_fp, file))
+            .then((_content) => _content.default)
+            .catch((e) => {
+              console.log(e);
+            });
+      }),
+    );
     return _mods;
   }
 

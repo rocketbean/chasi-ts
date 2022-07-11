@@ -40,7 +40,7 @@ export type RouterConfigInterface = {
   after?: Function;
 };
 
-export type RouteProperty = {
+export type RouteEndpointProperty = {
   method: string;
   controller: string;
   endpoint: string;
@@ -49,6 +49,7 @@ export type RouteProperty = {
 
 export type RouteGroupProperty = {
   middleware: string | string[];
+  controller?: string;
   prefix?: string;
   before?: Function;
   after?: Function;

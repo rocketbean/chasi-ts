@@ -10,6 +10,18 @@ export default {
   modelsDir: ["container/Models/"],
 
   /**
+   * Default Controllers Directory,
+   * Chasi will autoload this directoy
+   * as controllers, when
+   * [Router][controllersDir] property
+   * is missing from the config.
+   * this controllers will only be
+   * registered if the [JS][TS]file
+   * is a type of controller
+   */
+  ControllerDir: "container/controllers",
+
+  /**
    * install out of the box packages
    * into the app container
    */

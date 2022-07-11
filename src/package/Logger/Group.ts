@@ -10,16 +10,16 @@ export default class Group {
   constructor(name: string) {
     this.name = name;
     console.group(
-      chalk.grey.bgGreen.bold.underline(` | ${this.name.toUpperCase()} `),
+      chalk.greenBright.bold("\n>") +
+        chalk.greenBright.bold.underline(`${this.name.toUpperCase()}`),
     );
   }
 
   end() {
     console.groupEnd();
     console.log(
-      chalk.greenBright.bgMagentaBright.bold.underline(
-        ` | ${this.name.toUpperCase()} `,
-      ),
+      chalk.greenBright.bold(">") +
+        chalk.greenBright.bold.underline(`${this.name.toUpperCase()}`),
     );
   }
 }

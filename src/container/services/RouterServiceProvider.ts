@@ -11,6 +11,16 @@ export default class RouterServiceProvider implements ServiceProviderInterface {
         name: "api",
         prefix: "/api",
         namespace: "container/http/api.js",
+        ControllerDir: ["container/controllers/", "container/controllers2"],
+        middleware: [],
+        AuthRouteExceptions: [],
+        before: () => {},
+      } as RouterConfigInterface),
+
+      new Router({
+        name: "chasi",
+        prefix: "/t",
+        namespace: "container/http/chasi.js",
         ControllerDir: ["container/controllers/"],
         middleware: [],
         AuthRouteExceptions: [],

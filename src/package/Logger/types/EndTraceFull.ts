@@ -3,7 +3,7 @@ export default class EndTraceFull extends Writer implements Writable {
   public spacer: string = "-";
   format(message: string) {
     message = `| ${message} `;
-    let width: number = process.stdout.columns;
+    let width: number = this.cols;
     return message + this.fill(width - message.length);
   }
 }

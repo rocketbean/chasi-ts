@@ -9,10 +9,12 @@ export default class BeforeApp extends Event {
    * Installing Modules
    */
   async fire(params) {
-    await params.app.installModule(new Database());
-    await params.app.installModule(
-      await RouterModule.init(params.app.$services.routers),
+    let routers = await RouterModule.init(
+      params.app.$services.routers,
+      params.app.config.container,
     );
+    await params.app.installModule(routers);
+    await params.app.installModule(new Database());
     await params.next();
   }
   async onemit() {}

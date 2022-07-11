@@ -10,13 +10,16 @@ export default abstract class Writer {
   static groups: Group[] = [];
   spacer: string = " ";
   groups: Group[] = [];
-
   displayAs: Function = this.logType.clear;
 
   abstract format(message: string, b?: string, c?: string | number): void;
 
   protected fill(space: number, spacer: string = " "): string {
     return this.spacer.repeat(space);
+  }
+
+  get cols() {
+    return process.stdout.columns - Writer.groups.length * 2;
   }
 
   style(key: string): Writable {
@@ -60,11 +63,11 @@ export default abstract class Writer {
   }
 
   group(label: string = " ") {
-    this.groups.unshift(new Group(label));
+    Writer.groups.unshift(new Group(label));
   }
 
   endGroup(label: string = " ") {
-    this.groups = this.groups.filter((group) => {
+    Writer.groups = Writer.groups.filter((group) => {
       if (group.name == label) {
         group.end();
       }
@@ -73,7 +76,7 @@ export default abstract class Writer {
   }
 
   endGroups() {
-    this.groups = this.groups.filter((group) => {
+    Writer.groups = Writer.groups.filter((group) => {
       group.end();
     });
   }

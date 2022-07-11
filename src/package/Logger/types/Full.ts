@@ -1,13 +1,11 @@
 import Writer, { Writable } from "./Writer.js";
 export default class Full extends Writer implements Writable {
   format(message: string) {
-    let width: number = process.stdout.columns / 2;
+    let width: number = this.cols / 2;
     let mw: number = message.length / 2;
-    console.log(this.groups.length);
-    if (this.groups.length > 0) width -= this.groups.length;
     message = this.fill(width - mw) + message + this.fill(width - mw);
-    if (message.length < process.stdout.columns) {
-      message += this.fill(process.stdout.columns - message.length);
+    if (message.length < this.cols) {
+      message += this.fill(this.cols - message.length);
     }
     return message;
   }

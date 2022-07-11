@@ -7,6 +7,8 @@ import Base, { ProxyHandler } from "./Base.js";
 import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
 import { networkInterfaces } from "os";
+import RouterModule from "./framework/Router/RouterModule.js";
+
 import {
   ModuleInterface,
   ServiceProviderInterface,
@@ -96,24 +98,9 @@ export class Handler extends Base {
   }
 
   protected async boot() {
-    this.$app.$server.listen(this.config.server.port, async () => {
-      this.loggers.system.group("BOOT");
-      this.loggers.full.write("SERVING IN: ", "cool");
-      let nets = networkInterfaces();
-      Object.keys(nets).forEach((key) => {
-        nets[key]
-          .filter((addr) => addr.family == "IPv4")
-          .forEach((net) => {
-            let protocol = this.$app.mode.protocol;
-            let ipv = net.address == "127.0.0.1" ? "localhost" : net.address;
-            this.loggers.EndTraceFull.write(
-              `  ${protocol}://${ipv}:${this.config.server.port}`,
-              "systemRead",
-            );
-          });
-      });
-      this.loggers.system.endGroup("BOOT");
-    });
+    this.loggers.system.group("BOOT");
+    await this.$app.bootup();
+    this.loggers.system.endGroup("BOOT");
   }
 
   private installModule(module: ModuleInterface) {
@@ -127,7 +114,7 @@ export class Handler extends Base {
    */
   protected setup(): void {
     this.setLoggers();
-    this.$app = new App(this.config.server);
+    this.$app = new App(this.config.server, this.loggers);
     this.$observer = new Obsesrver(this.config.observer! as Iobject);
   }
 

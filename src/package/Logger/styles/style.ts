@@ -10,7 +10,7 @@ export default {
   negative: chalk.red,
   magenta: chalk.magenta,
   cool: chalk.bgHex("484276").bold,
-  systemRead: chalk.bgGrey.yellow,
+  systemRead: chalk.bgGrey.yellowBright,
   json: chalk.white,
   clear: chalk,
   danger: chalk.red.bgWhite,

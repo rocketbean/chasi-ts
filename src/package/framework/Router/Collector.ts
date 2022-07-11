@@ -9,7 +9,8 @@ export default class RouteCollector extends Base {
   protected $groups: [];
   protected namespace: Function;
   private methods: string[];
-  private $registry: Registry = new Registry();
+  $route: Route;
+  $registry: Registry;
 
   private methodHandler: {} = {
     apply: (target, thisArg, ArgList: any) => {
@@ -22,6 +23,8 @@ export default class RouteCollector extends Base {
   constructor(public property: RouterConfigInterface) {
     super();
     this.property = property;
+    this.$registry = new Registry(property);
+    this.$route = new Route(this.$registry);
     this.methods = Object.keys(methods.default).map((m: string) => {
       return m.toLowerCase();
     });
@@ -32,25 +35,12 @@ export default class RouteCollector extends Base {
    * [reflect|proxy]
    */
   async collectEndpoints() {
-    this.redefineMethods();
     this.namespace = await this.fetchFile(this.property.namespace);
-    Reflect.apply(this.namespace, this, []);
+    Reflect.apply(this.namespace, this, [this.$route]);
   }
 
-  /***
-   * META re assigning methods
-   * get the Registered methods at "./Methods"
-   * and re assign static method
-   * [reflect|proxy]
-   */
-  redefineMethods() {
-    this.methods.forEach((method) => {
-      if (Reflect.ownKeys(Route).includes(method))
-        Reflect.set(
-          Route,
-          method,
-          new Proxy(Route[method], this.methodHandler),
-        );
-    });
+  async init() {
+    await this.$registry.loadControllers();
+    await this.collectEndpoints();
   }
 }
