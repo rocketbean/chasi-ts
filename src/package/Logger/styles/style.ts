@@ -8,6 +8,8 @@ export default {
   bgpositive: chalk.green.bgBlack,
   positive: chalk.green,
   negative: chalk.red,
+  bgBrightPositive: chalk.bgGreen.black,
+  bgBrightNegative: chalk.bgRed.bold.strikethrough.white,
   magenta: chalk.magenta,
   cool: chalk.bgHex("484276").bold,
   systemRead: chalk.bgGrey.yellowBright,
@@ -17,5 +19,7 @@ export default {
   severe: chalk.red.bgBlack,
   warning: chalk.yellow,
   coolText: chalk.hex("986498"),
+  RouterName: chalk.bgHex("484276").bold.white,
+  RouterTags: chalk.bgMagenta.bold.white,
   lightGreen: chalk.bgGreenBright.rgb(0, 0, 0),
 };

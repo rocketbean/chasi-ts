@@ -15,6 +15,8 @@ export default abstract class Writer {
   abstract format(message: string, b?: string, c?: string | number): void;
 
   protected fill(space: number, spacer: string = " "): string {
+    if (space <= 0) return "";
+    if (spacer !== " ") return spacer.repeat(space);
     return this.spacer.repeat(space);
   }
 
@@ -27,26 +29,36 @@ export default abstract class Writer {
     return this;
   }
 
-  loading(message: string = "") {
+  /***
+   * command line loading
+   *
+   */
+  loading(message: string = "", finalMessage = "") {
+    this.spacer = " ";
     let timer;
+    let _wr = process.stdout;
     let start = () => {
       var P = ["\\", "|", "/", "-", "*"];
       var x = 0;
-      timer = setInterval(function () {
+      timer = setInterval(() => {
         x++;
-        process.stdout.write(
-          "\r" +
-            chalk.bold.yellow(message + " ") +
-            chalk.bold.yellow(P[x]) +
-            " ",
-        );
+        trs(chalk.bold.yellow(message + " ") + chalk.bold.yellow(P[x]));
         x %= P.length - 1;
       }, 50);
     };
-    let stop = () => {
-      clearInterval(timer);
+    let stop = ((_m?: "") => {
       process.stdout.cursorTo(0);
-    };
+      process.stdout.clearLine(0);
+      if (finalMessage.length > 0) {
+        trs(chalk.bold.yellow(_m));
+      }
+      clearInterval(timer);
+    }).bind(this);
+
+    let trs = ((m: string) => {
+      let indention = this.fill(process.stdout.columns - this.cols);
+      _wr.write("\r" + indention + m);
+    }).bind(this);
     return { start, stop };
   }
 
@@ -89,4 +101,5 @@ export interface Writable {
   endGroup(a: string): void;
   endGroups(): void;
   style(a: string): Writable;
+  loading(a: string, b?: any): any;
 }

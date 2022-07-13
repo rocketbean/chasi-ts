@@ -34,11 +34,14 @@ export default class RouterModule implements ModuleInterface {
   }
 
   static async init(routers: Router[], config: any) {
+    Logger.writers["Left"].group("RouteRegistry");
     Router.defaultControllerDir = config.ControllerDir;
     let module = new RouterModule(routers);
     await module.collect();
     await module.consume();
     await module.logRouter();
+    module.routers.map((router: Router) => {});
+    Logger.writers["Left"].endGroup("RouteRegistry");
     return module;
   }
 }

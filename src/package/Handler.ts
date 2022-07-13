@@ -62,6 +62,11 @@ export class Handler extends Base {
     this.setup();
   }
 
+  /***
+   * Initializes the App [services|modules] part
+   * and calling the [BeforeApp] event
+   * which installs modules;
+   */
   protected async start(): Promise<void> {
     await this.$observer.setup();
     this.$modules["services"] = await ServicesModule.init(
@@ -77,6 +82,11 @@ export class Handler extends Base {
     });
   }
 
+  /***
+   * before everything will be
+   * connected [before] method
+   * will be fired
+   */
   protected async before(): Promise<void> {
     await this.$observer.emit("__initialize__", {
       next: this.$proxy.initialize,
@@ -84,6 +94,9 @@ export class Handler extends Base {
     });
   }
 
+  /***
+   *
+   */
   protected async initialize() {
     await this.$observer.emit("__after__", {
       next: this.$proxy.after,

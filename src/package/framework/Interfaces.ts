@@ -1,6 +1,9 @@
 let _checkout = checkout;
 
 export interface ModuleInterface {}
+export interface Constructuble<T> {
+  new <T>(a?: any, B?: any): T;
+}
 
 export interface Iobject {
   [key: string]: any;
@@ -38,6 +41,21 @@ export type RouterConfigInterface = {
   AuthRouteExceptions?: string | string[];
   before?: Function;
   after?: Function;
+};
+
+export type DBProperty = {
+  driver: string;
+  url: string;
+  db: string;
+  params?: string;
+  options?: any;
+};
+
+export type DatabaseConfig = {
+  host: string;
+  bootWithDB: boolean;
+  default: string;
+  connections: { [key: string]: DBProperty };
 };
 
 export type RouteEndpointProperty = {

@@ -11,6 +11,7 @@ export default class Router extends Collector {
     right: Logger.writer("Right"),
     endTrace: Logger.writer("EndTrace"),
     startTrace: Logger.writer("StartTrace"),
+    RouterList: Logger.writer("RouterList"),
   };
   constructor(public property: RouterConfigInterface) {
     super(property);
@@ -30,12 +31,6 @@ export default class Router extends Collector {
   }
 
   async log() {
-    this.$log.left.group(this.property.name);
-    this.$registry.routes.forEach((route) => {
-      this.$log.startTrace.write(
-        `[${route.property.method.toUpperCase()}]${route.path}`,
-      );
-    });
-    this.$log.left.endGroup(this.property.name);
+    this.$log.RouterList.displayRouter(this);
   }
 }

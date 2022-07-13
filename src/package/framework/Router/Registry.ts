@@ -59,7 +59,7 @@ export default class Registry extends Base {
           this.constructEndpoint(ep);
           this.bindMethods(ep);
         } catch (e) {
-          console.log(ep, `@error on ep collect: ${this.property.name}`);
+          // console.log(e, `@error on ep collect: ${this.property.name}`);
         }
       }),
     );
@@ -91,14 +91,21 @@ export default class Registry extends Base {
   }
 
   bindMethods(ep: Endpoint) {
-    if (!ep.controller.includes("/")) {
-      ep.controller = Router.defaultControllerDir + "/" + ep.controller;
+    try {
+      if (!ep.controller.includes("/")) {
+        ep.controller = Router.defaultControllerDir + "/" + ep.controller;
+      }
+      let controller = Object.keys(Router.Controllers).find((key) =>
+        key.toLowerCase().includes(ep.controller.toLowerCase()),
+      );
+      ep.$controller = Router.Controllers[controller].instance;
+      ep.$method = Router.Controllers[controller].instance[ep.method];
+    } catch (e) {
+      console.log(
+        e,
+        `@error collecting instance methods: ${ep.controller} ${ep.method}`,
+      );
     }
-    let controller = Object.keys(Router.Controllers).find((key) =>
-      key.toLowerCase().includes(ep.controller.toLowerCase()),
-    );
-    ep.$controller = Router.Controllers[controller].instance;
-    ep.$method = Router.Controllers[controller].instance[ep.method];
   }
 
   constructEndpoint(ep: Endpoint) {
@@ -117,8 +124,10 @@ export default class Registry extends Base {
   }
 
   constructControllerPath(ep: Endpoint, group: Group) {
-    group.property.controller = group.property.controller.replace(/\//g, "");
-    ep.controller = group.property.controller + "/" + ep.controller;
+    if (group.property.controller != "") {
+      group.property.controller = group.property.controller.replace(/\//g, "");
+      ep.controller = group.property.controller + "/" + ep.controller;
+    }
   }
 
   constructBeforeFn(ep: Endpoint, group: Group) {

@@ -66,9 +66,11 @@ export default class Obsesrver extends Base {
     this.$events[key] = instance;
     this.emitter.on(key, async (property: any = {}) => {
       Reflect.set(instance, "options", property);
-      await instance.onemit();
-      await instance.fire(property);
-      await instance.emitted();
+      await instance.validate(property, async (): Promise<void> => {
+        await instance.onemit();
+        await instance.fire(property);
+        await instance.emitted();
+      });
     });
     return this.$events;
   }

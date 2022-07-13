@@ -15,24 +15,24 @@ export default (route: Route) => {
     route.post("321", "UserController@index");
   });
 
-  // route.search("/search", "UserController@search");
-  // route.group(
-  //   {
-  //     prefix: "group1",
-  //     before: async () => {
-  //       console.log("on group 1");
-  //     },
-  //   },
-  //   function () {
-  //     route.post("/test", "UserController@index");
-  //     route.group({ prefix: "group2" }, function () {
-  //       route.post("test2", "UserController@index");
-  //       route.group({ prefix: "group3" }, function () {
-  //         route.patch("ongroup3", "UserController@index");
-  //       });
-  //     });
-  //     route.get("/test2", "UserController@index");
-  //   },
-  // );
-  // route.post("/1", "UserController@index");
+  route.search("/search", "UserController@search");
+  route.group(
+    {
+      prefix: "group1",
+      before: async () => {
+        console.log("on group 1");
+      },
+    },
+    function () {
+      route.post("/test", "UserController@index");
+      route.group({ prefix: "group2" }, function () {
+        route.post("test2", "UserController@index");
+        route.group({ prefix: "group3" }, function () {
+          route.patch("ongroup3", "UserController@index");
+        });
+      });
+      route.get("/test2", "UserController@index");
+    },
+  );
+  route.post("/1", "UserController@index");
 };
