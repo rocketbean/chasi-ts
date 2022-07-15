@@ -13,6 +13,8 @@ export interface genericObject {
   [key: string]: any;
 }
 
+export interface AppException {}
+
 export interface RoutableInterface {}
 
 export interface ServiceProviderInterface {
@@ -24,6 +26,7 @@ export interface BootableInterface {
 }
 
 export interface RouteMethodsInterface {}
+export interface ModelInterface {}
 
 export type serverConfig = {
   staticDir: any;
@@ -60,7 +63,7 @@ export type DatabaseConfig = {
 
 export type RouteEndpointProperty = {
   method: string;
-  controller: string;
+  controller: string | Function;
   endpoint: string;
   options: any;
 };
@@ -71,4 +74,14 @@ export type RouteGroupProperty = {
   prefix?: string;
   before?: Function;
   after?: Function;
+};
+
+export type ExceptionProperty = {
+  name?: string;
+  message?: string;
+};
+
+export type genericImport = {
+  [key: string]: any;
+  default: Function;
 };

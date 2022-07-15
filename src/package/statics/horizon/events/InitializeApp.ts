@@ -1,5 +1,5 @@
 import Event from "./../../../Observer/Event.js";
-
+import RouterModule from "../../../framework/Router/RouterModule.js";
 export default class InitializeApp extends Event {
   /**
    *
@@ -9,6 +9,12 @@ export default class InitializeApp extends Event {
    * fired when validated
    */
   async validate(params, next) {
+    // console.log(params.app.$app);
+    let routers = <RouterModule>params.app.$modules.RouterModule;
+    params.app.$app.$routers = routers.routers;
+    await params.app.$app.consumeLayers();
+    // await params.app.consumeLayers();
+
     next();
   }
 

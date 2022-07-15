@@ -1,11 +1,13 @@
 import env from "dotenv";
 import Logger from "./Logger/index.js";
+import ExceptionHandler from "./framework/ErrorHandler/index.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
 declare global {
   var checkout: (val: any, backup: any) => {};
   var Logger: Logger;
+  var Caveat: ExceptionHandler;
   var __dirname: string;
   var __filepath: string;
   var _configpath_: string;
@@ -25,4 +27,7 @@ export default (async () => {
   );
   global._configpath_ = "config";
   global.__filepath = path.join(path.normalize(import.meta.url), "../../");
+  global.Caveat = new ExceptionHandler();
+
+  await ExceptionHandler.handleProcessError();
 })();

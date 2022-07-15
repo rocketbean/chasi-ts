@@ -1,11 +1,11 @@
-import Express from "express";
 import http from "http";
 import https from "https";
 import { serverConfig } from "../Interfaces.js";
 import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
-export default class App {
-  $server: any = Express();
+import Consumer from "./Consumer.js";
+
+export default class App extends Consumer {
   server: any;
   env: string;
   mode: { [key: string]: any };
@@ -15,6 +15,7 @@ export default class App {
     public config: serverConfig,
     private loggers: { [key: string]: Writable },
   ) {
+    super(config);
     this.config = config;
     this.setEnvironment();
     this.loggers = loggers;

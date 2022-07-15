@@ -74,6 +74,11 @@ export default class Base {
     return (await import(_fp)).default;
   }
 
+  static _resetApp() {
+    let _fp = path.join(__filepath + "server.js");
+    return import(_fp);
+  }
+
   static async _fetchFilesFromDir(dir: string): Promise<object> {
     let _mods: { [key: string]: object } = {};
 

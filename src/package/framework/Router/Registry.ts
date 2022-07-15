@@ -59,7 +59,7 @@ export default class Registry extends Base {
           this.constructEndpoint(ep);
           this.bindMethods(ep);
         } catch (e) {
-          // console.log(e, `@error on ep collect: ${this.property.name}`);
+          console.log(e, `@error on ep collect: ${this.property.name}`);
         }
       }),
     );
@@ -92,14 +92,16 @@ export default class Registry extends Base {
 
   bindMethods(ep: Endpoint) {
     try {
-      if (!ep.controller.includes("/")) {
-        ep.controller = Router.defaultControllerDir + "/" + ep.controller;
+      if (typeof ep.property.controller == "string") {
+        if (!ep.controller.includes("/")) {
+          ep.controller = Router.defaultControllerDir + "/" + ep.controller;
+        }
+        let controller = Object.keys(Router.Controllers).find((key) =>
+          key.toLowerCase().includes(ep.controller.toLowerCase()),
+        );
+        ep.$controller = Router.Controllers[controller].instance;
+        ep.$method = Router.Controllers[controller].instance[ep.method];
       }
-      let controller = Object.keys(Router.Controllers).find((key) =>
-        key.toLowerCase().includes(ep.controller.toLowerCase()),
-      );
-      ep.$controller = Router.Controllers[controller].instance;
-      ep.$method = Router.Controllers[controller].instance[ep.method];
     } catch (e) {
       console.log(
         e,
@@ -108,18 +110,28 @@ export default class Registry extends Base {
     }
   }
 
+  sanitizeRoute(str: string, log: boolean = false) {
+    let length = str.length;
+    if (str[0] === "/") str = str.substring(1, str.length);
+    if (str[length - 1] === "/") {
+      str = str.slice(0, length - 1);
+    }
+    return str;
+  }
+
   constructEndpoint(ep: Endpoint) {
-    ep.property.endpoint = ep.property.endpoint.replace(/\//g, "");
+    ep.property.endpoint = this.sanitizeRoute(ep.property.endpoint);
     ep.path += "/" + ep.property.endpoint;
   }
 
   constructRouterEp(ep: Endpoint) {
-    this.property.prefix = this.property.prefix.replace(/\//g, "");
+    this.property.prefix = this.sanitizeRoute(this.property.prefix);
     ep.path += "/" + this.property.prefix;
   }
 
   constructRoutePath(ep: Endpoint, group: Group) {
-    group.property.prefix = group.property.prefix.replace(/\//g, "");
+    this.sanitizeRoute(group.property.prefix, true),
+      (group.property.prefix = this.sanitizeRoute(group.property.prefix));
     ep.path += "/" + group.property.prefix;
   }
 

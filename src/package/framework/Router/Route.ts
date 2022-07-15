@@ -16,7 +16,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  get(endpoint: string, controller: string, options = {}) {
+  get(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {
@@ -37,7 +37,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  post(endpoint: string, controller: string, options = {}) {
+  post(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {
@@ -58,7 +58,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  options(endpoint: string, controller: string, options = {}) {
+  options(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {
@@ -79,7 +79,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  patch(endpoint: string, controller: string, options = {}) {
+  patch(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {
@@ -100,7 +100,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  put(endpoint: string, controller: string, options = {}) {
+  put(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {
@@ -121,7 +121,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  delete(endpoint: string, controller: string, options = {}) {
+  delete(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {
@@ -142,7 +142,7 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  search(endpoint: string, controller: string, options = {}) {
+  search(endpoint: string, controller: string | Function, options = {}) {
     this.$registry.register(
       new Endpoint(
         {

@@ -8,6 +8,7 @@ import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
 import { networkInterfaces } from "os";
 import RouterModule from "./framework/Router/RouterModule.js";
+import Router from "./framework/Router/Router.js";
 
 import {
   ModuleInterface,
@@ -72,6 +73,7 @@ export class Handler extends Base {
     this.$modules["services"] = await ServicesModule.init(
       this.config.container.ServiceBootstrap,
     );
+
     this.$services = (await (<ServicesModule>(
       this.$modules["services"]
     )).installServices()) as { [key: string]: Service };
@@ -95,13 +97,18 @@ export class Handler extends Base {
   }
 
   /***
-   *
+   * initialize Server
+   * • Register RouteLayers
    */
   protected async initialize() {
-    await this.$observer.emit("__after__", {
-      next: this.$proxy.after,
-      app: this.$proxy,
-    });
+    try {
+      await this.$observer.emit("__after__", {
+        next: this.$proxy.after,
+        app: this.$proxy,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
   protected async after() {
     await this.$observer.emit("__boot__", {
@@ -128,7 +135,7 @@ export class Handler extends Base {
   protected setup(): void {
     this.setLoggers();
     this.$app = new App(this.config.server, this.loggers);
-    this.$observer = new Obsesrver(this.config.observer! as Iobject);
+    this.$observer = new Obsesrver(this.config.observer as Iobject);
   }
 
   logthis(message: string, type: string = "system") {

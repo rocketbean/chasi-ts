@@ -14,7 +14,9 @@ export default class RouterServiceProvider implements ServiceProviderInterface {
         ControllerDir: ["container/controllers/", "container/controllers2"],
         middleware: [],
         AuthRouteExceptions: [],
-        before: () => {},
+        before: (request, response) => {
+          console.log("on api", request.params);
+        },
       } as RouterConfigInterface),
 
       new Router({
