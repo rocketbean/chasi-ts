@@ -9,6 +9,7 @@ export default class BootApp extends Event {
    * fired when validated
    */
   async validate(params, next) {
+    params.app.state = 4;
     next();
   }
 

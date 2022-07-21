@@ -9,12 +9,10 @@ export default class InitializeApp extends Event {
    * fired when validated
    */
   async validate(params, next) {
-    // console.log(params.app.$app);
+    params.app.state = 2;
     let routers = <RouterModule>params.app.$modules.RouterModule;
     params.app.$app.$routers = routers.routers;
     await params.app.$app.consumeLayers();
-    // await params.app.consumeLayers();
-
     next();
   }
 

@@ -16,18 +16,18 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  get(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "get",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  get(endpoint: string, controller: string | Function, options = {}): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "get",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   /**
@@ -37,18 +37,22 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  post(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "post",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  post(
+    endpoint: string,
+    controller: string | Function,
+    options = {},
+  ): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "post",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   /**
@@ -58,18 +62,22 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  options(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "options",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  options(
+    endpoint: string,
+    controller: string | Function,
+    options = {},
+  ): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "options",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   /**
@@ -79,18 +87,22 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  patch(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "patch",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  patch(
+    endpoint: string,
+    controller: string | Function,
+    options = {},
+  ): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "patch",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   /**
@@ -100,18 +112,18 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  put(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "put",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  put(endpoint: string, controller: string | Function, options = {}): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "put",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   /**
@@ -121,18 +133,22 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  delete(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "delete",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  delete(
+    endpoint: string,
+    controller: string | Function,
+    options = {},
+  ): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "delete",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   /**
@@ -142,18 +158,22 @@ export default class Route {
    * @param options {object} options
    * @returns [Route] instance to be collected on boot
    */
-  search(endpoint: string, controller: string | Function, options = {}) {
-    this.$registry.register(
-      new Endpoint(
-        {
-          method: "search",
-          controller,
-          endpoint,
-          options,
-        },
-        [...this.groups],
-      ),
+  search(
+    endpoint: string,
+    controller: string | Function,
+    options = {},
+  ): Endpoint {
+    let ep = new Endpoint(
+      {
+        method: "search",
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
     );
+    this.$registry.register(ep);
+    return ep;
   }
 
   group(stack: any, fn: Function) {

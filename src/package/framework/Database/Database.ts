@@ -3,12 +3,15 @@ import {
   DatabaseConfig,
   DBProperty,
   Constructuble,
+  DatabaseDrivers,
 } from "../Interfaces.js";
+import Models from "./Models.js";
+
 import Driver, { DBDriverInterface } from "./drivers/drivers.js";
 import MongoDBDriver from "./drivers/mongodb.js";
 
 export default class Database implements ModuleInterface {
-  $databases: { [key: string]: DBDriverInterface } = {};
+  $databases: DatabaseDrivers = {};
 
   $drivers: { [key: string]: Constructuble<Driver> } = {
     mongodb: MongoDBDriver as Constructuble<Driver>,
@@ -53,6 +56,7 @@ export default class Database implements ModuleInterface {
         loader.stop,
       );
     }
+    this.$databases["_"] = this.$databases[this.config.default];
   }
 
   async log(): Promise<void> {
@@ -67,6 +71,7 @@ export default class Database implements ModuleInterface {
     await db.collect();
     await db.connectDbs();
     await db.log();
+    await Models.init(db.$databases, config);
     Logger.writers["Left"].endGroup("Database");
     return db;
   }

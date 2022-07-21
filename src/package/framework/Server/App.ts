@@ -1,9 +1,11 @@
 import http from "http";
 import https from "https";
+import Consumer from "./Consumer.js";
+import Base from "../../Base.js";
+import cors from "cors";
 import { serverConfig } from "../Interfaces.js";
 import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
-import Consumer from "./Consumer.js";
 
 export default class App extends Consumer {
   server: any;
@@ -21,17 +23,36 @@ export default class App extends Consumer {
     this.loggers = loggers;
   }
 
+  /**
+   * setting up protocol
+   * based on environment
+   * selected on config/server
+   */
   setEnvironment() {
     this.mode = this.config.modes[this.config.environment];
     if (this.mode.protocol == "https") this.protocol = https;
     else this.protocol = http;
   }
 
-  install() {
-    this.server = this.protocol.createServer({}, this.$server);
+  /**
+   * actual booting of Http/Https Server
+   * fetching certificate and key file
+   * to
+   */
+  async install() {
+    let serverConfig: { cert?: any; key?: any } = {};
+    if (this.mode.key != null && this.mode.cert != null) {
+      serverConfig = {
+        key: Base._fsFetchFile(this.mode.key),
+        cert: Base._fsFetchFile(this.mode.cert),
+      };
+    }
+    if (this.config.cors.enabled) this.$server.use(cors(this.config.cors));
+    this.$server = this.protocol.createServer(serverConfig, this.$server);
   }
 
   async bootup(): Promise<void> {
+    await this.install();
     return new Promise((res, rej) => {
       this.$server.listen(this.config.port, async () => {
         this.loggers.full.write("SERVING IN: ", "cool");

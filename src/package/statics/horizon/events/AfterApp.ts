@@ -9,6 +9,7 @@ export default class AfterApp extends Event {
    * fired when validated
    */
   async validate(params, next) {
+    params.app.state = 3;
     next();
   }
 

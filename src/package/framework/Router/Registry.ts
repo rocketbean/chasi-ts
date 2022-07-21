@@ -8,12 +8,17 @@ import { RouterConfigInterface } from "../Interfaces.js";
 export default class Registry extends Base {
   controllers: Controller[] = [];
   routes: Endpoint[] = [];
+  middlewares: Function[] = [];
 
   constructor(public property: RouterConfigInterface) {
     super();
     this.property = property;
   }
 
+  /**
+   * collecting Controller resource
+   * registered from RouteService Container
+   */
   async loadControllers() {
     if (Array.isArray(this.property.ControllerDir)) {
       await Promise.all(
@@ -24,6 +29,10 @@ export default class Registry extends Base {
     }
   }
 
+  /**
+   * fetch and invokes the [Controller]class
+   * @param dir Controller directory
+   */
   async registerControllerDir(dir: string) {
     let controllers = await this.NamespacedfetchFilesFromDir(dir);
     await Promise.all(
@@ -38,6 +47,8 @@ export default class Registry extends Base {
 
   /**
    * Registers an enpoint
+   * [Registry]instance
+   * routes property
    * @param endpoint
    */
   async register(endpoint: Endpoint) {
@@ -56,10 +67,11 @@ export default class Registry extends Base {
         try {
           await this.setRouterLayer(ep);
           await this.consumeRouteGroup(ep);
+          this.bindMiddlewares(ep);
           this.constructEndpoint(ep);
           this.bindMethods(ep);
         } catch (e) {
-          console.log(e, `@error on ep collect: ${this.property.name}`);
+          Caveat.handle({ message: e, interpose: 2 });
         }
       }),
     );
@@ -75,6 +87,31 @@ export default class Registry extends Base {
   }
 
   /***
+   * Bind Middlewares from
+   * Route Container layer
+   */
+  async bindMiddlewares(ep) {
+    if ("middleware" in this.property) {
+      if (typeof this.property.middleware === "string") {
+        this.property.middleware = [this.property.middleware];
+      }
+      this.property.middleware.forEach((mw: string) => ep.pushMiddleware(mw));
+    }
+    ep.middlewares.map((mw: string) => {
+      if (!(mw in Router.Middlewares)) {
+        ep.addException(
+          Caveat.handle({
+            message: `undefined Middleware ${mw}`,
+            interpose: 2,
+            showStack: false,
+            hide: true,
+          }),
+        );
+      } else ep.$middlewares.push(Router.Middlewares[mw]);
+    });
+  }
+
+  /***
    * Route consuming Groups Layer
    */
   async consumeRouteGroup(ep: Endpoint) {
@@ -82,6 +119,7 @@ export default class Registry extends Base {
       await Promise.all(
         ep.groups.map(async (group: Group) => {
           this.constructRoutePath(ep, group);
+          this.constructMiddleware(ep, group);
           this.constructControllerPath(ep, group);
           this.constructBeforeFn(ep, group);
           this.constructAfterFn(ep, group);
@@ -90,6 +128,12 @@ export default class Registry extends Base {
     }
   }
 
+  /**
+   * binding [Controller]class and method
+   * connected to the [Endpoint]class
+   * if the route is appointed to a controller
+   * @param ep [Endpoint] class that handles the route
+   */
   bindMethods(ep: Endpoint) {
     try {
       if (typeof ep.property.controller == "string") {
@@ -103,9 +147,12 @@ export default class Registry extends Base {
         ep.$method = Router.Controllers[controller].instance[ep.method];
       }
     } catch (e) {
-      console.log(
-        e,
-        `@error collecting instance methods: ${ep.controller} ${ep.method}`,
+      ep.addException(
+        Caveat.handle({
+          message: "Error Binding ControllerMethods",
+          interpose: 2,
+          showStack: false,
+        }),
       );
     }
   }
@@ -140,6 +187,15 @@ export default class Registry extends Base {
       group.property.controller = group.property.controller.replace(/\//g, "");
       ep.controller = group.property.controller + "/" + ep.controller;
     }
+  }
+
+  constructMiddleware(ep: Endpoint, group: Group) {
+    if (typeof group.property.middleware === "string") {
+      group.property.middleware = [group.property.middleware];
+    }
+    group.property.middleware.map((mw: string) => {
+      ep.pushMiddleware(mw);
+    });
   }
 
   constructBeforeFn(ep: Endpoint, group: Group) {

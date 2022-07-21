@@ -1,9 +1,10 @@
-import { RouterConfigInterface } from "../Interfaces.js";
+import { Iobject, RouterConfigInterface } from "../Interfaces.js";
 import Collector from "./Collector.js";
 import Controller from "./Controller.js";
-
+import Base from "../../Base.js";
 export default class Router extends Collector {
   static Controllers: { [key: string]: any } = {};
+  static Middlewares: { [key: string]: any } = {};
   static defaultControllerDir: string = "";
   $log: { [key: string]: any } = {
     center: Logger.writer("Center"),
@@ -13,6 +14,7 @@ export default class Router extends Collector {
     startTrace: Logger.writer("StartTrace"),
     RouterList: Logger.writer("RouterList"),
   };
+
   constructor(public property: RouterConfigInterface) {
     super(property);
     this.property = property;
@@ -24,6 +26,14 @@ export default class Router extends Collector {
       constructor: instance.constructor.name,
       instance,
     };
+  }
+
+  static async loadMiddlewares(mw: Iobject) {
+    await Promise.all(
+      Object.keys(mw).map(async (_p) => {
+        Router.Middlewares[_p] = await Base._fetchFile(mw[_p]);
+      }),
+    );
   }
 
   async set() {

@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs";
 import _ from "lodash";
+import { Iobject } from "./framework/Interfaces.js";
+import ChasiTerminal from "./framework/Chasi/Terminal.js";
 
 export const ProxyHandler = {
   get: (target, prop, receiver) => {
@@ -59,9 +61,17 @@ export default class Base {
   }
 
   async fetchFile(filepath: string) {
-    if (!filepath.includes(".js")) filepath += ".js";
+    let ext = path.extname(filepath);
+    if (!ext) filepath += ".js";
     let _fp = path.join(__filepath + filepath);
     return (await import(_fp)).default;
+  }
+
+  static fetchSync(filepath: string) {
+    let ext = path.extname(filepath);
+    if (!ext) filepath += ".js";
+    let _fp = path.join(__filepath + filepath);
+    return import(_fp);
   }
 
   static mergeObjects(target: object, sources: any) {
@@ -69,9 +79,34 @@ export default class Base {
   }
 
   static async _fetchFile(filepath: string) {
-    if (!filepath.includes(".js")) filepath += ".js";
-    let _fp = path.join(__filepath + filepath);
-    return (await import(_fp)).default;
+    try {
+      let ext = path.extname(filepath);
+      if (!ext) filepath += ".js";
+      let _fp = path.join(__filepath + filepath);
+      return (await import(_fp)).default;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  static async _fsFetchDir(dir: string): Promise<any> {
+    let _p = path.resolve(__dirname + dir);
+    return await Promise.all(
+      fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
+        try {
+          return (await import(`file:\\${path.resolve(_p, file)}`)).default;
+        } catch (e) {
+          console.log(e);
+        }
+      }),
+    );
+  }
+
+  static _fsFetchFile(
+    filepath: string,
+    options: Iobject = { encoding: "utf-8" },
+  ) {
+    return fs.readFileSync(path.resolve(__dirname, filepath), options);
   }
 
   static _resetApp() {
@@ -81,7 +116,6 @@ export default class Base {
 
   static async _fetchFilesFromDir(dir: string): Promise<object> {
     let _mods: { [key: string]: object } = {};
-
     let _fp = path.join(__filepath + dir);
     await Promise.all(
       fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
@@ -92,7 +126,15 @@ export default class Base {
           });
       }),
     );
-
     return _mods;
+  }
+
+  /**
+   * Start Server
+   */
+  static async Ignition(): Promise<{ [key: string]: any }> {
+    let config = (await Base._fetchFilesFromDir(_configpath_)) as Iobject;
+    let chasi = await ChasiTerminal.createSession();
+    return { config, chasi };
   }
 }

@@ -12,11 +12,9 @@ export default class RouterServiceProvider implements ServiceProviderInterface {
         prefix: "/api",
         namespace: "container/http/api.js",
         ControllerDir: ["container/controllers/", "container/controllers2"],
-        middleware: [],
+        middleware: ["auth"],
         AuthRouteExceptions: [],
-        before: (request, response) => {
-          console.log("on api", request.params);
-        },
+        before: (request, response) => {},
       } as RouterConfigInterface),
 
       new Router({

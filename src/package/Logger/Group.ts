@@ -6,7 +6,7 @@ export default class Group {
   name: string;
   logger: Logger = Logger.init();
   writer: Writable;
-
+  /*╡*/
   constructor(name: string) {
     this.name = name;
     console.group(

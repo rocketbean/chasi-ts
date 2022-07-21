@@ -7,6 +7,6 @@ export default class Full extends Writer implements Writable {
     if (message.length < this.cols) {
       message += this.fill(this.cols - message.length);
     }
-    return message;
+    return message + "\n";
   }
 }

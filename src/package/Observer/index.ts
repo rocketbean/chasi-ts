@@ -4,7 +4,7 @@ import Writer from "../Logger/types/Writer.js";
 import Event, { EventInterface } from "./Event.js";
 import { Iobject } from "./../framework/Interfaces.js";
 
-export default class Obsesrver extends Base {
+export default class Observer extends Base {
   $events: { [key: string]: any } = {};
   emitter: AsyncEventEmitter = new AsyncEventEmitter();
   logger: Writer;

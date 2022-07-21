@@ -37,6 +37,7 @@ export default class RouterModule implements ModuleInterface {
     Logger.writers["Left"].group("RouteRegistry");
     Router.defaultControllerDir = config.ControllerDir;
     let module = new RouterModule(routers);
+    await Router.loadMiddlewares(config.middlewares);
     await module.collect();
     await module.consume();
     await module.logRouter();

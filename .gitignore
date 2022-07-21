@@ -3,6 +3,11 @@ node_modules
 certs
 .env
 statics/*
+src/package/statics/logs/*
+dist/package/statics/logs/*
+_security/*
+.log
+.session
 package-lock.json
 dist/*
 .gitmodules

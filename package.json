@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "lite-server",
-    "dev": "nodemon ./dist/server.js -e html,js,css"
+    "dev": "nodemon ./dist/server.js -e html,js,css --experimental-top-level-await"
   },
   "author": "",
   "license": "ISC",
@@ -22,10 +22,12 @@
   "dependencies": {
     "asynchronous-emitter": "^0.1.0",
     "chalk": "^5.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "lodash": "^4.17.21",
     "mongodb": "^4.7.0",
-    "mongoose": "^6.4.4"
+    "mongoose": "^6.4.4",
+    "uuid": "^8.3.2"
   }
 }

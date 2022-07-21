@@ -4,6 +4,6 @@ export default class EndTraceFull extends Writer implements Writable {
   format(message: string) {
     message = `| ${message} `;
     let width: number = this.cols;
-    return message + this.fill(width - message.length);
+    return message + this.fill(width - message.length) + "\n";
   }
 }

@@ -2,14 +2,6 @@ export default {
   name: global.checkout(process.env.APPNAME, "Chasi"),
 
   /**
-   * Chasi will autoload this dirs,
-   * look for models / schemas
-   * then bind it to
-   * [Event|Controller]Class
-   */
-  modelsDir: ["container/Models/"],
-
-  /**
    * Default Controllers Directory,
    * Chasi will autoload this directoy
    * as controllers, when
@@ -20,16 +12,6 @@ export default {
    * is a type of controller
    */
   ControllerDir: "container/controllers",
-
-  /**
-   * install out of the box packages
-   * into the app container
-   */
-  LoadPack: {
-    // Sessions: "package/framework/storage/session::init",
-    // Compiler: "package/framework/chasi/Compiler::init",
-    // FileManager: "container/modules/FileManager::init",
-  },
 
   /**
    * Service Bootstrap
@@ -44,6 +26,7 @@ export default {
      * therefore giving more versatility for dev's
      */
     routers: "container/services/RouterServiceProvider",
+    // StreamEngine: "container/services/StreamEngineServiceProvider",
     // auth: "container/services/AuthServiceProvider",
     // sockets: "container/services/SocketServiceProvider",
   },
@@ -62,5 +45,15 @@ export default {
      * be installed to that Chasi Route MWs Repository,
      * then you can use it in your routes
      */
+    auth: "./container/middlewares/Auth",
+    user: "./container/middlewares/User",
+    third: "./container/middlewares/third",
+  },
+
+  session: {
+    cache: false,
+    cacheFile: "./package/statics/logs/app.session",
+    logs: "./package/statics/logs/runtime.log",
+    useLogStream: true,
   },
 };

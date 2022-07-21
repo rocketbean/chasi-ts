@@ -4,7 +4,7 @@ import Group from "../Group.js";
 import util from "util";
 
 export default abstract class Writer {
-  log: Function = console.log;
+  log: Function = process.stdout.write.bind(process.stdout);
 
   logType: { [key: string]: Function } = logStyles;
   static groups: Group[] = [];
@@ -63,15 +63,16 @@ export default abstract class Writer {
   }
 
   write(message: any, display: string = "system"): void {
-    if (typeof message == "object") {
-      this.log(
-        util.inspect(message, {
-          showHidden: false,
-          depth: null,
-          colors: true,
-        }),
-      );
-    } else this.log(this.logType[display](this.format(message)));
+    if (typeof message !== "object") {
+      message = this.logType[display](this.format(message));
+    } else {
+      message = util.inspect(message, {
+        showHidden: false,
+        depth: null,
+        colors: true,
+      });
+    }
+    this.log(message);
   }
 
   group(label: string = " ") {

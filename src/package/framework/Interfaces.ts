@@ -1,4 +1,4 @@
-let _checkout = checkout;
+import { DBDriverInterface } from "./Database/drivers/drivers.js";
 
 export interface ModuleInterface {}
 export interface Constructuble<T> {
@@ -7,6 +7,10 @@ export interface Constructuble<T> {
 
 export interface Iobject {
   [key: string]: any;
+}
+
+export interface DatabaseDrivers {
+  [key: string]: DBDriverInterface;
 }
 
 export interface genericObject {
@@ -28,11 +32,16 @@ export interface BootableInterface {
 export interface RouteMethodsInterface {}
 export interface ModelInterface {}
 
+export interface ExceptionLoggerInterface {
+  write(a?: any, b?: any);
+}
+
 export type serverConfig = {
   staticDir: any;
   port: any;
   environment: any;
   modes: { [key: string]: any };
+  cors: Iobject;
 };
 
 export type RouterConfigInterface = {
@@ -69,7 +78,7 @@ export type RouteEndpointProperty = {
 };
 
 export type RouteGroupProperty = {
-  middleware: string | string[];
+  middleware: any[];
   controller?: string;
   prefix?: string;
   before?: Function;
@@ -79,6 +88,8 @@ export type RouteGroupProperty = {
 export type ExceptionProperty = {
   name?: string;
   message?: string;
+  interpose?: number | string;
+  showStack?: boolean;
 };
 
 export type genericImport = {
