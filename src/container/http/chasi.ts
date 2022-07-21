@@ -1,0 +1,14 @@
+import Route from "../../package/statics/Route.js";
+import api from "./api.js";
+export default (route: Route) => {
+  /* * * * * * * * * *  Route Endpoint Registry * * * * * * *
+   * this registry will serve as the routing container,
+   * please make sure that this is registered in
+   * [container/services/RouterServiceProvider]
+   * also check [config/authentication.js] ,
+   * by default, API's that is registered through auth config,
+   * will be protected by JWT unless registered in
+   * [AuthRouteExceptions] array option.
+   */
+  route.patch("chasi", (request, response) => {});
+};
