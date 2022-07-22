@@ -27,4 +27,4 @@ var userSchema = new mongoose.Schema<UserModelInterface>({
   },
 });
 
-export default Model.connect("user", userSchema, "local");
+export default Model.connect("user", userSchema);

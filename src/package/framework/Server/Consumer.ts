@@ -3,6 +3,7 @@ import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
 import Express from "express";
 import Exception from "../ErrorHandler/Exception.js";
+import Models from "../Database/Models.js";
 export default class Consumer {
   $server: any = Express();
   /****
@@ -23,6 +24,8 @@ export default class Consumer {
         ...ep.$middlewares,
         async (request, response) => {
           try {
+            if (Object.keys(request.params).length > 0)
+              await this.bindModel(request.params);
             await Promise.all(
               ep.beforeFns.map(async (fn: Function) => {
                 await fn(request, response);
@@ -43,6 +46,18 @@ export default class Consumer {
         },
       );
     }
+  }
+
+  async bindModel(params) {
+    await Promise.all(
+      Object.keys(params).map(async (mod) => {
+        if (mod in Models.collection) {
+          params[`__${mod}`] = await Models.collection[mod].findById(
+            params[mod],
+          );
+        }
+      }),
+    );
   }
 
   async consumeLayers() {

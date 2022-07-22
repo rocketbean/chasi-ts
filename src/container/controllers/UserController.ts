@@ -1,3 +1,4 @@
+import Service from "../../package/framework/Services/Service.js";
 import Controller from "../../package/statics/Controller.js";
 import User from "../models/user.js";
 export default class UserController extends Controller {
@@ -20,7 +21,7 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async index(request, response) {
-    return await User.find({});
+    return await Controller.$services.loadModule.fibonacci();
   }
 
   /**

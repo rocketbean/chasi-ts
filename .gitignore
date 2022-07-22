@@ -11,3 +11,5 @@ _security/*
 package-lock.json
 dist/*
 .gitmodules
+src/container/services/LoadModuleServiceProvider.ts
+src/container/modules

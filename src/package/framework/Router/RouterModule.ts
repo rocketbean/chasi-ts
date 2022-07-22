@@ -2,6 +2,7 @@ import Router from "./Router.js";
 import { ModuleInterface } from "../Interfaces.js";
 import Collector from "./Collector.js";
 import Route from "./Route.js";
+import Controller from "./Controller.js";
 export default class RouterModule implements ModuleInterface {
   constructor(public routers: Router[]) {}
 

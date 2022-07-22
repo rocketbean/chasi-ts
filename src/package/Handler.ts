@@ -1,18 +1,19 @@
-import Chasi from "./framework/Chasi/Terminal.js";
 import App from "./framework/Server/App.js";
 import Obsesrver from "./Observer/index.js";
+import Chasi from "./framework/Chasi/Terminal.js";
+import Session from "./framework/Chasi/Session.js";
 import horizon from "./statics/horizon/config.js";
 import Service from "./framework/Services/Service.js";
+import Controller from "./framework/Router/Controller.js";
 import ServicesModule from "./framework/Services/ServicesModule.js";
 import Base, { ProxyHandler } from "./Base.js";
-import Exception from "./framework/ErrorHandler/Exception.js";
 import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
+
 import {
   ModuleInterface,
   ServiceProviderInterface,
 } from "./framework/Interfaces.js";
-import Session from "./framework/Chasi/Session.js";
 
 export class Handler extends Base {
   /***
@@ -55,7 +56,6 @@ export class Handler extends Base {
    * [$modules] EventHandler
    */
   $modules: { [key: string]: ModuleInterface } = {};
-
   /***
    * [$app] Express App
    */
@@ -74,6 +74,7 @@ export class Handler extends Base {
   private _state: 0;
 
   $services: { [key: string]: Service };
+  private LockedServices: string[] = ["routers"];
 
   private constructor(private config: Iobject, private session: Chasi) {
     super();
@@ -117,7 +118,6 @@ export class Handler extends Base {
     this.$modules["services"] = await ServicesModule.init(
       this.config.container.ServiceBootstrap,
     );
-
     this.$services = (await (<ServicesModule>(
       this.$modules["services"]
     )).installServices()) as { [key: string]: Service };
@@ -167,6 +167,13 @@ export class Handler extends Base {
    *
    */
   protected async after() {
+    let services = {};
+    Object.keys(this.$services).filter((service: string) => {
+      if (!this.LockedServices.includes(service)) {
+        services[service] = this.$services[service];
+      }
+    });
+    Controller.init(services);
     await this.$observer.emit("__boot__", {
       next: this.$proxy.boot,
       app: this.$proxy,
