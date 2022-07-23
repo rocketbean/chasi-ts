@@ -4,7 +4,7 @@ import Group from "./Group.js";
 import Router from "./Router.js";
 import Base from "../../Base.js";
 import { RouterConfigInterface } from "../Interfaces.js";
-
+import Authentication from "../Server/Authentication.js";
 export default class Registry extends Base {
   controllers: Controller[] = [];
   routes: Endpoint[] = [];
@@ -47,12 +47,40 @@ export default class Registry extends Base {
 
   /**
    * Registers an enpoint
-   * [Registry]instance
-   * routes property
+   * • [Registry]instance
+   * • assign authentication driver
    * @param endpoint
    */
   async register(endpoint: Endpoint) {
+    if (
+      !this.property.auth ||
+      this.property.auth === null ||
+      this.property.auth === ""
+    )
+      endpoint.useAuth = (req, res, next) => {
+        next();
+      };
+    else {
+      this.attachAuthToEndpoint(endpoint);
+    }
     await this.routes.push(endpoint);
+  }
+
+  /**
+   * validate and assigns
+   * the Authentication[Driver][authorize] method
+   * which should return a function
+   * to be used as route[middleware]
+   * @param endpoint Endpoint class instance
+   */
+  attachAuthToEndpoint(endpoint: Endpoint) {
+    let driver = Authentication.$drivers[this.property.auth as string];
+    if (!driver)
+      Caveat.handle(`missing Authentication driver ${this.property.auth}`);
+    endpoint.useAuth = driver.authorize(
+      endpoint,
+      this.property.AuthRouteExceptions,
+    );
   }
 
   /**

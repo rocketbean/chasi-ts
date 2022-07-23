@@ -58,6 +58,7 @@ export default {
    * will fill in the client Responses.
    */
   responses: {
+    401: "we can't verify your token! ",
     404: "Oops, we can't find what you're looking for.",
     default: "ServerError, please try again later!",
   },

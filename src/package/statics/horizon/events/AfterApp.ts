@@ -10,6 +10,7 @@ export default class AfterApp extends Event {
    */
   async validate(params, next) {
     params.app.state = 3;
+    await params.app.$app.consumeLayers();
     next();
   }
 

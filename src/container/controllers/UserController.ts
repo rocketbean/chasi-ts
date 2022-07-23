@@ -11,6 +11,7 @@ export default class UserController extends Controller {
     return await new User({
       name: "test",
       email: "test@gmail.com",
+      password: "qweqwe",
       alias: "sldfsl",
     }).save();
   }
@@ -21,7 +22,8 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async index(request, response) {
-    return await Controller.$services.loadModule.fibonacci();
+    let user = await User.findByCredentials("test@gmail.com", "qweqwe");
+    return user.generateAuthToken();
   }
 
   /**

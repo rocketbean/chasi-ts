@@ -3,7 +3,8 @@ import https from "https";
 import Consumer from "./Consumer.js";
 import Base from "../../Base.js";
 import cors from "cors";
-import { serverConfig } from "../Interfaces.js";
+import Authentication from "./Authentication.js";
+import { Iobject, serverConfig } from "../Interfaces.js";
 import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
 
@@ -12,7 +13,7 @@ export default class App extends Consumer {
   env: string;
   mode: { [key: string]: any };
   protocol: any;
-
+  private auth: Authentication;
   constructor(
     public config: serverConfig,
     private loggers: { [key: string]: Writable },
@@ -47,8 +48,16 @@ export default class App extends Consumer {
         cert: Base._fsFetchFile(this.mode.cert),
       };
     }
-    if (this.config.cors.enabled) this.$server.use(cors(this.config.cors));
+    this.$server.use(cors(this.config.cors));
     this.$server = this.protocol.createServer(serverConfig, this.$server);
+  }
+
+  /**
+   * Initializes the Authentication layer
+   */
+  async setAuthLayer(authConfig: Iobject) {
+    this.auth = new Authentication(authConfig);
+    await this.auth.init();
   }
 
   async bootup(): Promise<void> {

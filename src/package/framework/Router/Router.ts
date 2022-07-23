@@ -2,8 +2,25 @@ import { Iobject, RouterConfigInterface } from "../Interfaces.js";
 import Collector from "./Collector.js";
 import Controller from "./Controller.js";
 import Base from "../../Base.js";
+
 export default class Router extends Collector {
+  /**
+   * RouterConfigInterface
+   * a list of required properties
+   * of a router container[Router::class]
+   */
+  static requiredProperty: string[] = ["auth", "name", "namespace", "prefix"];
+
+  /**
+   * static Controllers
+   * instance Storage
+   */
   static Controllers: { [key: string]: any } = {};
+
+  /**
+   * static Controllers
+   * FunctionStorage
+   */
   static Middlewares: { [key: string]: any } = {};
   static defaultControllerDir: string = "";
   $log: { [key: string]: any } = {
@@ -17,7 +34,18 @@ export default class Router extends Collector {
 
   constructor(public property: RouterConfigInterface) {
     super(property);
+    this.validate(property);
     this.property = property;
+  }
+
+  validate(property: RouterConfigInterface) {
+    Router.requiredProperty.map((prop) => {
+      if (!property.hasOwnProperty(prop)) {
+        Caveat.handle(
+          `RouterContainer::[${property.name}] is missing a required property[${prop}]`,
+        );
+      }
+    });
   }
 
   static async registerController(dir: string, instance: Controller) {

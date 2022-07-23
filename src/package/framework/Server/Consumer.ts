@@ -2,6 +2,8 @@ import { serverConfig, AppException } from "../Interfaces.js";
 import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
 import Express from "express";
+import cors from "cors";
+
 import Exception from "../ErrorHandler/Exception.js";
 import Models from "../Database/Models.js";
 export default class Consumer {
@@ -21,6 +23,7 @@ export default class Consumer {
       let ep = router.$registry.routes[r];
       this.$server[ep.property.method](
         ep.path,
+        ep.useAuth,
         ...ep.$middlewares,
         async (request, response) => {
           try {
@@ -37,11 +40,12 @@ export default class Consumer {
             });
             response.send(res);
           } catch (e: any) {
+            let status = e.status ? e.status : 500;
             if (!(e instanceof exception)) {
               e = Caveat.handle(e, "APIException");
             }
             ep.addExceptions(e);
-            response.status(500).send(e.message);
+            response.status(status).send(e.message);
           }
         },
       );

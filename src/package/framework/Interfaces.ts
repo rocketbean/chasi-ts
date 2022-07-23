@@ -1,5 +1,9 @@
 import { DBDriverInterface } from "./Database/drivers/drivers.js";
 
+export interface AuthDriver {
+  property: Iobject;
+  authorize: Function;
+}
 export interface ModuleInterface {}
 export interface Constructuble<T> {
   new <T>(a?: any, B?: any): T;
@@ -46,11 +50,12 @@ export type serverConfig = {
 
 export type RouterConfigInterface = {
   name: string;
+  auth: string | boolean | null;
   prefix: string;
   namespace: string;
   middleware: string | string[];
   ControllerDir: string | string[];
-  AuthRouteExceptions?: string | string[];
+  AuthRouteExceptions?: Iobject;
   before?: Function;
   after?: Function;
 };

@@ -9,6 +9,7 @@ export default class Endpoint {
   public $middlewares: Function[] = [];
   public beforeFns: Function[] = [];
   public afterFns: Function[] = [];
+  public useAuth: Function;
   $controller: Controller;
   controller: string;
   $method: Function;

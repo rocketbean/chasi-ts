@@ -9,7 +9,6 @@ export default {
    * https://www.npmjs.com/package/cors
    */
   cors: {
-    enabled: true,
     origin: "*",
     allowedHeaders: [
       "Content-Type",
@@ -17,7 +16,7 @@ export default {
       "Access-Control-Allow-Methods",
       "Access-Control-Request-Headers",
     ],
-    credentials: true,
+    credentials: false,
     enablePreflight: true,
   },
 

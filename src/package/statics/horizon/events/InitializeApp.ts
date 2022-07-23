@@ -12,7 +12,6 @@ export default class InitializeApp extends Event {
     params.app.state = 2;
     let routers = <RouterModule>params.app.$modules.RouterModule;
     params.app.$app.$routers = routers.routers;
-    await params.app.$app.consumeLayers();
     next();
   }
 

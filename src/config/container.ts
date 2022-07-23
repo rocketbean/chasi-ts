@@ -28,7 +28,6 @@ export default {
     routers: "container/services/RouterServiceProvider",
     // loadModule: "container/services/LoadModuleServiceProvider",
     // StreamEngine: "container/services/StreamEngineServiceProvider",
-    // auth: "container/services/AuthServiceProvider",
     // sockets: "container/services/SocketServiceProvider",
   },
 

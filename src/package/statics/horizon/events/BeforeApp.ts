@@ -5,6 +5,7 @@ export default class BeforeApp extends Event {
   async validate(params: any, next: Function) {
     params.app.state = 1;
     params.database = await Database.init(params.app.config.database);
+    await params.app.$app.setAuthLayer(params.app.config.authentication);
     params.routers = await RouterModule.init(
       params.app.$services.routers,
       params.app.config.container,

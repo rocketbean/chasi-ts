@@ -9,6 +9,10 @@ export default {
     },
   },
 
+  authentication: {
+    defaultJWTDriverPAth: "package/framework/Server/AuthDrivers/jwt.js",
+  },
+
   exceptions: {
     events: ["__exception__"],
   },
