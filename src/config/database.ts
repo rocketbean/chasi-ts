@@ -1,10 +1,5 @@
 export default {
   host: checkout(process.env.database, "dev"),
-  /*
-   * enabling "bootWithDB" property will throw a
-   * BreakExecutionError if any of the
-   * declared connection failed on boot
-   */
   bootWithDB: true,
   default: checkout(process.env.database, "dev"),
   /**

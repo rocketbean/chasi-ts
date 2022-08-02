@@ -26,9 +26,6 @@ export default {
      * therefore giving more versatility for dev's
      */
     routers: "container/services/RouterServiceProvider",
-    loadModule: "container/services/LoadModuleServiceProvider",
-    // StreamEngine: "container/services/StreamEngineServiceProvider",
-    // sockets: "container/services/SocketServiceProvider",
   },
 
   /**
@@ -47,7 +44,6 @@ export default {
      */
     auth: "./container/middlewares/Auth",
     user: "./container/middlewares/User",
-    third: "./container/middlewares/third",
   },
 
   session: {

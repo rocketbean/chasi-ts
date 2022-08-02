@@ -5,6 +5,7 @@ export default {
   staticDir: "storage",
   port: checkout(process.env.ServerPort, 3010),
   environment: checkout(process.env.environment, "local"),
+
   /**
    * check NPM[Cors] package
    * https://www.npmjs.com/package/cors
@@ -21,8 +22,16 @@ export default {
     enablePreflight: true,
   },
 
+  /**
+   * Enables Clustering for the api
+   * Chasi instace will be invoked
+   * on the number of workers decalared
+   * at serviceCluster[workers],
+   * it will be equal to the available
+   * cpus by default
+   */
   serviceCluster: {
-    enabled: true,
+    enabled: false,
     workers: os.cpus().length,
   },
 
