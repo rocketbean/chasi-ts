@@ -21,7 +21,9 @@ export default class UserController extends Controller {
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
-  async welcome(request, response) {}
+  async welcome(request, response) {
+    return "success";
+  }
 
   /**
    * Delete an ObjectModel[]
