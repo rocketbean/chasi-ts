@@ -8,6 +8,8 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
   public connection: any;
   public hasOptions = false;
   public isDefaultDB = false;
+  public logger;
+
   public states: any[] = [
     chalk.redBright,
     chalk.greenBright,
@@ -19,6 +21,8 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
     super(config);
     this.name = name;
     this.config = config;
+    this.logger = Logger.writers.Left;
+    this.logger.subject = "database";
     this.setup();
   }
 
@@ -61,18 +65,19 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
           } `,
         );
         let str = this.hideStrings(this.$property.url);
-        console.log("- " + this.$property.url.replace(/\/\/(.*?)\//g, str));
+        this.logger.write(
+          ` - ${this.$property.url.replace(/\/\/(.*?)\//g, str)}\n`,
+        );
         return con;
       })
       .catch((e) => {
         stop(`[${this.states[1]("•")}]${this.name.toUpperCase()}`);
         let str = this.hideStrings(this.$property.url);
-        console.log(
+        this.logger.write(
           chalk.redBright(
             "- " + this.$property.url.replace(/\/\/(.*?)\//g, str),
           ),
         );
-        return;
       });
   }
 }

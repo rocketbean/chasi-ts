@@ -9,15 +9,14 @@ export default class Group {
   /*╡*/
   constructor(name: string) {
     this.name = name;
-    console.group(
-      chalk.dim.bold.bgRgb(15, 100, 204).rgb(0, 0, 24)(
-        ` • ${this.name.toUpperCase()} \n`,
-      ),
-    );
+    // console.group(
+    //   chalk.dim.bold.bgRgb(15, 100, 204).rgb(0, 0, 24)(
+    //     ` • ${this.name.toUpperCase()} \n`,
+    //   ),
+    // );
   }
 
   end() {
-    console.groupEnd();
-    console.log();
+    // console.groupEnd();
   }
 }

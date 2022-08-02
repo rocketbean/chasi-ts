@@ -4,13 +4,17 @@ import Group from "../Group.js";
 import util from "util";
 
 export default abstract class Writer {
-  log: Function = process.stdout.write.bind(process.stdout);
+  static log: Function = () => {};
 
   logType: { [key: string]: Function } = logStyles;
   static groups: Group[] = [];
   spacer: string = " ";
   groups: Group[] = [];
   displayAs: Function = this.logType.clear;
+
+  constructor(public subject: string = "logs") {
+    this.subject = subject;
+  }
 
   abstract format(message: string, b?: string, c?: string | number): void;
 
@@ -42,7 +46,7 @@ export default abstract class Writer {
       var x = 0;
       timer = setInterval(() => {
         x++;
-        trs(chalk.bold.yellow(message + " ") + chalk.bold.yellow(P[x]));
+        // trs(chalk.bold.yellow(message + " ") + chalk.bold.yellow(P[x]));
         x %= P.length - 1;
       }, 50);
     };
@@ -50,19 +54,21 @@ export default abstract class Writer {
       process.stdout.cursorTo(0);
       process.stdout.clearLine(0);
       if (finalMessage.length > 0) {
-        trs(chalk.bold.yellow(_m));
+        this.write(chalk.bold.yellow(_m), "clear", this.subject);
       }
       clearInterval(timer);
     }).bind(this);
 
     let trs = ((m: string) => {
       let indention = this.fill(process.stdout.columns - this.cols);
-      _wr.write("\r" + indention + m);
+      this.write(`\r ${indention} ${m}`, "clear", this.subject);
     }).bind(this);
+
     return { start, stop };
   }
 
-  write(message: any, display: string = "system"): void {
+  write(message: any, display: string = "clear", subject?: string): void {
+    if (!subject) subject = this.subject;
     if (typeof message !== "object") {
       message = this.logType[display](this.format(message));
     } else {
@@ -72,7 +78,7 @@ export default abstract class Writer {
         colors: true,
       });
     }
-    this.log(message);
+    Writer.log(message, subject);
   }
 
   group(label: string = " ") {
@@ -96,7 +102,7 @@ export default abstract class Writer {
 }
 
 export interface Writable {
-  write(a?: string | object, b?: string): void;
+  write(a?: string | object, b?: string, c?: string): void;
   format(a?: string, b?: string): void;
   group(a: string): void;
   endGroup(a: string): void;

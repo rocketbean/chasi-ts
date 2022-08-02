@@ -65,13 +65,16 @@ export default class RouterList extends Writer implements Writable {
   formatPath(router: Router) {
     router.$registry.routes.forEach((ep: Endpoint) => {
       let _m = `[${ep.property.method.toUpperCase()}]`;
-      process.stdout.write(
+      this.write(
         `${_style.warning(_m)}${this.startTrace(ep, _m)}| ${ep.groups
           .map(
             (group) => `${_style.coolText("[" + group.property.prefix + "]")}`,
           )
           .join("")}\n`,
+        "clear",
+        "routeRegistry",
       );
+
       if (ep.exceptions.length > 0) {
         ep.exceptions.forEach((exc) => {
           exc.log();
@@ -81,8 +84,11 @@ export default class RouterList extends Writer implements Writable {
   }
 
   displayRouter(route: Router) {
-    console.log(this.formatHeader(route) + "\n");
+    this.write(
+      "\n" + this.formatHeader(route) + "\n",
+      "clear",
+      "routeRegistry",
+    );
     this.formatPath(route);
-    console.log();
   }
 }

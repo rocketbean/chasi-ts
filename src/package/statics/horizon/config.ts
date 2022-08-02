@@ -13,6 +13,13 @@ export default {
     defaultJWTDriverPAth: "package/framework/Server/AuthDrivers/jwt.js",
   },
 
+  server: {
+    serviceCluster: {
+      serverFile: "package/framework/Chasi/storage/session.chasi",
+      clusterFile: "package/framework/Chasi/storage/cluster.chasi",
+    },
+  },
+
   exceptions: {
     events: ["__exception__"],
   },

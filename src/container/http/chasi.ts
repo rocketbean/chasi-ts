@@ -9,7 +9,7 @@ export default (route: Route) => {
    * will be protected by JWT unless registered in
    * [AuthRouteExceptions] array option.
    */
-  route.get("", (request: Request, response: Response) => {
+  route.get("index", (request: Request, response: Response) => {
     return "success";
   });
 };

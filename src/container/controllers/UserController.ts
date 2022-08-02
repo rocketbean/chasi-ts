@@ -8,12 +8,18 @@ export default class UserController extends Controller {
    * @return {} translated as [ExpressResponse] Object
    * */
   async create(request, response) {
-    return await new User({
-      name: "test",
-      email: "test@gmail.com",
-      password: "qweqwe",
-      alias: "sldfsl",
-    }).save();
+    try {
+      return await new User({
+        name: "test",
+        email: "test@gmail.com",
+        password: "qweqwe",
+        alias: "alias1",
+      }).save();
+    } catch (e) {
+      throw new Error(
+        "Email provided is already registered, please try a different one",
+      );
+    }
   }
 
   /**
@@ -32,7 +38,8 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async welcome(request, response) {
-    return "Welcome";
+    await this.loadModule.fibonacci();
+    return `${process.pid}`;
   }
 
   /**

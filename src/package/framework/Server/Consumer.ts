@@ -3,9 +3,10 @@ import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
 import Express from "express";
 import cors from "cors";
-
 import Exception from "../ErrorHandler/Exception.js";
 import Models from "../Database/Models.js";
+import cluster from "cluster";
+
 export default class Consumer {
   $server: any = Express();
   /****
@@ -47,6 +48,7 @@ export default class Consumer {
             ep.addExceptions(e);
             response.status(status).send(e.message);
           }
+          if (this.config.serviceCluster.enabled) cluster.worker.kill();
         },
       );
     }

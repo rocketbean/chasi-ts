@@ -172,14 +172,16 @@ export default class Registry extends Base {
           key.toLowerCase().includes(ep.controller.toLowerCase()),
         );
         ep.$controller = Router.Controllers[controller].instance;
-        ep.$method = Router.Controllers[controller].instance[ep.method];
+        ep.$method = Router.Controllers[controller].instance[ep.method].bind(
+          Router.Controllers[controller].instance,
+        );
       }
     } catch (e) {
       ep.addException(
         Caveat.handle({
-          message: "Error Binding ControllerMethods",
+          message: `Error Binding ControllerMethods ${ep.controller}::${ep.method} `,
           interpose: 2,
-          showStack: false,
+          showStack: true,
         }),
       );
     }

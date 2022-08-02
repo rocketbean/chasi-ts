@@ -1,8 +1,9 @@
 import { serverConfig } from "../package/framework/Interfaces.js";
+import os from "os";
 
 export default {
   staticDir: "storage",
-  port: checkout(process.env.port, 3000),
+  port: checkout(process.env.ServerPort, 3010),
   environment: checkout(process.env.environment, "local"),
   /**
    * check NPM[Cors] package
@@ -20,6 +21,11 @@ export default {
     enablePreflight: true,
   },
 
+  serviceCluster: {
+    enabled: true,
+    workers: os.cpus().length,
+  },
+
   /**
    * you can setup your own server environment
    * and add that inside [mode] property
@@ -27,6 +33,7 @@ export default {
    * selection, just keep make sure that the selected
    * environment is registered here...
    */
+
   modes: {
     dev: {
       key: checkout(process.env.devKey),

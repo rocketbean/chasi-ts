@@ -26,7 +26,7 @@ export default {
      * therefore giving more versatility for dev's
      */
     routers: "container/services/RouterServiceProvider",
-    // loadModule: "container/services/LoadModuleServiceProvider",
+    loadModule: "container/services/LoadModuleServiceProvider",
     // StreamEngine: "container/services/StreamEngineServiceProvider",
     // sockets: "container/services/SocketServiceProvider",
   },

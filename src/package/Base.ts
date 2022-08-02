@@ -133,8 +133,6 @@ export default class Base {
    * Start Server
    */
   static async Ignition(): Promise<{ [key: string]: any }> {
-    let config = (await Base._fetchFilesFromDir(_configpath_)) as Iobject;
-    let chasi = await ChasiTerminal.createSession();
-    return { config, chasi };
+    return (await Base._fetchFilesFromDir(_configpath_)) as Iobject;
   }
 }

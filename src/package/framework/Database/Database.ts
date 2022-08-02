@@ -9,6 +9,7 @@ import Models from "./Models.js";
 
 import Driver, { DBDriverInterface } from "./drivers/drivers.js";
 import MongoDBDriver from "./drivers/mongodb.js";
+import Writer from "../../Logger/types/Writer.js";
 
 export default class Database implements ModuleInterface {
   $databases: DatabaseDrivers = {};
@@ -30,8 +31,12 @@ export default class Database implements ModuleInterface {
     ),
   };
 
+  logLeft: any;
+
   constructor(public config: DatabaseConfig) {
     this.config = config;
+    this.logLeft = Logger.writers.Left;
+    this.logLeft.subject = "database";
   }
 
   async collect(): Promise<void> {
@@ -47,7 +52,7 @@ export default class Database implements ModuleInterface {
 
   async connectDbs(): Promise<void> {
     for (let db in this.$databases) {
-      let loader = Logger.writer("Left").loading(
+      let loader = this.logLeft.loading(
         `Initialize connection [${db}]`,
         "done",
       );
@@ -66,13 +71,11 @@ export default class Database implements ModuleInterface {
   }
 
   static async init(config) {
-    Logger.writers["Left"].group("Database");
     let db = new Database(config as DatabaseConfig);
     await db.collect();
     await db.connectDbs();
     await db.log();
     await Models.init(db.$databases, config);
-    Logger.writers["Left"].endGroup("Database");
     return db;
   }
 }

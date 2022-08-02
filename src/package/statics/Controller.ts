@@ -4,11 +4,15 @@ export default class Controller extends controller {
     super();
   }
 
+  get sumthing() {
+    return "something";
+  }
+
   get services() {
     return Controller.$services;
   }
 
-  get loadmodule() {
-    return Controller.$services;
+  get loadModule() {
+    return this.services.loadModule;
   }
 }

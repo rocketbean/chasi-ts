@@ -79,11 +79,16 @@ export default class ErrorHandler extends Base {
     });
 
     process.on("uncaughtException", function (err, origin) {
-      Caveat.handle(err, "ChasiException");
+      // try {
+      //   Caveat.handle(err, "ChasiException");
+      // } catch (e) {
+      console.log(err);
+      // }
     });
 
     process.on("unhandledRejection", function (reason, promise) {
-      Caveat.handle(`[${promise}] ${reason}`, "ChasiException");
+      // Caveat.handle(`[${promise}] ${reason}`, "ChasiException");
+      console.log(reason);
     });
   }
 

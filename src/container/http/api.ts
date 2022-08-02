@@ -11,8 +11,7 @@ export default (route: Route) => {
    * [AuthRouteExceptions] array option.
    */
 
-  route.get("/", "UserController@search");
-  route.search("/search", "UserController@search");
+  route.get("/", "UserController@welcome");
   route.group({ prefix: "users", middleware: "user" }, () => {
     route.post("/", "UserController@create");
     route.get("/", "UserController@index");

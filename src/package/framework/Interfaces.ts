@@ -40,12 +40,27 @@ export interface ExceptionLoggerInterface {
   write(a?: any, b?: any);
 }
 
+export type SessionStorageData = {
+  database: Iobject[];
+  routeRegistry: Iobject[];
+  boot: Iobject[];
+  exceptions: Iobject[];
+  services: [];
+  logs: [];
+};
+
+export type SessionStorageClusterData = {
+  process: number | string;
+  session_id: number | string;
+};
+
 export type serverConfig = {
   staticDir: any;
   port: any;
   environment: any;
   modes: { [key: string]: any };
   cors: Iobject;
+  serviceCluster: Iobject;
 };
 
 export type RouterConfigInterface = {

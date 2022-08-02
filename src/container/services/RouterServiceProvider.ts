@@ -62,7 +62,7 @@ export default class RouterServiceProvider implements ServiceProviderInterface {
       new Router({
         name: "chasi",
         auth: false,
-        prefix: "/",
+        prefix: "/chasi",
         namespace: "container/http/chasi.js",
         ControllerDir: ["container/controllers/"],
         middleware: [],

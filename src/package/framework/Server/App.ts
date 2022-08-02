@@ -54,6 +54,7 @@ export default class App extends Consumer {
 
   /**
    * Initializes the Authentication layer
+   *
    */
   async setAuthLayer(authConfig: Iobject) {
     this.auth = new Authentication(authConfig);
@@ -61,10 +62,10 @@ export default class App extends Consumer {
   }
 
   async bootup(): Promise<void> {
-    await this.install();
-    return new Promise((res, rej) => {
+    return await new Promise((res, rej) => {
+      this.install();
       this.$server.listen(this.config.port, async () => {
-        this.loggers.full.write("SERVING IN: ", "cool");
+        this.loggers.full.write("SERVING IN: ", "cool", "boot");
         let nets = networkInterfaces();
         Object.keys(nets).forEach((key) => {
           nets[key]
@@ -75,6 +76,7 @@ export default class App extends Consumer {
               this.loggers.EndTraceFull.write(
                 `  ${protocol}://${ipv}:${this.config.port}`,
                 "systemRead",
+                "boot",
               );
             });
           res();

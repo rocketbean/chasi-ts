@@ -1,7 +1,6 @@
 import App from "./framework/Server/App.js";
 import Obsesrver from "./Observer/index.js";
 import Chasi from "./framework/Chasi/Terminal.js";
-import Session from "./framework/Chasi/Session.js";
 import horizon from "./statics/horizon/config.js";
 import Service from "./framework/Services/Service.js";
 import Controller from "./framework/Router/Controller.js";
@@ -14,6 +13,8 @@ import {
   ModuleInterface,
   ServiceProviderInterface,
 } from "./framework/Interfaces.js";
+import { workerData } from "worker_threads";
+import { EventEmitter } from "events";
 
 export class Handler extends Base {
   /***
@@ -21,14 +22,13 @@ export class Handler extends Base {
    * handles the Lifecycle
    */
   private static _instance: Handler;
-
+  $ev: EventEmitter;
   $proxy = new Proxy(this, ProxyHandler);
 
   /**
    * Chasi generates a unique
    * runtime id to specify Chasi Sessions
    */
-  private $runtime: Session;
   private $runtime_id: string;
 
   /***
@@ -76,10 +76,10 @@ export class Handler extends Base {
   $services: { [key: string]: Service };
   private LockedServices: string[] = ["routers"];
 
-  private constructor(private config: Iobject, private session: Chasi) {
+  private constructor(private config: Iobject) {
     super();
+    this.$ev = new EventEmitter();
     this.config = <Iobject>Base.mergeObjects(horizon, config);
-    this.session = session;
     this.setup();
   }
 
@@ -111,8 +111,8 @@ export class Handler extends Base {
    * • setup Observers [emitters]
    */
   protected async start(): Promise<void> {
-    this.$runtime = await this.session.set(this.config, this);
-    this.$runtime_id = this.$runtime.id;
+    // this.$runtime = await this.session.set(this.config, this);
+    // this.$runtime_id = this.$runtime.id;
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);
     this.$modules["services"] = await ServicesModule.init(
@@ -126,6 +126,7 @@ export class Handler extends Base {
       next: this.$proxy.before,
       app: this.$proxy,
     });
+    return;
   }
 
   /***
@@ -183,8 +184,8 @@ export class Handler extends Base {
   protected async boot() {
     this.loggers.system.group("BOOT");
     await this.$app.bootup();
-    await this.session.cacheSession(this.$runtime_id);
     this.loggers.system.endGroup("BOOT");
+    this.$ev.emit("done");
   }
 
   /**
@@ -226,9 +227,9 @@ export class Handler extends Base {
     };
   }
 
-  static async init(property: Iobject): Promise<Handler> {
+  static async init(config: Iobject): Promise<Handler> {
     if (Handler._instance) return Handler._instance;
-    Handler._instance = new Handler(property.config, property.chasi);
+    Handler._instance = new Handler(config);
     global.$app = Handler._instance;
     await Handler._instance.start();
     return Handler._instance;
