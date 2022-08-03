@@ -22,7 +22,8 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async welcome(request, response) {
-    return "success";
+    throw new Error("askdjfhksjdh");
+    return `${process.pid}`;
   }
 
   /**

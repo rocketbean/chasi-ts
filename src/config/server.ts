@@ -28,11 +28,28 @@ export default {
    * on the number of workers decalared
    * at serviceCluster[workers],
    * it will be equal to the available
-   * cpus by default
+   * cpus by default.
+   *  ----------------------------------------------------------
+   * enabled[boolean]:  enables the clustering
+   * logs[boolean]: logs the cluster when enabled
+   * workers[number]:   number or workers to assign in a cluster
+   * settings[object]:  settings to apply to the cluster. check
+   * https://nodejs.org/docs/latest/api/cluster.html#clustersetupprimarysettings
+   *
+   * schedulingPolicy[number]:  [1|2]
+   *  [1] none - this is typically left on the OS, to distribute tasks.
+   *  [2] RoundRobin - round robin approach where requests will be assigned in sequence
+   *
+   * ** please note that in windows, using [2]round robin scheduling might not
+   * as good as it was intended. **
    */
+
   serviceCluster: {
     enabled: false,
+    logs: true,
     workers: os.cpus().length,
+    settings: {},
+    schedulingPolicy: 2,
   },
 
   /**

@@ -6,27 +6,33 @@ import {
   Iobject,
 } from "../Interfaces.js";
 import { watch, createReadStream, readFileSync } from "fs";
-import cluster from "cluster";
+import chalk from "chalk";
 
 export default class SessionStorage {
   public data: SessionStorageData = {
+    threads: [],
     database: [],
     routeRegistry: [],
     boot: [],
-    exceptions: [],
     services: [],
+    exceptions: [],
     logs: [],
   };
 
   public clusterData: SessionStorageClusterData = {
     session_id: 0,
     process: 0,
+    threads: [],
+    pids: [],
+    scheduling: 2,
+    serverData: {},
   };
 
-  public serverFilePath;
   public clusterFilePath;
-  public writer: Writer;
   public clusterWriter: Writer;
+  public clusterReader;
+  public serverFilePath;
+  public writer: Writer;
   public reader;
   public enabled;
   public static clusterData;
@@ -46,20 +52,49 @@ export default class SessionStorage {
   }
 
   public watcher() {
-    this.reader = watch(
-      path.join(this.serverFilePath),
-      this.readServerFile.bind(this),
+    let clusterData = SessionStorage.readClusterData();
+    if (!this.config.enabled || clusterData.process == process.pid) {
+      this.watchThreads();
+      this.reader = watch(
+        path.join(this.serverFilePath),
+        this.readServerFile.bind(this),
+      );
+
+      this.clusterReader = watch(
+        path.join(this.clusterFilePath),
+        this.readClusterFile.bind(this),
+      );
+    }
+  }
+
+  saveServerData() {
+    let clusterData = SessionStorage.readClusterData();
+    this.clusterData = clusterData;
+    this.clusterData.serverData = this.data;
+    this.writeClusterData(this.clusterData);
+  }
+
+  watchThreads() {
+    let clusterData = SessionStorage.readClusterData();
+    let sched = clusterData.scheduling == 1 ? "os specified" : "RoundRobin";
+    this.data.threads.push(
+      chalk.bold.magentaBright(`Active thread/s : `) +
+        `[${clusterData.threads}]\n`,
+      chalk.bold.magentaBright(`Scheduling      : `) + sched + "\n",
+      chalk.bold.magentaBright(`MainThread      : `) +
+        clusterData.process +
+        "\n",
+      chalk.bold.magentaBright(`PIDs            : `) +
+        clusterData.pids.join(" ") +
+        "\n",
     );
   }
 
   writeClusterData(data) {
-    this.clusterWriter.writeObject(data);
+    this.clusterData = data;
+    this.clusterWriter.writeObject(this.clusterData);
   }
 
-  /**
-   *
-   * @returns
-   */
   static readClusterData() {
     try {
       let content = readFileSync(SessionStorage.clusterData, {
@@ -79,6 +114,10 @@ export default class SessionStorage {
           console.clear();
           this.data[target].push(message);
           this.writer.write(this.data);
+        } else {
+          if (target == "logs" || target == "exceptions") {
+            this.appendTargetData(message, target);
+          }
         }
       }
     } else {
@@ -87,9 +126,43 @@ export default class SessionStorage {
     }
   }
 
+  appendTargetData(message: any, target: string = "logs") {
+    let clusterData = SessionStorage.readClusterData();
+    if (clusterData.serverData[target]) {
+      clusterData.serverData[target].push(
+        chalk.bgGray
+          .rgb(147, 231, 85)
+          .bold(` ☼ PID-${process.pid} | Stamp:${Date.now()} \n`) +
+          `  ${message}` +
+          "\n",
+      );
+    }
+
+    this.writeClusterData(clusterData);
+  }
+
   readServerFile(cur, prev) {
     console.clear();
+    let clusterData = SessionStorage.readClusterData();
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
     let content = readFileSync(this.serverFilePath, { encoding: "utf-8" });
     process.stdout.write(`\r ${content.toString()}\n`);
+  }
+
+  readClusterFile(cur, prev) {
+    if (cur == "change") {
+      let clusterData = SessionStorage.readClusterData();
+      clusterData.serverData?.logs.map((log: string) => {
+        if (!this.data.logs.includes(log)) {
+          this.write(log);
+        }
+      });
+      clusterData.serverData?.exceptions.map((exc: string) => {
+        if (!this.data.exceptions.includes(exc)) {
+          this.write(exc, "exceptions");
+        }
+      });
+    }
   }
 }

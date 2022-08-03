@@ -3,6 +3,7 @@ import Cluster from "cluster";
 import SessionWriter from "./writers/FileWriter.js";
 import ServiceCluster from "./ServiceCluster.js";
 import horizon from "../../statics/horizon/config.js";
+import SessionStorage from "./Storage.js";
 import { v4 as uuidv4 } from "uuid";
 import { Handler } from "../../Handler.js";
 import { Iobject } from "./../Interfaces.js";
@@ -25,7 +26,6 @@ export default class Session {
    * checking [node version]
    * to return [isMaster]
    * || [isPrimary] property
-   *
    **/
   static checkMainThread(): Function | boolean {
     if (Session.nodeVer < 16) return Cluster.isMaster;
@@ -48,10 +48,12 @@ export default class Session {
       if (Session.checkMainThread()) {
         await cluster.createCluster();
       } else {
-        process.on("message", (msg) => {
-          console.log(msg, "message rec");
-        });
-        return await Session.createHandler(session, config);
+        let clusterData = SessionStorage.readClusterData();
+        let app = await Session.createHandler(session, config);
+        if (process.pid === clusterData.process) {
+          cluster.storage.saveServerData();
+        }
+        return app;
       }
     } else {
       return await Session.createHandler(session, config);

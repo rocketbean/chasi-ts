@@ -15,6 +15,7 @@ import {
 } from "./framework/Interfaces.js";
 import { workerData } from "worker_threads";
 import { EventEmitter } from "events";
+import Consumer from "./framework/Server/Consumer.js";
 
 export class Handler extends Base {
   /***
@@ -205,6 +206,7 @@ export class Handler extends Base {
   protected setup(): void {
     this.setLoggers();
     this.$app = new App(this.config.server, this.loggers);
+    Consumer._defaultResponses = this.config.exceptions.responses;
     this.$observer = new Obsesrver(this.config.observer as Iobject);
   }
 

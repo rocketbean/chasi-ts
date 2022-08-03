@@ -46,7 +46,7 @@ export default abstract class Writer {
       var x = 0;
       timer = setInterval(() => {
         x++;
-        // trs(chalk.bold.yellow(message + " ") + chalk.bold.yellow(P[x]));
+        trs(chalk.bold.yellow(message + " ") + chalk.bold.yellow(P[x]));
         x %= P.length - 1;
       }, 50);
     };
@@ -54,7 +54,7 @@ export default abstract class Writer {
       process.stdout.cursorTo(0);
       process.stdout.clearLine(0);
       if (finalMessage.length > 0) {
-        this.write(chalk.bold.yellow(_m), "clear", this.subject);
+        this.write("\r" + chalk.bold.yellow(_m), "clear", this.subject);
       }
       clearInterval(timer);
     }).bind(this);

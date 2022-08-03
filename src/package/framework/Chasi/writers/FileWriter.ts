@@ -32,11 +32,9 @@ export default class SessionWriter {
     let str = "\n";
     Object.keys(data).forEach((group) => {
       if (data[group].length > 0) {
-        str +=
-          "\n" +
-          chalk.dim.bold.bgRgb(15, 100, 204).rgb(0, 0, 24)(
-            ` • ${group.toUpperCase()} \n`,
-          );
+        str += chalk.dim.bold.bgRgb(15, 100, 204).rgb(0, 0, 24)(
+          `\n • ${group.toUpperCase()} \n`,
+        );
         str += "\n";
         str += data[group].map((message) => `  ${message}`).join("");
       }

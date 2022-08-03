@@ -1,19 +1,20 @@
 import { serverConfig, AppException } from "../Interfaces.js";
 import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
-import Express from "express";
-import cors from "cors";
-import Exception from "../ErrorHandler/Exception.js";
+import Express, { response } from "express";
 import Models from "../Database/Models.js";
+import APIException from "../ErrorHandler/exceptions/APIException.js";
 import cluster from "cluster";
 
 export default class Consumer {
   $server: any = Express();
+
   /****
    * Router Consumer
    * registers the routing layer
    * to the [Express]server
    */
+  static _defaultResponses = {};
   public $routers: Router[] = [];
   constructor(public config: serverConfig) {
     this.config = config;
@@ -41,17 +42,25 @@ export default class Consumer {
             });
             response.send(res);
           } catch (e: any) {
-            let status = e.status ? e.status : 500;
-            if (!(e instanceof exception)) {
-              e = Caveat.handle(e, "APIException");
-            }
-            ep.addExceptions(e);
-            response.status(status).send(e.message);
+            return await this.handleError(e, ep, response);
           }
-          if (this.config.serviceCluster.enabled) cluster.worker.kill();
         },
       );
     }
+  }
+
+  async handleError(e, ep, response) {
+    let status = e.status ? e.status : 500;
+    let autoMs = Consumer._defaultResponses[status]
+      ? Consumer._defaultResponses[status]
+      : Consumer._defaultResponses["message"];
+    e.message = e.message ? e.message : autoMs;
+    if (!(e instanceof exception)) {
+      e = new APIException(e, status, ep);
+    }
+    ep.addExceptions(e);
+    response.statusCode = status;
+    response.send(e.message);
   }
 
   async bindModel(params) {
@@ -73,7 +82,7 @@ export default class Consumer {
     }
 
     this.$server.use((req, res, next) => {
-      res.send("unknown request");
+      res.status(404).send(Consumer._defaultResponses["404"]);
     });
   }
 }

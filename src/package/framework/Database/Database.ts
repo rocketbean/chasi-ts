@@ -56,6 +56,7 @@ export default class Database implements ModuleInterface {
         `Initialize connection [${db}]`,
         "done",
       );
+
       loader.start();
       this.$databases[db].connection = await this.$databases[db].connect(
         loader.stop,

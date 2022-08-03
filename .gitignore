@@ -13,3 +13,4 @@ dist/*
 .gitmodules
 src/container/services/LoadModuleServiceProvider.ts
 src/container/modules
+rest.http

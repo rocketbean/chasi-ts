@@ -58,7 +58,7 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
       .asPromise()
       .then((con) => {
         stop(
-          `╡[${this.states[con.readyState]("•")}]${
+          `  ╡[${this.states[con.readyState]("•")}]${
             this.isDefaultDB
               ? chalk.greenBright.underline(this.name.toUpperCase())
               : this.name.toUpperCase()

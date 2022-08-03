@@ -26,13 +26,15 @@ export default class Exception extends Error {
   constructor(public property: ExceptionProperty) {
     super(property.message);
     if (property instanceof Error) this.stack = property.stack;
+    else this.stack = new Error(property.message).stack;
+
     if (!property.hasOwnProperty("showStack")) this.property.showStack = true;
     const actualProto = new.target.prototype;
     this.commonInvoker.push(this.constructor.name);
     this.commonInvoker.push(property.message);
     this.invoker = this.setInvoker();
-    Object.setPrototypeOf(this, new.target.prototype);
     this.property = property;
+    Object.setPrototypeOf(this, new.target.prototype);
     Exception.$observer.emit("__exception__", {
       exception: this,
     });

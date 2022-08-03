@@ -35,7 +35,10 @@ export default class ErrorHandler extends Base {
    * @param exception [string] type of exception;
    * @returns Exception::class
    */
-  handle(property: ExceptionProperty | string | Iobject, exception?: string) {
+  handle(
+    property: ExceptionProperty | string | Iobject | Error,
+    exception?: string,
+  ) {
     if (typeof property == "string") property = { message: property };
     if (!exception) exception = "ChasiException";
     return new ErrorHandler.exceptions[exception](

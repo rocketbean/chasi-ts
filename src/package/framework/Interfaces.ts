@@ -41,17 +41,22 @@ export interface ExceptionLoggerInterface {
 }
 
 export type SessionStorageData = {
+  threads: any;
   database: Iobject[];
   routeRegistry: Iobject[];
   boot: Iobject[];
-  exceptions: Iobject[];
   services: [];
-  logs: [];
+  exceptions: any;
+  logs: any;
 };
 
 export type SessionStorageClusterData = {
   process: number | string;
   session_id: number | string;
+  threads: any;
+  pids: any;
+  scheduling: number;
+  serverData: Iobject;
 };
 
 export type serverConfig = {
@@ -110,6 +115,7 @@ export type ExceptionProperty = {
   message?: string;
   interpose?: number | string;
   showStack?: boolean;
+  stack?: any;
 };
 
 export type genericImport = {
