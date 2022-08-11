@@ -116,9 +116,10 @@ export class Handler extends Base {
     // this.$runtime_id = this.$runtime.id;
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);
-    this.$modules["services"] = await ServicesModule.init(
+    this.$modules.services = await ServicesModule.init(
       this.config.container.ServiceBootstrap,
     );
+
     this.$services = (await (<ServicesModule>(
       this.$modules["services"]
     )).installServices()) as { [key: string]: Service };

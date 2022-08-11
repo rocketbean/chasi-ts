@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "lite-server",
-    "dev": "nodemon ./dist/server.js -e html,js,css --experimental-top-level-await"
+    "dev": "nodemon ./dist/server.js -e html,js,css --experimental-top-level-await "
   },
   "author": "",
   "license": "ISC",
@@ -18,9 +18,11 @@
     "lite-server": "^2.6.1",
     "log-update": "^5.0.1",
     "os-utils": "^0.0.14",
+    "redis-cli": "^2.1.2",
     "typescript": "^4.8.0-dev.20220630"
   },
   "dependencies": {
+    "@rocketbean/data-repo": "^1.0.1",
     "asynchronous-emitter": "^0.1.0",
     "bcryptjs": "^2.4.3",
     "chalk": "^5.0.1",
@@ -31,6 +33,7 @@
     "lodash": "^4.17.21",
     "mongodb": "^4.7.0",
     "mongoose": "^6.4.4",
+    "redis": "^4.2.0",
     "uuid": "^8.3.2"
   }
 }

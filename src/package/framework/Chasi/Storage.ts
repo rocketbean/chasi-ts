@@ -54,7 +54,7 @@ export default class SessionStorage {
   public watcher() {
     let clusterData = SessionStorage.readClusterData();
     if (!this.config.enabled || clusterData.process == process.pid) {
-      this.watchThreads();
+      if (this.config.logs && this.config.enabled) this.watchThreads();
       this.reader = watch(
         path.join(this.serverFilePath),
         this.readServerFile.bind(this),
@@ -85,7 +85,7 @@ export default class SessionStorage {
         clusterData.process +
         "\n",
       chalk.bold.magentaBright(`PIDs            : `) +
-        clusterData.pids.join(" ") +
+        clusterData?.pids?.join(" ") +
         "\n",
     );
   }
@@ -111,7 +111,7 @@ export default class SessionStorage {
     if (this.config.enabled) {
       if (clusterData) {
         if (clusterData.process == process.pid) {
-          console.clear();
+          console.log("falling hir");
           this.data[target].push(message);
           this.writer.write(this.data);
         } else {
@@ -137,15 +137,14 @@ export default class SessionStorage {
           "\n",
       );
     }
-
     this.writeClusterData(clusterData);
   }
 
   readServerFile(cur, prev) {
     console.clear();
-    let clusterData = SessionStorage.readClusterData();
     process.stdout.clearLine(0);
     process.stdout.cursorTo(0);
+    let clusterData = SessionStorage.readClusterData();
     let content = readFileSync(this.serverFilePath, { encoding: "utf-8" });
     process.stdout.write(`\r ${content.toString()}\n`);
   }

@@ -4,16 +4,18 @@ import SessionWriter from "./writers/FileWriter.js";
 import ServiceCluster from "./ServiceCluster.js";
 import horizon from "../../statics/horizon/config.js";
 import SessionStorage from "./Storage.js";
+import Writer from "../../Logger/types/Writer.js";
 import { v4 as uuidv4 } from "uuid";
 import { Handler } from "../../Handler.js";
 import { Iobject } from "./../Interfaces.js";
-import Writer from "../../Logger/types/Writer.js";
+
 export default class Session {
   public id = uuidv4();
   public writer: SessionWriter;
   public nodeVer: number;
   private $app: Handler;
   static nodeVer = Number(process.version.match(/^v(\d+\.\d+)/)[1]);
+
   constructor(public config: Iobject) {
     this.config = config;
   }
@@ -26,6 +28,7 @@ export default class Session {
    * checking [node version]
    * to return [isMaster]
    * || [isPrimary] property
+   *
    **/
   static checkMainThread(): Function | boolean {
     if (Session.nodeVer < 16) return Cluster.isMaster;
