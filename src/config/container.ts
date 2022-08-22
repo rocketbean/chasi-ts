@@ -34,6 +34,7 @@ export default {
    * any middlewares pointed to a
    * route or route group or even in a route
    * containers, should be registered here
+   *
    */
   middlewares: {
     /**

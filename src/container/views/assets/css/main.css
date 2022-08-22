@@ -1,0 +1,16 @@
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+.container {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

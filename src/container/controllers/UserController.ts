@@ -11,19 +11,22 @@ export default class UserController extends Controller {
 
   /**
    * Single ObjectModel[index]
+   *
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
-  async index(request, response) {}
+  async index(request, response) {
+    return await this.compiler.render("/about");
+  }
 
   /**
    * Single ObjectModel[index]
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
+   *
    * */
   async welcome(request, response) {
-    throw new Error("PID process delayed");
-    // return `${process.pid}`;
+    return "testing";
   }
 
   /**

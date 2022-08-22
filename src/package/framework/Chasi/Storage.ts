@@ -7,14 +7,15 @@ import {
 } from "../Interfaces.js";
 import { watch, createReadStream, readFileSync } from "fs";
 import chalk from "chalk";
+import fs, { constants } from "fs";
 
 export default class SessionStorage {
   public data: SessionStorageData = {
     threads: [],
     database: [],
     routeRegistry: [],
-    boot: [],
     services: [],
+    boot: [],
     exceptions: [],
     logs: [],
   };
@@ -59,12 +60,34 @@ export default class SessionStorage {
         path.join(this.serverFilePath),
         this.readServerFile.bind(this),
       );
-
       this.clusterReader = watch(
         path.join(this.clusterFilePath),
         this.readClusterFile.bind(this),
       );
     }
+  }
+
+  /****
+   * Verify existence of a file
+   * and directory
+   */
+  static async verifyExistingDir(filepaths: string[]) {
+    return await Promise.all(
+      filepaths.map(async (filepath) => {
+        filepath = path.join(__dirname, filepath);
+        await fs.promises
+          .access(filepath, constants.R_OK)
+          .catch(async (err) => {
+            console.log(filepath, "@@ filepath");
+            if (err) {
+              return await fs.writeFile(filepath, "", (writeErr) => {
+                if (writeErr) return writeErr;
+                else return filepath;
+              });
+            }
+          });
+      }),
+    );
   }
 
   saveServerData() {

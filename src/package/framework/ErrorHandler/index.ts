@@ -1,15 +1,19 @@
 import Base from "../../Base.js";
+import chalk from "chalk";
 import Exception from "./Exception.js";
 import APIException from "./exceptions/APIException.js";
 import ChasiException from "./exceptions/APIException.js";
 import ExceptionLogger from "./ExceptionLogger.js";
-import { genericImport, ExceptionProperty, Iobject } from "../Interfaces.js";
 import Observer from "../../Observer/index.js";
+import { genericImport, ExceptionProperty, Iobject } from "../Interfaces.js";
 import { Handler } from "../../Handler.js";
 
 export default class ErrorHandler extends Base {
   static errors: Exception[] = [];
-  static exceptions: { [key: string]: any } = {};
+  static exceptions: { [key: string]: any } = {
+    ChasiException,
+    APIException,
+  };
   public config: Iobject;
   public logger: ExceptionLogger;
   public $observer: Observer;
@@ -78,20 +82,19 @@ export default class ErrorHandler extends Base {
    */
   static async handleProcessError() {
     process.on("exit", (code) => {
-      Caveat.handle(`process exited with code[${code}]`, "ChasiException");
+      console.error(
+        chalk.yellow(
+          `\n----♦ process exited with code [${code}], waiting for re establishing instance`,
+        ),
+      );
     });
 
     process.on("uncaughtException", function (err, origin) {
-      // try {
-      //   Caveat.handle(err, "ChasiException");
-      // } catch (e) {
-      console.log(err);
-      // }
+      console.error(err);
     });
 
     process.on("unhandledRejection", function (reason, promise) {
-      // Caveat.handle(`[${promise}] ${reason}`, "ChasiException");
-      console.log(reason);
+      console.error(reason);
     });
   }
 

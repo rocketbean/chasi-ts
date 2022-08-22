@@ -29,8 +29,8 @@ export default {
    * at serviceCluster[workers],
    * it will be equal to the available
    * cpus by default.
+   * ---------------------------------------------------------------------------
    *
-   *  ----------------------------------------------------------
    * enabled[boolean]:  enables the clustering
    * logs[boolean]: logs the cluster when enabled
    * workers[number]:   number or workers to assign in a cluster
@@ -47,8 +47,8 @@ export default {
 
   serviceCluster: {
     enabled: false,
-    logs: false,
-    workers: os.cpus().length,
+    logs: true,
+    workers: Math.round(os.cpus().length / 2),
     settings: {},
     schedulingPolicy: 2,
   },
@@ -59,7 +59,6 @@ export default {
    * change the [environment] property to the desired
    * selection, just keep make sure that the selected
    * environment is registered here...
-   *
    */
 
   modes: {

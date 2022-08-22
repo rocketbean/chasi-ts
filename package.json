@@ -9,12 +9,20 @@
     "start": "lite-server",
     "dev": "nodemon ./dist/server.js -e html,js,css --experimental-top-level-await "
   },
+  "nodemonConfig": {
+    "ignore": [
+      "./container/views",
+      "./nuxt.config.js"
+    ]
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@nuxtjs/vuetify": "^1.12.3",
     "@types/chalk": "^2.2.0",
     "@types/express": "^4.17.13",
     "@types/node": "^18.0.0",
+    "@types/vue": "^2.0.0",
     "lite-server": "^2.6.1",
     "log-update": "^5.0.1",
     "os-utils": "^0.0.14",
@@ -33,7 +41,11 @@
     "lodash": "^4.17.21",
     "mongodb": "^4.7.0",
     "mongoose": "^6.4.4",
+    "npm-cache": "^0.7.0",
+    "nuxt": "^2.15.8",
     "redis": "^4.2.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "vuetify": "^2.6.9",
+    "vuetify-loader": "^1.9.2"
   }
 }

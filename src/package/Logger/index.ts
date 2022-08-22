@@ -21,8 +21,8 @@ export default class Logger {
     this.writers[writer].write(message, display);
   }
 
-  writer(writer: string = "Left") {
-    return new _writers[writer]();
+  writer(writer: string = "Left", subject: string = "logs"): Writer {
+    return new _writers[writer](subject);
   }
 
   static init() {

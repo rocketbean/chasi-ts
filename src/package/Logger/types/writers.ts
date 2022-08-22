@@ -1,5 +1,6 @@
 import Center from "./Center.js";
 import Full from "./Full.js";
+import FullCustom from "./FullCustom.js";
 import StartTrace from "./StartTrace.js";
 import EndTrace from "./EndTrace.js";
 import Left from "./Left.js";
@@ -18,4 +19,5 @@ export {
   Right,
   LeftFull,
   RouterList,
+  FullCustom,
 };

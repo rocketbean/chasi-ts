@@ -5,6 +5,7 @@ export interface AuthDriver {
   authorize: Function;
 }
 export interface ModuleInterface {}
+
 export interface Constructuble<T> {
   new <T>(a?: any, B?: any): T;
 }

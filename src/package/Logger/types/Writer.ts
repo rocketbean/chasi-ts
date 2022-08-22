@@ -2,6 +2,8 @@ import chalk from "chalk";
 import logStyles from "../styles/style.js";
 import Group from "../Group.js";
 import util from "util";
+import readline from "readline";
+import { urlToHttpOptions } from "url";
 
 export default abstract class Writer {
   static log: Function = () => {};
@@ -51,8 +53,8 @@ export default abstract class Writer {
       }, 50);
     };
     let stop = ((_m?: "") => {
-      process.stdout.cursorTo(0);
-      process.stdout.clearLine(0);
+      readline.cursorTo(_wr, 0);
+      readline.clearLine(_wr, 0);
       if (finalMessage.length > 0) {
         this.write("\r" + chalk.bold.yellow(_m), "clear", this.subject);
       }
@@ -61,9 +63,8 @@ export default abstract class Writer {
 
     let trs = ((m: string) => {
       let indention = this.fill(process.stdout.columns - this.cols);
-      this.write(`\r ${indention} ${m}`, "clear", this.subject);
+      _wr.write(`\r ${indention} ${m}`);
     }).bind(this);
-
     return { start, stop };
   }
 
@@ -78,7 +79,20 @@ export default abstract class Writer {
         colors: true,
       });
     }
+
     Writer.log(message, subject);
+  }
+
+  drawAs(
+    message: string,
+    draw: Function,
+    formatStr: boolean = true,
+    subject?: string,
+  ) {
+    let parsedStr: any = message;
+    if (!subject) subject = this.subject;
+    if (formatStr) parsedStr = this.format(message);
+    Writer.log(draw(parsedStr), subject);
   }
 
   group(label: string = " ") {

@@ -16,6 +16,7 @@ import {
 import { workerData } from "worker_threads";
 import { EventEmitter } from "events";
 import Consumer from "./framework/Server/Consumer.js";
+import { exit } from "process";
 
 export class Handler extends Base {
   /***
@@ -65,7 +66,7 @@ export class Handler extends Base {
   /***
    * App[state] represents the
    * Handler State with number:
-   * ******
+   * ********
    * [0] unintiated
    * [1] before Handler is initiated
    * [2] Initializing Handler
@@ -106,6 +107,7 @@ export class Handler extends Base {
    * and calling the [BeforeApp] event
    * which installs modules;
    * -----------------------------------|
+   *
    * • ServerSession will be created
    * • Caveat ErrorHandling initiated
    * • ServicesModules installation
@@ -153,7 +155,7 @@ export class Handler extends Base {
    * initializing Handler state
    * getting ready for boot
    * --------------------------|
-   * • Router layers will be consumed
+   * ♦ Router layers will be consumed
    */
   protected async initialize() {
     try {
@@ -167,7 +169,8 @@ export class Handler extends Base {
   /**
    *  STATE[3]
    * After Handler was initiated
-   *
+   * ♦ setup compiler
+   * ♦ setup services
    */
   protected async after() {
     let services = {};
@@ -177,6 +180,10 @@ export class Handler extends Base {
       }
     });
     Controller.init(services);
+    if (this.config.compiler.enabled) {
+      let compiler = this.$modules.CompilerEngine as any;
+      Controller.$compiler = compiler.driver;
+    }
     await this.$observer.emit("__boot__", {
       next: this.$proxy.boot,
       app: this.$proxy,
@@ -185,6 +192,7 @@ export class Handler extends Base {
 
   protected async boot() {
     this.loggers.system.group("BOOT");
+
     await this.$app.bootup();
     this.loggers.system.endGroup("BOOT");
     this.$ev.emit("done");

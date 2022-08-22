@@ -4,8 +4,8 @@ export default class Controller extends controller {
     super();
   }
 
-  get sumthing() {
-    return "something";
+  get compiler() {
+    return Controller.$compiler;
   }
 
   get services() {

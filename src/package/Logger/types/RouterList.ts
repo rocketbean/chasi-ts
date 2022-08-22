@@ -1,11 +1,8 @@
 import Writer, { Writable } from "./Writer.js";
 import _style from "../styles/style.js";
-import { PassThrough } from "stream";
 import chalk from "chalk";
 import Router from "../../framework/Router/Router.js";
 import Endpoint from "../../framework/Router/Endpoint.js";
-import AfterApp from "../../statics/horizon/events/AfterApp.js";
-import logupdate from "log-update";
 
 export default class RouterList extends Writer implements Writable {
   format(message: string) {
@@ -50,7 +47,6 @@ export default class RouterList extends Writer implements Writable {
     let displayname = `[...${router.property.prefix.toUpperCase()}/]`,
       _tags = this.setTags({
         auth: true,
-        setup: false,
       });
     let cols = this.cols - displayname.length;
     cols -= _tags.reduce((a, b) => a + b.key.length, 0);

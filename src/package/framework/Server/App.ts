@@ -38,7 +38,6 @@ export default class App extends Consumer {
   /**
    * actual booting of Http/Https Server
    * fetching certificate and key file
-   * to
    */
   async install() {
     let serverConfig: { cert?: any; key?: any } = {};
@@ -50,11 +49,11 @@ export default class App extends Consumer {
     }
     this.$server.use(cors(this.config.cors));
     this.$server = this.protocol.createServer(serverConfig, this.$server);
+    return;
   }
 
   /**
    * Initializes the Authentication layer
-   *
    */
   async setAuthLayer(authConfig: Iobject) {
     this.auth = new Authentication(authConfig);
@@ -62,10 +61,18 @@ export default class App extends Consumer {
   }
 
   async bootup(): Promise<void> {
-    return await new Promise((res, rej) => {
-      this.install();
+    return await new Promise(async (res, rej) => {
+      await this.install();
       this.$server.listen(this.config.port, async () => {
         this.loggers.full.write("SERVING IN: ", "cool", "boot");
+        App.servelog.forEach((str) => {
+          let protocol = this.mode.protocol;
+          this.loggers.EndTraceFull.write(
+            `╟► ${protocol}://localhost:${this.config.port}${str}`,
+            "systemRead",
+            "boot",
+          );
+        });
         let nets = networkInterfaces();
         Object.keys(nets).forEach((key) => {
           nets[key]
@@ -74,13 +81,14 @@ export default class App extends Consumer {
               let protocol = this.mode.protocol;
               let ipv = net.address == "127.0.0.1" ? "localhost" : net.address;
               this.loggers.EndTraceFull.write(
-                `  ${protocol}://${ipv}:${this.config.port}`,
+                `╟► ${protocol}://${ipv}:${this.config.port}`,
                 "systemRead",
                 "boot",
               );
             });
-          res();
         });
+        this.loggers.EndTraceFull.write("╟", "systemRead", "boot");
+        res();
       });
     });
   }

@@ -1,7 +1,7 @@
 import fs, { existsSync, mkdirSync } from "fs";
 import path from "path";
 import chalk from "chalk";
-import util from "util";
+
 export default class SessionWriter {
   public writer;
   public rawPath;

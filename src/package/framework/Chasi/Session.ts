@@ -1,5 +1,6 @@
-import Base from "../../Base.js";
 import Cluster from "cluster";
+import Base from "../../Base.js";
+import CompilerEngine from "../Compiler/compiler.js";
 import SessionWriter from "./writers/FileWriter.js";
 import ServiceCluster from "./ServiceCluster.js";
 import horizon from "../../statics/horizon/config.js";
@@ -28,7 +29,6 @@ export default class Session {
    * checking [node version]
    * to return [isMaster]
    * || [isPrimary] property
-   *
    **/
   static checkMainThread(): Function | boolean {
     if (Session.nodeVer < 16) return Cluster.isMaster;
@@ -41,14 +41,24 @@ export default class Session {
     return $app;
   }
 
+  static async validates(config) {
+    if (config.compiler.enabled) {
+      Writer.log = process.stdout.write;
+      await CompilerEngine.runValidations(config);
+    }
+    return;
+  }
+
   static async initialize(config: Iobject) {
     config = <Iobject>Base.mergeObjects(horizon, config);
+    if (!config.server.serviceCluster.enabled) await Session.validates(config);
     let session = new Session(config);
     let cluster = new ServiceCluster(session);
-    cluster.createStorage();
+    await cluster.createStorage();
     Writer.log = cluster.storage.write.bind(cluster.storage);
     if (config.server.serviceCluster.enabled) {
       if (Session.checkMainThread()) {
+        await Session.validates(config);
         await cluster.createCluster();
       } else {
         let clusterData = SessionStorage.readClusterData();

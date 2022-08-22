@@ -10,7 +10,6 @@ export default class BootApp extends Event {
    */
   async validate(params, next) {
     params.app.state = 4;
-    // params.compiler = params.app.$services.compiler;
     next();
   }
 
@@ -22,9 +21,6 @@ export default class BootApp extends Event {
    * been passed on emit.
    */
   async fire(params) {
-    // await params.app.installModule(
-    //   await params.compiler.init(params.app.config.compiler),
-    // );
     await params.next();
   }
   async onemit() {}

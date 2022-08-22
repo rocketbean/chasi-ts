@@ -15,7 +15,6 @@ export default class ServiceCluster {
   constructor(public $session: Session) {
     this.$session = $session;
     this.config = $session.config.server.serviceCluster;
-    this.createStorage();
   }
 
   /**
@@ -26,12 +25,18 @@ export default class ServiceCluster {
    * threads app instance will be logged
    * except for [exceptions] and [logs]
    */
-  createStorage() {
+  async createStorage() {
+    await Storage.verifyExistingDir([
+      this.config.serverFile,
+      this.config.clusterFile,
+    ]);
+
     this.storage = new Storage(
       this.config.serverFile,
       this.config.clusterFile,
       this.config,
     );
+    return;
   }
 
   /**

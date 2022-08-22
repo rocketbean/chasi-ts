@@ -1,16 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ScriptHost",
-      "ESNext",
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules/types",
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ScriptHost", "ESNext"],
+    "typeRoots": ["node_modules/@types", "node_modules/types"],
     "allowJs": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -19,7 +11,7 @@
     "outDir": "./dist",
     "removeComments": false,
     "forceConsistentCasingInFileNames": true,
-    /* Type Checking */
+    /* Type Checking  */
     "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -29,7 +21,5 @@
     "experimentalDecorators": true,
     "types": ["node"]
   },
-  "exclude": [
-    "dist"
-  ]
+  "exclude": ["dist", "*.config.js", "chasi.json"]
 }

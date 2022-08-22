@@ -84,8 +84,8 @@ export default class Base {
       if (!ext) filepath += ".js";
       let _fp = path.join(__filepath + filepath);
       return (await import(_fp)).default;
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      Logger.writers["Left"].write(e);
     }
   }
 
@@ -131,6 +131,7 @@ export default class Base {
 
   /**
    * Start Server
+   *
    */
   static async Ignition(): Promise<{ [key: string]: any }> {
     return (await Base._fetchFilesFromDir(_configpath_)) as Iobject;
