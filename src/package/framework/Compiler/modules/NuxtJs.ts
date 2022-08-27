@@ -6,6 +6,7 @@ import { Iobject } from "../../Interfaces.js";
 import { Nuxt, build, loadNuxt } from "nuxt";
 /** NuxtJS
  * Compiler Engine Driver
+ * 
  */
 export default class NuxtJs {
   public instance;

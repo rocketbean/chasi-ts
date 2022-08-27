@@ -7,6 +7,7 @@ import nuxt from "../modules/NuxtJs.js";
 import run from "./run.js";
 import chalk from "chalk";
 import path from "path";
+import { inspect } from "util";
 import { exit } from "process";
 var basePath;
 var _config;
@@ -130,7 +131,11 @@ export default async (config, writer, dir) => {
      * check config file
      */
     if (!_engineConfig || state.state < 2) {
-      let confContent = JSON.stringify(engineConfig, null, 2);
+      let confContent = inspect(engineConfig, {
+        showHidden: false,
+        customInspect: false,
+        depth: null,
+      });
       await checkAndWriteFile(
         path.join(basePath, "nuxt.config.js"),
         `export default ${confContent}`,
@@ -146,7 +151,11 @@ export default async (config, writer, dir) => {
       _engineConfig?.default &&
       !__deepEqual(_engineConfig?.default, engineConfig)
     ) {
-      let confContent = JSON.stringify(engineConfig, null, 2);
+      let confContent = inspect(engineConfig, {
+        showHidden: false,
+        customInspect: false,
+        depth: null,
+      });
       return await updateFile(
         path.join(basePath, "nuxt.config.js"),
         `export default ${confContent}`,

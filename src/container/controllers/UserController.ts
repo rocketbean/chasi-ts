@@ -16,7 +16,19 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async index(request, response) {
-    return await this.compiler.render("/about");
+    this.compiler.renderer.resources.errorTemplate = () => {};
+    console.log(this.compiler.renderer.resources.errorTemplate);
+    let r = await this.compiler.renderRoute("/", {
+      app: {
+        nuxt: {
+          error: (err) => {
+            console.log("err");
+            return null;
+          },
+        },
+      },
+    });
+    return r.html;
   }
 
   /**
