@@ -48,6 +48,7 @@ export type SessionStorageData = {
   boot: Iobject[];
   services: [];
   exceptions: any;
+  reports: any;
   logs: any;
 };
 

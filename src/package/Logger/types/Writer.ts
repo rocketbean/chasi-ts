@@ -4,6 +4,7 @@ import Group from "../Group.js";
 import util from "util";
 import readline from "readline";
 import { urlToHttpOptions } from "url";
+import { exit } from "process";
 
 export default abstract class Writer {
   static log: Function = () => {};
@@ -79,7 +80,6 @@ export default abstract class Writer {
         colors: true,
       });
     }
-
     Writer.log(message, subject);
   }
 

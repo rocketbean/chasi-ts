@@ -28,7 +28,22 @@ export default class SessionWriter {
     });
   }
 
-  async write(data: any) {
+  format(data: any) {
+    let str = "";
+    Object.keys(data).forEach((group) => {
+      if (data[group].length > 0) {
+        str += chalk.dim.bold.bgRgb(15, 100, 204).rgb(0, 0, 24)(
+          `\n • ${group.toUpperCase()} \n`,
+        );
+        str += "\n";
+        str += data[group].map((message) => `  ${message}`).join("");
+      }
+    });
+
+    return str;
+  }
+
+  async write(data: any): Promise<any> {
     let str = "\n";
     Object.keys(data).forEach((group) => {
       if (data[group].length > 0) {
@@ -43,5 +58,6 @@ export default class SessionWriter {
     fs.writeFile(this.storage, str, (err) => {
       if (err) console.log(err);
     });
+    return str;
   }
 }

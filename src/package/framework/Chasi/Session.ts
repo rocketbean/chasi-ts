@@ -9,12 +9,15 @@ import Writer from "../../Logger/types/Writer.js";
 import { v4 as uuidv4 } from "uuid";
 import { Handler } from "../../Handler.js";
 import { Iobject } from "./../Interfaces.js";
+import { exit } from "process";
+import PipeHandler from "./PipeHandler.js";
 
 export default class Session {
   public id = uuidv4();
   public writer: SessionWriter;
   public nodeVer: number;
   private $app: Handler;
+
   static nodeVer = Number(process.version.match(/^v(\d+\.\d+)/)[1]);
 
   constructor(public config: Iobject) {
@@ -35,8 +38,12 @@ export default class Session {
     else return Cluster.isPrimary;
   }
 
-  static async createHandler(session: Session, config: Iobject) {
-    let $app = await Handler.init(config);
+  static async createHandler(
+    session: Session,
+    config: Iobject,
+    pipe?: PipeHandler,
+  ) {
+    let $app = await Handler.init(config, pipe);
     session.attachApp($app);
     return $app;
   }
@@ -61,12 +68,9 @@ export default class Session {
         await Session.validates(config);
         await cluster.createCluster();
       } else {
-        let clusterData = SessionStorage.readClusterData();
-        let app = await Session.createHandler(session, config);
-        if (process.pid === clusterData.process) {
-          cluster.storage.saveServerData();
-        }
-        return app;
+        let pipe = new PipeHandler();
+        await cluster.storage.setPipe(pipe);
+        return await Session.createHandler(session, config, pipe);
       }
     } else {
       return await Session.createHandler(session, config);

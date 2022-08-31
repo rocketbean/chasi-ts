@@ -11,10 +11,21 @@ export default class Logger {
 
   public writers: { [key: string]: Writable } = {};
 
+  public static board: any;
+
   private constructor() {
     Object.keys(_writers).map((key: string): void => {
       this.writers[key] = new _writers[key]();
     });
+  }
+
+  get board() {
+    return Logger.board;
+  }
+
+  set board(v) {
+    console.log(v);
+    Logger.board = v;
   }
 
   log(message: string, writer: string, display: string = "clear") {

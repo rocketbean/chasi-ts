@@ -33,6 +33,8 @@ export default {
    *
    * enabled[boolean]:  enables the clustering
    * logs[boolean]: logs the cluster when enabled
+   * trackUsage.enabled[boolean]: tracks memory heaps
+   * trackUsage.interval[number]: track update interval
    * workers[number]:   number or workers to assign in a cluster
    * settings[object]:  settings to apply to the cluster. check
    * https://nodejs.org/docs/latest/api/cluster.html#clustersetupprimarysettings
@@ -50,6 +52,10 @@ export default {
    */
   serviceCluster: {
     enabled: true,
+    trackUsage: {
+      enabled: false,
+      interval: 500,
+    },
     logs: true,
     workers: Math.round(os.cpus().length / 2),
     settings: {},

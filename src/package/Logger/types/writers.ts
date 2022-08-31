@@ -8,6 +8,7 @@ import Right from "./Right.js";
 import EndTraceFull from "./EndTraceFull.js";
 import LeftFull from "./LeftFull.js";
 import RouterList from "./RouterList.js";
+import Reporter from "./Reporter.js";
 
 export {
   Center,
@@ -20,4 +21,5 @@ export {
   LeftFull,
   RouterList,
   FullCustom,
+  Reporter,
 };

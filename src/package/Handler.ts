@@ -8,16 +8,13 @@ import ServicesModule from "./framework/Services/ServicesModule.js";
 import Base, { ProxyHandler } from "./Base.js";
 import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
-
 import {
   ModuleInterface,
   ServiceProviderInterface,
 } from "./framework/Interfaces.js";
-import { workerData } from "worker_threads";
 import { EventEmitter } from "events";
 import Consumer from "./framework/Server/Consumer.js";
-import { exit } from "process";
-
+import PipeHandler from "./framework/Chasi/PipeHandler.js";
 export class Handler extends Base {
   /***
    * singleton [Handler];
@@ -78,7 +75,7 @@ export class Handler extends Base {
   $services: { [key: string]: Service };
   private LockedServices: string[] = ["routers"];
 
-  private constructor(private config: Iobject) {
+  private constructor(private config: Iobject, public pipe?: PipeHandler) {
     super();
     this.$ev = new EventEmitter();
     this.config = <Iobject>Base.mergeObjects(horizon, config);
@@ -114,8 +111,14 @@ export class Handler extends Base {
    * • setup Observers [emitters]
    */
   protected async start(): Promise<void> {
-    // this.$runtime = await this.session.set(this.config, this);
-    // this.$runtime_id = this.$runtime.id;
+    if (!process.stdout.isTTY) {
+      let board = (await this.pipe.getAsync({
+        action: "getTty",
+      })) as Iobject;
+      process.stdout.columns = parseInt(board.columns);
+      process.stdout.rows = parseInt(board.rows);
+    }
+
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);
     this.$modules.services = await ServicesModule.init(
@@ -192,7 +195,6 @@ export class Handler extends Base {
 
   protected async boot() {
     this.loggers.system.group("BOOT");
-
     await this.$app.bootup();
     this.loggers.system.endGroup("BOOT");
     this.$ev.emit("done");
@@ -229,18 +231,18 @@ export class Handler extends Base {
    */
   protected setLoggers(): void {
     this.loggers = {
-      system: global.Logger.writer("Left").style("system"),
-      subsystem: global.Logger.writer("Left").style("subsystem"),
-      center: global.Logger.writer("Center").style("cool"),
-      full: global.Logger.writer("Full").style("cool"),
-      LeftFull: global.Logger.writer("LeftFull").style("cool"),
-      EndTraceFull: global.Logger.writer("EndTraceFull").style("cool"),
+      system: Logger.writer("Left").style("system"),
+      subsystem: Logger.writer("Left").style("subsystem"),
+      center: Logger.writer("Center").style("cool"),
+      full: Logger.writer("Full").style("cool"),
+      LeftFull: Logger.writer("LeftFull").style("cool"),
+      EndTraceFull: Logger.writer("EndTraceFull").style("cool"),
     };
   }
 
-  static async init(config: Iobject): Promise<Handler> {
+  static async init(config: Iobject, pipe?: PipeHandler): Promise<Handler> {
     if (Handler._instance) return Handler._instance;
-    Handler._instance = new Handler(config);
+    Handler._instance = new Handler(config, pipe);
     global.$app = Handler._instance;
     await Handler._instance.start();
     return Handler._instance;

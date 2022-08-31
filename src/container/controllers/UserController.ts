@@ -54,6 +54,8 @@ export default class UserController extends Controller {
    *
    * */
   async welcome(request, response) {
+    let num = process.pid.toString();
+    console.log(`welcome ${num}`);
     return "your server is ready";
   }
 
