@@ -13,5 +13,10 @@ export default (route: Route) => {
    */
 
   route.get("/", "UserController@welcome");
-  route.get("/:test", "UserController@index");
+  route.get("/:id", "UserController@renderHtml");
+  route.group({ prefix: "user" }, () => {
+    route.get("create", "UserController@create");
+    route.get("welcome", "UserController@welcome");
+    route.get(":user", "UserController@index");
+  });
 };

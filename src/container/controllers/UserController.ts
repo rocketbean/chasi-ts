@@ -7,7 +7,13 @@ export default class UserController extends Controller {
    * @param {request} [ExpressRequest] Object
    * @return {} translated as [ExpressResponse] Object
    * */
-  async create(request, response) {}
+  async create(request, response) {
+    return await User.create({
+      email: "buzzokkin@gmail.com",
+      name: "nikko mesina",
+      alias: "nikko@buzz",
+    });
+  }
 
   /**
    * Single ObjectModel[index]
@@ -15,7 +21,7 @@ export default class UserController extends Controller {
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
-  async index(request, response) {
+  async renderHtml(request, response) {
     this.compiler.renderer.resources.errorTemplate = () => {};
     console.log(this.compiler.renderer.resources.errorTemplate);
     let r = await this.compiler.renderRoute("/", {
@@ -33,12 +39,22 @@ export default class UserController extends Controller {
 
   /**
    * Single ObjectModel[index]
+   *
+   * @param {request} [ExpressRequest] Object
+   * @return {Object} translated as [ExpressResponse] Object
+   * */
+  async index(request, response) {
+    return request.params.__user;
+  }
+
+  /**
+   * Single ObjectModel[index]
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    *
    * */
   async welcome(request, response) {
-    return "testing";
+    return "your server is ready";
   }
 
   /**

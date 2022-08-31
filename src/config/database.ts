@@ -10,6 +10,7 @@ export default {
    * | is set. [Model] connection can be altered in the     |
    * | model itself.                                        |
    * *------------------------------------------------------*
+   *
    */
 
   connections: {

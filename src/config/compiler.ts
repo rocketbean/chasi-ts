@@ -1,7 +1,7 @@
 import { resolve } from "path";
 
 export default {
-  enabled: true,
+  enabled: false,
   driver: "NuxtJs",
   /* * *
    * Directory to compile view files
@@ -17,7 +17,7 @@ export default {
        * App[AfterApp] hook.
        * * * * * *
        * disable this option if your on development
-       * and clusters[./server.serviceCluster]
+       * and clusters @[./server.serviceCluster]
        * is disabled.
        */
       useProdEnv: false,

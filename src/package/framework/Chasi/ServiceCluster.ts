@@ -6,6 +6,7 @@ import cluster from "cluster";
 import Writer from "./writers/FileWriter.js";
 import Storage from "./Storage.js";
 import SessionStorage from "./Storage.js";
+import { exit } from "process";
 export default class ServiceCluster {
   static nodeVer = Number(process.version.match(/^v(\d+\.\d+)/)[1]);
 

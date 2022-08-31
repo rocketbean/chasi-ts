@@ -57,6 +57,7 @@ export default class RouterServiceProvider implements ServiceProviderInterface {
          */
         AuthRouteExceptions: [],
         before: (request, response) => {},
+        after: (request, response) => {},
       } as RouterConfigInterface),
 
       new Router({

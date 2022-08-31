@@ -8,7 +8,7 @@
         <div class = "content-box" :class="document_cb_class" :style = "document_cb" >
           <div class = "content-pad" >
             <section>
-              <h1 class="title">Chasi-TS</h1>
+              <h1 class="title">Chasi-TS </h1>
               <h2 class="subtitle">Build Something Awesome!</h2>
               <div style = "border-top: 1px solid grey">
                 <logs-sm v-if = "document"></logs-sm>

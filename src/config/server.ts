@@ -42,14 +42,19 @@ export default {
    *  [2] RoundRobin - round robin approach where requests will be assigned in sequence
    *
    * ** please note that in windows, using [2]round robin scheduling might not
-   * as good as it was intended. **
+   * as good as it was intended.
+   * loadtest your app to check and adjust performance,
+   * e.g. installing loadtest
+   * loadtest -n 1000 -c 200 http://localhost:3000/app/
+   * **
    */
-
   serviceCluster: {
-    enabled: false,
+    enabled: true,
     logs: true,
     workers: Math.round(os.cpus().length / 2),
-    settings: {},
+    settings: {
+      stdio: [null, null, null, "pipe", "pipe", "ipc"],
+    },
     schedulingPolicy: 2,
   },
 
