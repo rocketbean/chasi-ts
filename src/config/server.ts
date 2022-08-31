@@ -52,9 +52,7 @@ export default {
     enabled: true,
     logs: true,
     workers: Math.round(os.cpus().length / 2),
-    settings: {
-      stdio: [null, null, null, "pipe", "pipe", "ipc"],
-    },
+    settings: {},
     schedulingPolicy: 2,
   },
 
