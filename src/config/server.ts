@@ -51,7 +51,7 @@ export default {
    * **
    */
   serviceCluster: {
-    enabled: true,
+    enabled: false,
     trackUsage: {
       enabled: false,
       interval: 500,

@@ -2,9 +2,13 @@ import {
   ServiceProviderInterface,
   RouterConfigInterface,
 } from "../../package/framework/Interfaces.js";
+import Provider from "../../package/framework/Services/Provider.js";
 import Router from "../../package/statics/Router.js";
 
-export default class RouterServiceProvider implements ServiceProviderInterface {
+export default class RouterServiceProvider
+  extends Provider
+  implements ServiceProviderInterface
+{
   async boot() {
     return [
       new Router({

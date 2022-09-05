@@ -41,29 +41,30 @@ export class Handler extends Base {
   private status: "off" | "initializing" | "instantiating" | "initialized" =
     "off";
 
-  /***
+  /* * *
    * [loggers] Log Handlers
    */
   private loggers: { [key: string]: Writable } = {};
 
-  /***
+  /* * *
    * [$observer] EventHandler
    */
   $observer: Obsesrver;
 
-  /***
+  /* * *
    * [$modules] EventHandler
    */
   $modules: { [key: string]: ModuleInterface } = {};
-  /***
+
+  /* * *
    * [$app] Express App
    */
   $app: App;
 
-  /***
+  /* * * * * * * * *
    * App[state] represents the
    * Handler State with number:
-   * ********
+   * * * * * * * * *
    * [0] unintiated
    * [1] before Handler is initiated
    * [2] Initializing Handler
@@ -90,7 +91,7 @@ export class Handler extends Base {
     this._state = v;
   }
 
-  /**
+  /* *
    * returns back the
    * private runtime id;
    */
@@ -98,12 +99,12 @@ export class Handler extends Base {
     return this.$runtime_id;
   }
 
-  /***
+  /* * * * * * * * * * * * * * *
    * State[0]
    * Initializes the App [services|modules] part
    * and calling the [BeforeApp] event
    * which installs modules;
-   * -----------------------------------|
+   * -------------------------------|
    *
    * • ServerSession will be created
    * • Caveat ErrorHandling initiated
@@ -121,6 +122,7 @@ export class Handler extends Base {
 
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);
+
     this.$modules.services = await ServicesModule.init(
       this.config.container.ServiceBootstrap,
     );
@@ -136,7 +138,7 @@ export class Handler extends Base {
     return;
   }
 
-  /***
+  /* * *
    * STATE[1]
    * before everything will be
    * connected [before] event
@@ -153,7 +155,7 @@ export class Handler extends Base {
     });
   }
 
-  /***
+  /* * *
    * STATE[2]
    * initializing Handler state
    * getting ready for boot
@@ -169,7 +171,7 @@ export class Handler extends Base {
     } catch (e) {}
   }
 
-  /**
+  /* * * *
    *  STATE[3]
    * After Handler was initiated
    * ♦ setup compiler
@@ -200,7 +202,7 @@ export class Handler extends Base {
     this.$ev.emit("done");
   }
 
-  /**
+  /* *
    * modules from out of the box
    * App installation
    * @param module ModuleInterface
@@ -209,7 +211,7 @@ export class Handler extends Base {
     this.$modules[module.constructor.name] = module;
   }
 
-  /***
+  /* * *
    * initial setup before
    * App [Singleton] Instance
    * @return [void]
@@ -225,7 +227,7 @@ export class Handler extends Base {
     this.loggers[type].write(message.toUpperCase());
   }
 
-  /***
+  /* * *
    * Set System-Display Log
    * @return [void]
    */

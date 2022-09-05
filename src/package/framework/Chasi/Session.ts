@@ -30,8 +30,7 @@ export default class Session {
 
   /**
    * checking [node version]
-   * to return [isMaster]
-   * || [isPrimary] property
+   * to return [isMaster] || [isPrimary] property
    **/
   static checkMainThread(): Function | boolean {
     if (Session.nodeVer < 16) return Cluster.isMaster;

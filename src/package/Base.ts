@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs";
 import _ from "lodash";
 import { Iobject } from "./framework/Interfaces.js";
-import ChasiTerminal from "./framework/Chasi/Terminal.js";
 
 export const ProxyHandler = {
   get: (target, prop, receiver) => {
@@ -84,17 +83,17 @@ export default class Base {
       if (!ext) filepath += ".js";
       let _fp = path.join(__filepath + filepath);
       return (await import(_fp)).default;
-    } catch (e: any) {
-      Logger.writers["Left"].write(e);
+    } catch (e) {
+      console.log(e);
     }
   }
 
   static async _fsFetchDir(dir: string): Promise<any> {
-    let _p = path.resolve(__dirname + dir);
+    let _p = path.join(__filepath, dir);
     return await Promise.all(
       fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
         try {
-          return (await import(`file:\\${path.resolve(_p, file)}`)).default;
+          return (await import(`${path.join(_p, file)}`)).default;
         } catch (e) {
           console.log(e);
         }
@@ -131,7 +130,6 @@ export default class Base {
 
   /**
    * Start Server
-   *
    */
   static async Ignition(): Promise<{ [key: string]: any }> {
     return (await Base._fetchFilesFromDir(_configpath_)) as Iobject;

@@ -1,6 +1,6 @@
 export default {
   host: checkout(process.env.database, "dev"),
-  bootWithDB: true,
+  bootWithDB: false,
   default: checkout(process.env.database, "dev"),
   /**
    * *------------- [ Database Connections ] ---------------*
