@@ -3,6 +3,7 @@ import Base from "../Base.js";
 import Writer from "../Logger/types/Writer.js";
 import Event, { EventInterface } from "./Event.js";
 import { Iobject } from "./../framework/Interfaces.js";
+import Listener from "./Listener.js";
 
 export default class Observer extends Base {
   $events: { [key: string]: any } = {};
@@ -70,11 +71,18 @@ export default class Observer extends Base {
         await instance.validate(property, async (): Promise<void> => {
           await instance.onemit();
           await instance.fire(property);
+          await instance.fireListeners();
           await instance.emitted();
         });
       } catch (e) {}
     });
     return this.$events;
+  }
+
+  when(key, fn, opts = {}) {
+    let ev = this.$events[key];
+    let lis = new Listener(key, fn, opts);
+    ev.listeners.push(lis);
   }
 
   async emit(event: string, params?: any) {

@@ -1,5 +1,6 @@
 import Base from "../../Base.js";
 import Service from "./Service.js";
+import Provider from "./Provider.js";
 import {
   Iobject,
   ModuleInterface,
@@ -40,6 +41,7 @@ export default class ServicesModule extends Base implements ModuleInterface {
   }
 
   static async init(services: any): Promise<ServicesModule> {
+    Provider.init();
     let module = new ServicesModule(services);
     await module.bootServices();
     return module;

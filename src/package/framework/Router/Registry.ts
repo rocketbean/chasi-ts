@@ -5,6 +5,7 @@ import Router from "./Router.js";
 import Base from "../../Base.js";
 import { RouterConfigInterface } from "../Interfaces.js";
 import Authentication from "../Server/Authentication.js";
+import { exit } from "process";
 export default class Registry extends Base {
   controllers: Controller[] = [];
   routes: Endpoint[] = [];
@@ -91,18 +92,27 @@ export default class Registry extends Base {
    */
   async expand() {
     await Promise.all(
-      this.routes.map(async (ep: Endpoint) => {
+      this.routes.map(async (ep: Endpoint, index: number) => {
         try {
           await this.setRouterLayer(ep);
           await this.consumeRouteGroup(ep);
-          this.bindMiddlewares(ep);
           this.constructEndpoint(ep);
+          this.bindMiddlewares(ep);
           this.bindMethods(ep);
+          this.pullDynamicRoute(ep);
         } catch (e) {
           Caveat.handle({ message: e, interpose: 2 });
         }
       }),
     );
+  }
+
+  pullDynamicRoute(ep: Endpoint) {
+    if (ep.path.includes(":")) {
+      ep.isDynamic = true;
+      this.routes = this.routes.filter((e) => e.path !== ep.path);
+      this.routes.push(ep);
+    }
   }
 
   /***

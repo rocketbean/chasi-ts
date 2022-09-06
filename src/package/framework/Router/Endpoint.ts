@@ -5,6 +5,7 @@ import Group from "./Group.js";
 import Exception from "../ErrorHandler/Exception.js";
 export default class Endpoint {
   public path: string = "";
+  public isDynamic: boolean = false;
   public middlewares: string[] = [];
   public $middlewares: Function[] = [];
   public beforeFns: Function[] = [];

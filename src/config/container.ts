@@ -27,6 +27,7 @@ export default {
      */
     routers: "container/services/RouterServiceProvider",
     compiler: "container/services/CompilerEngineServiceProvider",
+    sockets: "container/services/SocketServiceProvider",
   },
 
   /**

@@ -83,6 +83,12 @@ export default class ServiceCluster {
     }
   }
 
+  broadcast(message) {
+    this.workers.map((worker) => {
+      worker.process.stdio[4].write(message);
+    });
+  }
+
   setMessagingProto(worker) {
     let tunnel = new PassThrough();
     tunnel.on("data", (chunk) => {
@@ -106,11 +112,30 @@ export default class ServiceCluster {
         );
       }
 
+      if (_prop.action.includes("logData")) {
+        console.log(_prop.transmit);
+      }
+
+      if (_prop.action.includes("websock")) {
+        this.handleSocketActions(worker, _prop);
+      }
+
       if (_prop.action.includes("clearAll")) {
         console.clear();
       }
     });
     worker.process.stdio[3].pipe(tunnel);
+  }
+
+  handleSocketActions(worker, _prop) {
+    if (_prop.action.includes("event")) {
+      this.broadcast(
+        JSON.stringify({
+          action: "socket:fire",
+          transmit: _prop,
+        }),
+      );
+    }
   }
 
   /**

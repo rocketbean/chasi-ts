@@ -62,14 +62,14 @@ export default class Base {
   async fetchFile(filepath: string) {
     let ext = path.extname(filepath);
     if (!ext) filepath += ".js";
-    let _fp = path.join(__filepath + filepath);
+    let _fp = path.join(__filepath, filepath);
     return (await import(_fp)).default;
   }
 
   static fetchSync(filepath: string) {
     let ext = path.extname(filepath);
     if (!ext) filepath += ".js";
-    let _fp = path.join(__filepath + filepath);
+    let _fp = path.join(__filepath, filepath);
     return import(_fp);
   }
 
@@ -81,7 +81,7 @@ export default class Base {
     try {
       let ext = path.extname(filepath);
       if (!ext) filepath += ".js";
-      let _fp = path.join(__filepath + filepath);
+      let _fp = path.join(__filepath, filepath);
       return (await import(_fp)).default;
     } catch (e) {
       console.log(e);

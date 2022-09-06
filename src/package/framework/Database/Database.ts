@@ -42,6 +42,8 @@ export default class Database implements ModuleInterface {
     await Promise.all(
       Object.keys(this.config.connections).map(async (con: string) => {
         let connection = this.config.connections[con] as DBProperty;
+        connection.hideLogConnectionStrings =
+          this.config.hideLogConnectionStrings;
         let driver = this.$drivers[connection.driver];
         this.$databases[con] = new driver(connection, con);
         if (con == this.config.default) this.$databases[con].isDefaultDB = true;
@@ -50,7 +52,7 @@ export default class Database implements ModuleInterface {
   }
 
   /***
-   * fake loading time for testing purposes
+   * fake loading time for [testing purposes]
    */
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

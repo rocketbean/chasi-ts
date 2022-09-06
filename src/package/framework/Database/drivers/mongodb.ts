@@ -2,6 +2,7 @@ import Driver, { DBDriverInterface } from "./drivers.js";
 import { DBProperty, Iobject } from "../../Interfaces.js";
 import mongoose, { mongo } from "mongoose";
 import chalk from "chalk";
+import { exit } from "process";
 export default class MongoDBDriver extends Driver implements DBDriverInterface {
   public $property: Iobject = {};
   public protocol = "mongodb://";
@@ -64,10 +65,15 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
               : this.name.toUpperCase()
           } `,
         );
-        let str = this.hideStrings(this.$property.url);
-        this.logger.write(
-          ` - ${this.$property.url.replace(/\/\/(.*?)\//g, str)}\n`,
-        );
+        if (this.config.hideLogConnectionStrings) {
+          let str = this.hideStrings(this.$property.url);
+          this.logger.write(
+            ` - ${this.$property.url.replace(/\/\/(.*?)\//g, str)}\n`,
+          );
+        } else {
+          this.logger.write(` - ${this.$property.url}\n`);
+        }
+
         return con;
       })
       .catch((e) => {

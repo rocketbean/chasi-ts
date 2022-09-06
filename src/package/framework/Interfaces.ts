@@ -26,8 +26,16 @@ export interface AppException {}
 
 export interface RoutableInterface {}
 
+export interface ProviderInterface {
+  name: string;
+  instance: any;
+  service: any;
+  status: string;
+}
+
 export interface ServiceProviderInterface {
   boot(a?: any, b?: any): void;
+  ServerBoot?(a?: any, b?: any): void;
 }
 
 export interface BootableInterface {
@@ -88,12 +96,14 @@ export type DBProperty = {
   db: string;
   params?: string;
   options?: any;
+  hideLogConnectionStrings?: boolean;
 };
 
 export type DatabaseConfig = {
   host: string;
   bootWithDB: boolean;
   default: string;
+  hideLogConnectionStrings: boolean;
   connections: { [key: string]: DBProperty };
 };
 

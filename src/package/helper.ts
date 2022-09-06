@@ -55,6 +55,8 @@ declare global {
 
   var __deepEqual: Function;
 
+  var _getMethods: Function;
+
   var $app: any;
 }
 
@@ -87,6 +89,10 @@ export default (async () => {
   );
 
   global.__filepath = path.join(path.normalize(import.meta.url), "../../");
+
+  global._getMethods = (obj) => {
+    return Object.getOwnPropertyNames(obj).filter((item) => item);
+  };
 
   global.Caveat = new ExceptionHandler();
   await ExceptionHandler.handleProcessError();

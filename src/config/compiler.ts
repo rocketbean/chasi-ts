@@ -69,6 +69,7 @@ export default {
         dependencies: {
           nuxt: "^2.9.0",
           vuetify: "^2.6.9",
+          "vue-three": "^0.1.20",
           "vuetify-loader": "^1.9.2",
         },
       },

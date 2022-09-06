@@ -198,6 +198,9 @@ export class Handler extends Base {
   protected async boot() {
     this.loggers.system.group("BOOT");
     await this.$app.bootup();
+    await this.$observer.emit("__ready__", {
+      server: this.$app.$server,
+    });
     this.loggers.system.endGroup("BOOT");
     this.$ev.emit("done");
   }
@@ -240,6 +243,10 @@ export class Handler extends Base {
       LeftFull: Logger.writer("LeftFull").style("cool"),
       EndTraceFull: Logger.writer("EndTraceFull").style("cool"),
     };
+  }
+
+  static get Instance() {
+    return Handler._instance;
   }
 
   static async init(config: Iobject, pipe?: PipeHandler): Promise<Handler> {

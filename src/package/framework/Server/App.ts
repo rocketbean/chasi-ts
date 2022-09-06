@@ -63,6 +63,7 @@ export default class App extends Consumer {
   async bootup(): Promise<void> {
     return await new Promise(async (res, rej) => {
       await this.install();
+      this.$server.on("error", (err) => rej(err));
       this.$server.listen(this.config.port, async () => {
         this.loggers.full.write("SERVING IN: ", "cool", "boot");
         App.servelog.forEach((str) => {

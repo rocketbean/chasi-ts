@@ -1,10 +1,18 @@
-import { serverConfig, AppException, Iobject } from "../Interfaces.js";
+import {
+  serverConfig,
+  AppException,
+  Iobject,
+  ServiceProviderInterface,
+  ProviderInterface,
+} from "../Interfaces.js";
 import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
 import Express, { response } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
+import { Handler } from "../../Handler.js";
 import { exit } from "process";
+import Service from "../Services/Service.js";
 
 export default class Consumer {
   $server: any = Express();
@@ -20,12 +28,14 @@ export default class Consumer {
     this.config = config;
   }
 
-  /* * * [consume]
+  /** * * [consume()]
    * consumes the routing layer
+   * attaches the [Endpoint] instance
+   * to express server.
    * [Enpoint::class]
    * @param router Router Container
    */
-  async consume(router: Router) {
+  async consume(router: Router): Promise<void> {
     for (let r in router.$registry.routes) {
       let ep = router.$registry.routes[r];
       this.$server[ep.property.method](
@@ -34,8 +44,7 @@ export default class Consumer {
         ...ep.$middlewares,
         async (request, response) => {
           try {
-            if (Object.keys(request.params).length > 0)
-              await this.bindModel(request.params);
+            if (ep.isDynamic) await this.bindModel(request.params);
             await Promise.all(
               ep.beforeFns.map(async (fn: Function) => {
                 await fn(request, response);
@@ -54,7 +63,13 @@ export default class Consumer {
     }
   }
 
-  async handleError(e, ep, response) {
+  /** * [handleError()]
+   * Handles the [Request]Endpoint Error
+   * wrapping the error on an [APIException]::class
+   * and executes a log, before sending
+   * a client response.
+   */
+  async handleError(e, ep, response): Promise<void> {
     let status = e.status ? e.status : 500;
     let autoMs = Consumer._defaultResponses[status]
       ? Consumer._defaultResponses[status]
@@ -68,27 +83,48 @@ export default class Consumer {
     response.send(e.message);
   }
 
-  /* * * [bindModel]
-   * binding parameters to the model
-   * if a model is found,
-   * it attaches the
-   * model[collection] to the
+  /** * [bindModel()]
+   * binding parameters to the model if a model is found,
+   * it attaches the model[collection] to the
    * request via (findById)
-   *
    */
-  async bindModel(params) {
+  async bindModel(params: Iobject): Promise<void> {
+    try {
+      await Promise.all(
+        Object.keys(params).map(async (mod) => {
+          if (mod in Models.collection) {
+            params[`__${mod}`] = await Models.collection[mod].findById(
+              params[mod],
+            );
+          } else {
+            params[`__${mod}`] = null;
+          }
+        }),
+      );
+    } catch (e) {}
+  }
+
+  /** *
+   * BootLoads services
+   * from server perspective
+   * calling the ServerBoot(app) function
+   * if it is provided,
+   * exposing the express instance
+   * where they can use methods like
+   * [express.all(), express.use(), etc...]
+   */
+  async bootFromProviders(): Promise<void> {
+    let mods = Handler.Instance.$modules.services["$container"];
     await Promise.all(
-      Object.keys(params).map(async (mod) => {
-        if (mod in Models.collection) {
-          params[`__${mod}`] = await Models.collection[mod].findById(
-            params[mod],
-          );
+      Object.values(mods).map(async (service: any) => {
+        if (service.instance?.beforeServerBoot) {
+          await service.instance.beforeServerBoot(this.$server);
         }
       }),
     );
   }
 
-  /* * * [consumeLayers]
+  /** * [consumeLayers]
    * routing layer consumption
    * ♦ consumes the routing layer
    * ♦ registers the routing layer
@@ -96,30 +132,31 @@ export default class Consumer {
    * @param options Compiler options
    * @param engine CompilerEngine::class
    * @param compiler EngineDriver::class
+   * @returns void;
    */
-  async consumeLayers(options: Iobject, engine?: Iobject, compiler?: any) {
-    try {
-      for (let r in this.$routers) {
-        let router = this.$routers[r];
-        await this.consume(router);
-      }
-      if (options.enabled) {
-        if (engine.config.driver === "NuxtJs") {
-          this.$server.all(
-            `${engine.driverConfig.config.router.base}*`,
-            compiler.render,
-          );
-          await engine.logRoutes();
-          Consumer.servelog.push(engine.driverConfig.config.router.base);
-        }
-      }
-
-      this.$server.use((req, res, next) => {
-        res.status(404).send(Consumer._defaultResponses["404"]);
-      });
-    } catch (e) {
-      console.log(e);
-      exit(1);
+  async consumeLayers(
+    options: Iobject,
+    engine?: Iobject,
+    compiler?: any,
+  ): Promise<void> {
+    for (let r in this.$routers) {
+      let router = this.$routers[r];
+      await this.consume(router);
     }
+    await this.bootFromProviders();
+
+    if (options.enabled) {
+      if (engine.config.driver === "NuxtJs") {
+        this.$server.all(
+          `${engine.driverConfig.config.router.base}*`,
+          compiler.render,
+        );
+        await engine.logRoutes();
+        Consumer.servelog.push(engine.driverConfig.config.router.base);
+      }
+    }
+    this.$server.use((req, res, next) => {
+      res.status(404).send(Consumer._defaultResponses["404"]);
+    });
   }
 }

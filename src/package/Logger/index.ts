@@ -15,7 +15,7 @@ export default class Logger {
 
   private constructor() {
     Object.keys(_writers).map((key: string): void => {
-      this.writers[key] = new _writers[key]();
+      this.writers[key] = new _writers[key]("logs");
     });
   }
 
@@ -28,8 +28,9 @@ export default class Logger {
     Logger.board = v;
   }
 
-  log(message: string, writer: string, display: string = "clear") {
-    this.writers[writer].write(message, display);
+  log(message: any, writer: string = "Left", display: string = "clear") {
+    let wr = this.writer(writer);
+    wr.write(message, display);
   }
 
   writer(writer: string = "Left", subject: string = "logs"): Writer {

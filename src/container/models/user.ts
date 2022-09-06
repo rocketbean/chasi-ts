@@ -3,6 +3,7 @@ import Authorization from "../../package/statics/Authorization.js";
 import mongoose from "mongoose";
 import bc from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 export interface UserModelInterface {
   name: string;
   password: string;

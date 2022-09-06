@@ -9,7 +9,7 @@ export default class UserController extends Controller {
    * */
   async create(request, response) {
     return await User.create({
-      email: "buzzokkin@gmail.com",
+      email: "nikz@gmail.com",
       name: "nikko mesina",
       alias: "nikko@buzz",
     });
@@ -17,7 +17,6 @@ export default class UserController extends Controller {
 
   /**
    * Single ObjectModel[index]
-   *
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
@@ -55,7 +54,6 @@ export default class UserController extends Controller {
    * */
   async welcome(request, response) {
     let num = process.pid.toString();
-    console.log(`welcome ${num}`);
     return "your server is ready";
   }
 

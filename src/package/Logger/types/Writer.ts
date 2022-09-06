@@ -70,7 +70,8 @@ export default abstract class Writer {
   }
 
   write(message: any, display: string = "clear", subject?: string): void {
-    if (!subject) subject = this.subject;
+    if (subject == undefined || subject == null || !subject)
+      subject = this.subject;
     if (typeof message !== "object") {
       message = this.logType[display](this.format(message));
     } else {

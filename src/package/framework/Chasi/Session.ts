@@ -29,6 +29,7 @@ export default class Session {
   }
 
   /**
+   *
    * checking [node version]
    * to return [isMaster] || [isPrimary] property
    **/

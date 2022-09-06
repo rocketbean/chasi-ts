@@ -1,7 +1,8 @@
 export default {
-  host: checkout(process.env.database, "dev"),
+  host: checkout(process.env.database, "local"),
   bootWithDB: false,
-  default: checkout(process.env.database, "dev"),
+  hideLogConnectionStrings: true,
+  default: checkout(process.env.database, "local"),
   /**
    * *------------- [ Database Connections ] ---------------*
    * | all instances declared will automatically            |
@@ -31,6 +32,7 @@ export default {
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        connectTimeoutMS: 10000,
       },
     },
 
@@ -41,6 +43,7 @@ export default {
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        connectTimeoutMS: 10000,
       },
     },
 
@@ -51,6 +54,7 @@ export default {
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        connectTimeoutMS: 10000,
       },
     },
   },

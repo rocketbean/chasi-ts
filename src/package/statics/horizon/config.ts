@@ -6,6 +6,7 @@ export default {
       __initialize__: "package/statics/horizon/events/InitializeApp",
       __exception__: "package/statics/horizon/events/exception",
       __boot__: "package/statics/horizon/events/BootApp",
+      __ready__: "package/statics/horizon/events/readyApp",
     },
   },
 
