@@ -15,7 +15,8 @@ export default (route: Route) => {
   route.get("/", "UserController@welcome");
   route.get("/welcome", "UserController@renderHtml");
 
-  route.group({ prefix: "user" }, () => {
+  route.group({ prefix: "user", middleware: ["auth"] }, () => {
+    route.post("/", "UserController@create");
     route.get("/:user", "UserController@index");
     route.get("/", "UserController@welcome");
     route.get("create", "UserController@create");

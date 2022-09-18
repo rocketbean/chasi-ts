@@ -21,7 +21,13 @@ export class Handler extends Base {
    * handles the Lifecycle
    */
   private static _instance: Handler;
+
   $ev: EventEmitter;
+
+  /***
+   * [MetaProperty]
+   * Proxy of instance
+   */
   $proxy = new Proxy(this, ProxyHandler);
 
   /**
@@ -52,7 +58,7 @@ export class Handler extends Base {
   $observer: Obsesrver;
 
   /* * *
-   * [$modules] EventHandler
+   * [$modules]
    */
   $modules: { [key: string]: ModuleInterface } = {};
 
@@ -162,7 +168,7 @@ export class Handler extends Base {
    * --------------------------|
    * ♦ Router layers will be consumed
    */
-  protected async initialize() {
+  protected async initialize(): Promise<void> {
     try {
       await this.$observer.emit("__after__", {
         next: this.$proxy.after,
@@ -177,7 +183,7 @@ export class Handler extends Base {
    * ♦ setup compiler
    * ♦ setup services
    */
-  protected async after() {
+  protected async after(): Promise<void> {
     let services = {};
     Object.keys(this.$services).filter((service: string) => {
       if (!this.LockedServices.includes(service)) {
@@ -195,22 +201,33 @@ export class Handler extends Base {
     });
   }
 
-  protected async boot() {
+  /** [boot()]
+   * after Handler.boot(),
+   * the app will be ready to
+   * recieve requests
+   */
+  protected async boot(): Promise<void> {
     this.loggers.system.group("BOOT");
     await this.$app.bootup();
     await this.$observer.emit("__ready__", {
       server: this.$app.$server,
     });
+
+    this.loggers.system.write(
+      "[SRV_State]::Server onReady state",
+      "clear",
+      "boot",
+    );
     this.loggers.system.endGroup("BOOT");
     this.$ev.emit("done");
   }
 
-  /* *
+  /**
    * modules from out of the box
    * App installation
    * @param module ModuleInterface
    */
-  private installModule(module: ModuleInterface) {
+  private installModule(module: ModuleInterface): void {
     this.$modules[module.constructor.name] = module;
   }
 
@@ -245,7 +262,7 @@ export class Handler extends Base {
     };
   }
 
-  static get Instance() {
+  static get Instance(): Handler {
     return Handler._instance;
   }
 

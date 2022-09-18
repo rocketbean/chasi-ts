@@ -11,8 +11,4 @@ export default class Controller extends controller {
   get services() {
     return Controller.$services;
   }
-
-  get loadModule() {
-    return this.services.loadModule;
-  }
 }

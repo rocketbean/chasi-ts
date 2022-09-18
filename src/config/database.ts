@@ -36,10 +36,10 @@ export default {
       },
     },
 
-    local: {
+    stage: {
       driver: "mongodb",
-      url: process.env.dbConStringLocal,
-      db: process.env.databaseName,
+      url: process.env.dbConStringStage,
+      db: process.env.stageDatabaseName,
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -47,10 +47,10 @@ export default {
       },
     },
 
-    stage: {
+    local: {
       driver: "mongodb",
-      url: process.env.dbConStringStage,
-      db: process.env.stageDatabaseName,
+      url: process.env.dbConStringLocal,
+      db: process.env.databaseName,
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,

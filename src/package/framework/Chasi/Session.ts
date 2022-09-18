@@ -1,6 +1,5 @@
 import Cluster from "cluster";
 import Base from "../../Base.js";
-import CompilerEngine from "../Compiler/compiler.js";
 import SessionWriter from "./writers/FileWriter.js";
 import ServiceCluster from "./ServiceCluster.js";
 import horizon from "../../statics/horizon/config.js";
@@ -51,7 +50,7 @@ export default class Session {
   static async validates(config) {
     if (config.compiler.enabled) {
       Writer.log = process.stdout.write;
-      await CompilerEngine.runValidations(config);
+      // await CompilerEngine.runValidations(config);
     }
     return;
   }

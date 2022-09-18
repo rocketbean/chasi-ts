@@ -2,6 +2,9 @@ import Service from "../../package/framework/Services/Service.js";
 import Controller from "../../package/statics/Controller.js";
 import User from "../models/user.js";
 export default class UserController extends Controller {
+  get builder() {
+    return Controller.$services.compiler.builder;
+  }
   /**
    * Write a New ModelEntry
    * @param {request} [ExpressRequest] Object
@@ -9,9 +12,9 @@ export default class UserController extends Controller {
    * */
   async create(request, response) {
     return await User.create({
-      email: "nikz@gmail.com",
+      email: "nikz1@gmail.com",
       name: "nikko mesina",
-      alias: "nikko@buzz",
+      alias: "nikko1@buzz",
     });
   }
 
@@ -19,21 +22,24 @@ export default class UserController extends Controller {
    * Single ObjectModel[index]
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
+   *
    * */
   async renderHtml(request, response) {
-    this.compiler.renderer.resources.errorTemplate = () => {};
-    console.log(this.compiler.renderer.resources.errorTemplate);
-    let r = await this.compiler.renderRoute("/", {
-      app: {
-        nuxt: {
-          error: (err) => {
-            console.log("err");
-            return null;
-          },
-        },
-      },
-    });
-    return r.html;
+    return await this.builder.render("/about");
+    // return await this.render("/about");
+    // this.compiler.renderer.resources.errorTemplate = () => {};
+    // console.log(this.compiler.renderer.resources.errorTemplate);
+    // let r = await this.compiler.renderRoute("/", {
+    //   app: {
+    //     nuxt: {
+    //       error: (err) => {
+    //         console.log("err");
+    //         return null;
+    //       },
+    //     },
+    //   },
+    // });
+    // return r.html;
   }
 
   /**

@@ -3,7 +3,7 @@
     <div class = "grid-clip-right-sm">
         <span>ChangeLog</span>
         <small class = "text-dark">
-          <i>BetaVer :</i><strong>[0.9]</strong>
+          <i>BetaVer :</i><strong>[0.2.0]</strong>
         </small>
     </div>
     <section class = "section-text-md shadow-inset-1" style = "text-align:left; padding: 10px">
@@ -18,6 +18,7 @@
         <li>• Controller</li>
         <li>• View[Nuxt]</li>
         <li>• Events</li>
+        <li>• SocketServer <small><i>[@v0.2.0]</i></small></li>
       </ul>
     </section>
   </div>

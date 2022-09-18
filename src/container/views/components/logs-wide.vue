@@ -3,7 +3,7 @@
     <div class = "grid-clip-right-sm">
         <span>ChangeLog</span>
         <small class = "text-light">
-          <i>BetaVer :</i><strong >[0.9]</strong>
+          <i>BetaVer :</i><strong >[0.2.0]</strong>
         </small>
     </div>
     <section class = "section-text-md shadow-inset-1" style = "text-align:left; padding: 10px">

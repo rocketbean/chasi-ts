@@ -66,5 +66,5 @@ userSchema.methods.generateAuthToken = async function (authType = "_") {
   return await jwt.sign({ _id: user._id.toString() }, gateway.property.key);
 };
 
-const User = Model.connect("user", userSchema);
+const User = Model.connect("user", userSchema, "stage");
 export default User;

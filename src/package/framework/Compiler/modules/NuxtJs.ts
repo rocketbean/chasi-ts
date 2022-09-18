@@ -3,11 +3,15 @@ import chalk from "chalk";
 import defaults from "./NuxtJs/defaults.js";
 import Base from "../../../Base.js";
 import { Iobject } from "../../Interfaces.js";
-import { Nuxt, build, loadNuxt } from "nuxt";
+// import { Nuxt, build, loadNuxt } from "nuxt";
 /** NuxtJS
  * Compiler Engine Driver
- * 
+ *
  */
+
+const Nuxt = {},
+  build = () => {},
+  loadNuxt = {};
 export default class NuxtJs {
   public instance;
   public log: Iobject = {
@@ -32,12 +36,13 @@ export default class NuxtJs {
   async setup() {
     this.conFilePath = path.join(this.config.outDir, "nuxt.config.js");
     let conf = await Base._fetchFile(this.conFilePath);
-    if (this.state.useProdEnv) this.instance = await loadNuxt("start");
-    else this.instance = new Nuxt(conf);
-    if (this.onDev && !this.state.useProdEnv) {
-      await build(this.instance);
-    }
-    return this.instance;
+    //@ts-ignore
+    // if (this.state.useProdEnv) this.instance = await loadNuxt("start");
+    // else this.instance = new Nuxt(conf);
+    // if (this.onDev && !this.state.useProdEnv) {
+    //   await build(this.instance);
+    // }
+    // return this.instance;
   }
 
   /* * * * [logRoutes]

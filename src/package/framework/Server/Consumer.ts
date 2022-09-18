@@ -118,7 +118,7 @@ export default class Consumer {
     await Promise.all(
       Object.values(mods).map(async (service: any) => {
         if (service.instance?.beforeServerBoot) {
-          await service.instance.beforeServerBoot(this.$server);
+          return await service.instance.beforeServerBoot(this.$server);
         }
       }),
     );

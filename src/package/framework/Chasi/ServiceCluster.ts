@@ -13,6 +13,11 @@ export default class ServiceCluster {
   public pids: any[] = [];
   public ids: any[] = [];
   public workers: any[] = [];
+  private forkOpts: Iobject = {
+    env: { ...process.env },
+    FORCE_COLOR: 3,
+  };
+
   constructor(public $session: Session) {
     this.$session = $session;
     this.config = $session.config.server.serviceCluster;
@@ -149,26 +154,22 @@ export default class ServiceCluster {
       for (let worker = 0; worker < this.config.workers; worker++) {
         process.env["lead"] = "0";
         if (worker === 0) process.env["lead"] = "1";
-        let w = cluster.fork({
-          env: { ...process.env },
-          FORCE_COLOR: 3,
-        });
-        this.workers.push(w);
-        this.pids.push(`${w.process.pid}`);
-        this.ids.push(`${w.id}`);
+        let w = cluster.fork(this.forkOpts);
       }
 
       cluster.on("fork", (worker: Iobject) => {
         worker.process.stderr.pipe(process.stderr);
         this.setMessagingProto(worker);
-
+        this.workers.push(worker);
+        this.pids.push(`${worker.process.pid}`);
+        this.ids.push(`${worker.id}`);
         if (worker.id == 1) {
           worker.process.stdout = process.stdout;
         }
       });
 
       cluster.on("exit", (worker, code, sig) => {
-        cluster.fork();
+        cluster.fork(this.forkOpts);
       });
 
       cluster.on("message", (worker, m) => {});
