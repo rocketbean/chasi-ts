@@ -1,14 +1,15 @@
 <template>
   <div>
     <router-view v-slot="{ Component }">
-      <Suspense>
         <div>
           <component :is="Component" ></component>
         </div>
-      </Suspense>
     </router-view>
   </div>
 </template>
+<script setup>
+import styles from './assets/main.module.css'
+</script>
 
 <style>
 @font-face {

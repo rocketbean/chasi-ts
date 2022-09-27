@@ -1,6 +1,6 @@
 export default {
   drivers: {
-    _: {
+    dev: {
       /**
        * Authentication Driver
        */

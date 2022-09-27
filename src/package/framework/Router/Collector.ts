@@ -39,6 +39,14 @@ export default class RouteCollector extends Base {
     Reflect.apply(this.namespace, this, [this.$route]);
   }
 
+  /***
+   * META Program
+   * [reflect|proxy]
+   */
+  async collectEndpointFn(fn: any) {
+    Reflect.apply(fn, this, [this.$route]);
+  }
+
   async init() {
     await this.$registry.loadControllers();
     await this.collectEndpoints();

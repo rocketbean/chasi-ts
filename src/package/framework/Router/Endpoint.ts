@@ -6,6 +6,8 @@ import Exception from "../ErrorHandler/Exception.js";
 export default class Endpoint {
   public path: string = "";
   public isDynamic: boolean = false;
+  public unmatched: boolean = false;
+  public registered: boolean = false;
   public middlewares: string[] = [];
   public $middlewares: Function[] = [];
   public beforeFns: Function[] = [];
@@ -22,6 +24,7 @@ export default class Endpoint {
     this.groups = groups;
     this.setControllerMethod();
   }
+
   /***
    * defines the type of
    * Controller [string][function]

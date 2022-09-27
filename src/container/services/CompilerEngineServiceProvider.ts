@@ -1,31 +1,33 @@
-import CompilerEngine from "../modules/compilerEngine/compiler.js";
+import Provider from "../../package/framework/Services/Provider.js";
+import { join } from "path";
+import CompilerEngine, {
+  devBundler,
+  prodBundler,
+  CompilerEngineConfig,
+} from "../modules/compilerEngine/compiler.js";
+
 import {
   Iobject,
   ServiceProviderInterface,
 } from "../../package/framework/Interfaces.js";
-import Provider from "../../package/framework/Services/Provider.js";
-import serveStatic from "serve-static";
 
 export default class CompilerEngineServiceProvider
   extends Provider
   implements ServiceProviderInterface
 {
-  constructor(public engine: CompilerEngine) {
+  constructor(public compiler: CompilerEngine) {
     super();
-    this.engine = new CompilerEngine();
+    this.compiler = new CompilerEngine(
+      CompilerEngineServiceProvider.config.compiler as CompilerEngineConfig,
+    );
   }
 
   async boot() {
-    await this.engine.builder.raw();
-    return this.engine;
+    return this.compiler;
   }
 
   async beforeServerBoot($app: any) {
-    await Promise.all(
-      this.engine.getStaticRenders().map((stat: Iobject) => {
-        $app.use(`/test${stat.path}`, serveStatic(stat.root, { index: false }));
-      }),
-    );
-    $app.use(this.engine.builder.transpiler.middlewares);
+    this.compiler.setInvoker($app);
+    await this.compiler.setupEngines();
   }
 }

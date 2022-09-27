@@ -8,8 +8,9 @@ export default (route: Route) => {
    * by default, API's that is registered through auth config,
    * will be protected by JWT unless registered in
    * [AuthRouteExceptions] array option.
+   *
    */
   route.get("index", (request: Request, response: Response) => {
-    return "success";
+    return "Index";
   });
 };

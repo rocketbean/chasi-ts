@@ -22,4 +22,5 @@ export default {
   RouterName: chalk.bgHex("484276").bold.white,
   RouterTags: chalk.bgMagenta.bold.white,
   lightGreen: chalk.bgGreenBright.rgb(0, 0, 0),
+  adjusted: chalk.rgb(25, 150, 175),
 };

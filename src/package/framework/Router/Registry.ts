@@ -220,6 +220,7 @@ export default class Registry extends Base {
     this.sanitizeRoute(group.property.prefix, true),
       (group.property.prefix = this.sanitizeRoute(group.property.prefix));
     ep.path += "/" + group.property.prefix;
+    ep.path = ep.path.replace("//", "/");
   }
 
   constructControllerPath(ep: Endpoint, group: Group) {

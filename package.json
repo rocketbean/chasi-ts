@@ -12,7 +12,8 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "./container/views"
+      "./container/views",
+      "./container/html/*"
     ]
   },
   "author": "",
@@ -30,7 +31,6 @@
     "redis-cli": "^2.1.2",
     "typescript": "^4.8.0-dev.20220630",
     "vite": "^3.1.0",
-    "vue": "^3.2.39",
     "vue-router": "^4.1.5"
   },
   "dependencies": {
@@ -56,6 +56,7 @@
     "three-trackballcontrols": "^0.9.0",
     "three-vignette-background": "^1.0.3",
     "uuid": "^8.3.2",
+    "vue": "^3.2.39",
     "ws": "^8.2.3"
   }
 }

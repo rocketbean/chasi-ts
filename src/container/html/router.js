@@ -12,7 +12,7 @@ const routes = Object.keys(pages).map((path) => {
   const name = path.match(/\.\/pages(.*)\.vue$/)[1].toLowerCase();
   return {
     path: name === "/home" ? "/" : name,
-    component: pages[path], // () => import('./pages/*.vue')
+    component: pages[path],
   };
 });
 
@@ -21,8 +21,10 @@ export function createRouter() {
     // use appropriate history implementation for server/client
     // import.meta.env.SSR is injected by Vite.
     history: import.meta.env.SSR
-      ? createMemoryHistory("/test/")
-      : createWebHistory("/test/"),
+      ? createMemoryHistory(`${import.meta.env.BASE_URL}`)
+      : createWebHistory(`${import.meta.env.BASE_URL}`),
     routes,
   });
 }
+
+export const buildroutes = routes;

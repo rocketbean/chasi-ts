@@ -9,16 +9,12 @@ export default (route: Route) => {
    * by default, API's that is registered through auth config,
    * will be protected by JWT unless registered in
    * [AuthRouteExceptions] array option.
-   *
    */
 
-  route.get("/", "UserController@welcome");
-  route.get("/welcome", "UserController@renderHtml");
-
-  route.group({ prefix: "user", middleware: ["auth"] }, () => {
+  route.group({ prefix: "user" }, () => {
     route.post("/", "UserController@create");
-    route.get("/:user", "UserController@index");
     route.get("/", "UserController@welcome");
+    route.get("/:user", "UserController@index");
     route.get("create", "UserController@create");
   });
 };

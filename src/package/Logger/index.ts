@@ -28,9 +28,12 @@ export default class Logger {
     Logger.board = v;
   }
 
-  log(message: any, writer: string = "Left", display: string = "clear") {
-    let wr = this.writer(writer);
-    wr.write(message, display);
+  log(...message: any) {
+    let wr = this.writer("Left");
+    message.forEach((msg, ind) => {
+      if (ind > 0) wr.write("\n");
+      wr.write(msg);
+    });
   }
 
   writer(writer: string = "Left", subject: string = "logs"): Writer {

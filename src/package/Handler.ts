@@ -82,7 +82,7 @@ export class Handler extends Base {
   $services: { [key: string]: Service };
   private LockedServices: string[] = ["routers"];
 
-  private constructor(private config: Iobject, public pipe?: PipeHandler) {
+  private constructor(protected config: Iobject, public pipe?: PipeHandler) {
     super();
     this.$ev = new EventEmitter();
     this.config = <Iobject>Base.mergeObjects(horizon, config);
@@ -91,6 +91,10 @@ export class Handler extends Base {
 
   get state() {
     return this._state;
+  }
+
+  get _config() {
+    return this.config;
   }
 
   set state(v) {
@@ -191,10 +195,6 @@ export class Handler extends Base {
       }
     });
     Controller.init(services);
-    if (this.config.compiler.enabled) {
-      let compiler = this.$modules.CompilerEngine as any;
-      Controller.$compiler = compiler.driver;
-    }
     await this.$observer.emit("__boot__", {
       next: this.$proxy.boot,
       app: this.$proxy,

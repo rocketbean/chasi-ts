@@ -1,12 +1,13 @@
 import { basename } from "node:path";
 import { renderToString } from "vue/server-renderer";
 import { createApp } from "./main.js";
+import { buildroutes } from "./router.js";
 
+export { buildroutes };
 export async function render(url, manifest) {
   const { app, router } = createApp();
   app.use(router);
   // set the router to the desired URL before rendering
-
   await router.push(url);
   await router.isReady();
   // passing SSR context object which will be available via useSSRContext()
@@ -19,7 +20,7 @@ export async function render(url, manifest) {
   // which we can then use to determine what files need to be preloaded for this
   // request.
   const preloadLinks = renderPreloadLinks(ctx.modules, manifest);
-  console.log(preloadLinks, "@pre;l");
+
   return [html, preloadLinks];
 }
 
@@ -44,6 +45,7 @@ function renderPreloadLinks(modules, manifest) {
       });
     }
   });
+
   return links;
 }
 

@@ -4,6 +4,7 @@ import {
   Iobject,
   ServiceProviderInterface,
   ProviderInterface,
+  RouterMountable,
 } from "../Interfaces.js";
 import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
@@ -44,15 +45,20 @@ export default class Consumer {
         ...ep.$middlewares,
         async (request, response) => {
           try {
+            let data: Function = () => {};
             if (ep.isDynamic) await this.bindModel(request.params);
+            if (router.property?.data) {
+              if (ep?.$controller) ep.$controller.$data = router.property.data;
+              data = router.property.data;
+            }
             await Promise.all(
               ep.beforeFns.map(async (fn: Function) => {
-                await fn(request, response);
+                await fn(request, response, data);
               }),
             );
-            let res = await ep.$method(request, response);
+            let res = await ep.$method(request, response, data);
             ep.afterFns.map(async (fn: Function) => {
-              await fn(request, response, res);
+              await fn(request, response, res, data);
             });
             response.send(res);
           } catch (e: any) {
@@ -61,6 +67,15 @@ export default class Consumer {
         },
       );
     }
+  }
+
+  async mounts(router: Router): Promise<void> {
+    await Promise.all(
+      router.property.mount.map(async (mount: RouterMountable) => {
+        if (!mount?.props) mount.props = [];
+        await mount.exec.mount(router, [...mount.props]);
+      }),
+    );
   }
 
   /** * [handleError()]
@@ -143,17 +158,12 @@ export default class Consumer {
       let router = this.$routers[r];
       await this.consume(router);
     }
+
     await this.bootFromProviders();
 
-    if (options.enabled) {
-      if (engine.config.driver === "NuxtJs") {
-        this.$server.all(
-          `${engine.driverConfig.config.router.base}*`,
-          compiler.render,
-        );
-        await engine.logRoutes();
-        Consumer.servelog.push(engine.driverConfig.config.router.base);
-      }
+    for (let r in this.$routers) {
+      let router = this.$routers[r];
+      if (router.property.mount) await this.mounts(router);
     }
     this.$server.use((req, res, next) => {
       res.status(404).send(Consumer._defaultResponses["404"]);

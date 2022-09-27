@@ -176,6 +176,33 @@ export default class Route {
     return ep;
   }
 
+  /**
+   *  Register a [search] Method endpoint;
+   * @param endpoint {string} | path url endpoint;
+   * @param controller {string} controller and method to call when the endpoint is called;
+   * @param options {object} options
+   * @returns [Route] instance to be collected on boot
+   */
+  dynamic(
+    endpoint: string,
+    controller: string | Function,
+    method: "string",
+    options = {},
+  ): Endpoint {
+    let ep = new Endpoint(
+      {
+        method,
+        controller,
+        endpoint,
+        options,
+      },
+      [...this.groups],
+    );
+    ep.unmatched = true;
+    this.$registry.register(ep);
+    return ep;
+  }
+
   group(stack: any, fn: Function) {
     let _g = this.stackGroup(stack);
     fn();

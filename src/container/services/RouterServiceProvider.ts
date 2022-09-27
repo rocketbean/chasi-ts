@@ -1,10 +1,11 @@
 import {
   ServiceProviderInterface,
   RouterConfigInterface,
+  RouterMountable,
 } from "../../package/framework/Interfaces.js";
 import Provider from "../../package/framework/Services/Provider.js";
 import Router from "../../package/statics/Router.js";
-
+import CompilerEngine from "../modules/compilerEngine/compiler.js";
 export default class RouterServiceProvider
   extends Provider
   implements ServiceProviderInterface
@@ -23,7 +24,7 @@ export default class RouterServiceProvider
          * to use any auth for your router
          * {String} {Boolean[false]} {null}
          */
-        auth: null,
+        auth: "dev",
         /**
          * prefix[string]
          * will be appended to all the routes
@@ -60,6 +61,22 @@ export default class RouterServiceProvider
          * [request.auth],
          */
         AuthRouteExceptions: [],
+
+        /**
+         * Router Hooks
+         */
+        data: () => {
+          return {
+            abc: 123,
+          };
+        },
+        mount: <RouterMountable[]>[
+          {
+            name: "engine",
+            props: ["web"],
+            exec: CompilerEngine.instance,
+          },
+        ],
         before: (request, response) => {},
         after: (request, response) => {},
       } as RouterConfigInterface),
@@ -72,6 +89,11 @@ export default class RouterServiceProvider
         ControllerDir: ["container/controllers/"],
         middleware: [],
         AuthRouteExceptions: [],
+        data: () => {
+          return {
+            abc: 321,
+          };
+        },
       } as RouterConfigInterface),
     ];
   }

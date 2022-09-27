@@ -1,5 +1,6 @@
 import { exit } from "process";
 import Event from "./../../../Observer/Event.js";
+import RouterModule from "../../../framework/Router/RouterModule.js";
 
 export default class AfterApp extends Event {
   /**
@@ -10,9 +11,6 @@ export default class AfterApp extends Event {
    * fired when validated
    */
   async validate(params, next) {
-    params.app.state = 3;
-    if (params.app.config.compiler.enabled)
-      params.compiler = params.app.$services.compiler;
     next();
   }
 
@@ -24,16 +22,7 @@ export default class AfterApp extends Event {
    * been passed on emit.
    */
   async fire(params) {
-    let engine;
-    if (params.app.config.compiler.enabled) {
-      engine = await params.compiler.init(params.app.config.compiler);
-      await params.app.installModule(engine);
-    }
-    await params.app.$app.consumeLayers(
-      params.app.config.compiler,
-      engine,
-      engine?.driver,
-    );
+    await params.app.$app.consumeLayers();
     await params.next();
   }
 

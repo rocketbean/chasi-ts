@@ -1,10 +1,13 @@
 <template>
-  <h1>About</h1>
+  <h1 class = "color-red">Test</h1>
 </template>
+
 <script >
 export default {
   data() {
-
+    return {
+      ctx: null
+    }
   },
   mounted () {
   }
@@ -12,8 +15,7 @@ export default {
 </script>
 
 <style scoped>
-h1,
-a {
+h1 {
   color: green;
 }
 </style>

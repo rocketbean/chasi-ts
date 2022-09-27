@@ -1,4 +1,5 @@
 import { DBDriverInterface } from "./Database/drivers/drivers.js";
+import Router from "./Router/Router.js";
 
 export interface AuthDriver {
   property: Iobject;
@@ -49,6 +50,10 @@ export interface ExceptionLoggerInterface {
   write(a?: any, b?: any);
 }
 
+export interface RouterMountableInterface {
+  mount(router: Router, a: any);
+}
+
 export type SessionStorageData = {
   threads: any;
   database: Iobject[];
@@ -78,6 +83,12 @@ export type serverConfig = {
   serviceCluster: Iobject;
 };
 
+export type RouterMountable = {
+  name?: string;
+  props?: any[];
+  exec: RouterMountableInterface;
+};
+
 export type RouterConfigInterface = {
   name: string;
   auth: string | boolean | null;
@@ -86,6 +97,8 @@ export type RouterConfigInterface = {
   middleware: string | string[];
   ControllerDir: string | string[];
   AuthRouteExceptions?: Iobject;
+  data?: Function;
+  mount?: RouterMountable[];
   before?: Function;
   after?: Function;
 };

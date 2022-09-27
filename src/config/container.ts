@@ -25,8 +25,8 @@ export default {
      * interactions developers need to associate with this services,
      * therefore giving more versatility for dev's
      */
+    compiler: "container/services/CompilerEngineServiceProvider",
     routers: "container/services/RouterServiceProvider",
-    // compiler: "container/services/CompilerEngineServiceProvider",
     sockets: "container/services/SocketServiceProvider",
   },
 

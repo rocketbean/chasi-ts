@@ -24,20 +24,28 @@ export default class RouterList extends Writer implements Writable {
     let width: number = Math.floor(this.cols / 1.8);
     let threshold = width - message.length - method.length;
     let fullMessage = this.fill(threshold, "-") + message;
-    if (ep.exceptions.length > 0)
+    if (ep.exceptions.length > 0) {
       fullMessage = chalk.rgb(175, 125, 25)(fullMessage);
+    }
+    if (ep.unmatched) {
+      fullMessage = _style["adjusted"](fullMessage);
+    }
     return fullMessage;
   }
 
+  /***
+   */
   setTags(tags) {
     return Object.keys(tags).map((key: string): { [key: string]: any } => {
       let style;
       if (typeof tags[key] == "boolean") {
         if (tags[key]) style = _style.RouterTags(`[${key}]`);
         else style = _style.bgBrightNegative(`[${key}]`);
+        let _tk = `[${key}] `;
         return {
-          key: `[${key}] `,
+          key: _tk,
           style,
+          count: _tk.length,
         };
       }
     });
@@ -46,10 +54,21 @@ export default class RouterList extends Writer implements Writable {
   formatHeader(router: Router) {
     let displayname = `[...${router.property.prefix.toUpperCase()}/]`,
       _tags = this.setTags({
-        auth: true,
+        auth: router.property.auth ? true : false,
       });
+    if (router.property?.mount) {
+      router.property?.mount.map((_m) => {
+        let _tk = `[${_m.name}:${_m.props.join("|")}]`;
+        _tags.push({
+          key: [`${_m.name}`],
+          style: _style.RouterTags(_tk.toUpperCase()),
+          count: _tk.length,
+        });
+      });
+    }
+
     let cols = this.cols - displayname.length;
-    cols -= _tags.reduce((a, b) => a + b.key.length, 0);
+    cols -= _tags.reduce((a, b) => a + b.count, 0);
     return `${_style.RouterName(displayname)}:${_tags
       .map((tag) => tag.style)
       .join(" ")} ${this.center(
@@ -60,9 +79,13 @@ export default class RouterList extends Writer implements Writable {
 
   formatPath(router: Router) {
     router.$registry.routes.forEach((ep: Endpoint) => {
+      let writeStyle;
       let _m = `[${ep.property.method.toUpperCase()}]`;
+      if (ep.unmatched) writeStyle = "adjusted";
+      else writeStyle = "warning";
+
       this.write(
-        `${_style.warning(_m)}${this.startTrace(ep, _m)}| ${ep.groups
+        `${_style[writeStyle](_m)}${this.startTrace(ep, _m)}| ${ep.groups
           .map(
             (group) => `${_style.coolText("[" + group.property.prefix + "]")}`,
           )

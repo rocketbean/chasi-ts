@@ -18,6 +18,7 @@ export default class Router extends Collector {
   static Controllers: { [key: string]: any } = {};
 
   /**
+   *
    * static Controllers
    * FunctionStorage
    */
@@ -30,6 +31,12 @@ export default class Router extends Collector {
     endTrace: Logger.writer("EndTrace"),
     startTrace: Logger.writer("StartTrace"),
     RouterList: Logger.writer("RouterList"),
+  };
+
+  static defaultProps: Iobject = {
+    data: () => {
+      return {};
+    },
   };
 
   constructor(public property: RouterConfigInterface) {
