@@ -17,6 +17,7 @@ export default class SocketServiceProvider
     new SocketRouter("/", {
       container: "container/net/web",
     });
+
     return this.netserver;
   }
 
@@ -31,5 +32,6 @@ export default class SocketServiceProvider
         Logger.log(e);
       }
     });
+    await this.netserver.logSockets();
   }
 }

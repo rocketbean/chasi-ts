@@ -2,6 +2,7 @@ import chalk from "chalk";
 
 export default {
   system: chalk.dim.bold.yellow,
+  yellow: chalk.yellow,
   silver: chalk.bgGrey.yellow,
   subsystem: chalk.bgGreen.bold.rgb(0, 70, 0),
   light: chalk.green,
