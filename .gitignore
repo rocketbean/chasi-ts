@@ -1,6 +1,5 @@
 src/container/services/LoadModuleServiceProvider.ts
 src/container/views/nuxt.config.json
-src/container/modules
 src/package/statics/logs/*
 dist/package/statics/logs/*
 statics/*
