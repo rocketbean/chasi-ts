@@ -4,7 +4,7 @@ export default {
       __before__: "package/statics/horizon/events/BeforeApp",
       __after__: "package/statics/horizon/events/AfterApp",
       __initialize__: "package/statics/horizon/events/InitializeApp",
-      __exception__: "package/statics/horizon/events/exception",
+      __exception__: "package/statics/horizon/events/Exception",
       __boot__: "package/statics/horizon/events/BootApp",
       __ready__: "package/statics/horizon/events/readyApp",
     },
