@@ -13,6 +13,7 @@ import PipeHandler from "./PipeHandler.js";
 
 export default class Session {
   public id = uuidv4();
+  public static _conf;
   public writer: SessionWriter;
   public nodeVer: number;
   private $app: Handler;
@@ -47,16 +48,27 @@ export default class Session {
     return $app;
   }
 
+  static getConfig(conf: string) {
+    return Session._conf[conf];
+  }
+
   static async validates(config) {
     if (config.compiler.enabled) {
       Writer.log = process.stdout.write;
-      // await CompilerEngine.runValidations(config);
     }
     return;
   }
 
+  static async beforeSessionHook(config: Iobject) {
+    if (Session.checkMainThread()) {
+      Session._conf = { ...config };
+      await config.server.hooks.beforeApp(Session.getConfig);
+    }
+  }
+
   static async initialize(config: Iobject) {
     config = <Iobject>Base.mergeObjects(horizon, config);
+    await Session.beforeSessionHook(config);
     if (!config.server.serviceCluster.enabled) await Session.validates(config);
     let session = new Session(config);
     let cluster = new ServiceCluster(session);

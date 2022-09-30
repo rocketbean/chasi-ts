@@ -1,3 +1,11 @@
+h1 {
+  color: red;
+}
+
+.color-red {
+  color: red !important;
+}
+
 body {
   margin: 0px;
   padding: 0px;
@@ -27,7 +35,7 @@ body {
   margin: 5px;
   padding: 5px;
   border-radius: 5px;
-  max-height: 150px;
+  max-height: 200px;
   overflow-y: auto;
 }
 

@@ -10,12 +10,12 @@ import PipeHandler from "./PipeHandler.js";
 export default class SessionStorage {
   public data: SessionStorageData = {
     threads: [],
+    reports: {},
     database: [],
     routeRegistry: [],
     services: [],
     boot: [],
     exceptions: [],
-    reports: {},
     logs: [],
   };
 

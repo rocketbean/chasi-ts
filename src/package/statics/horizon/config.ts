@@ -19,6 +19,11 @@ export default {
       serverFile: "package/framework/Chasi/storage/session.chasi",
       clusterFile: "package/framework/Chasi/storage/cluster.chasi",
     },
+    hooks: {
+      beforeApp(getConfig) {
+        console.log("msmsmsm");
+      },
+    },
   },
 
   exceptions: {

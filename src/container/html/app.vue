@@ -8,9 +8,9 @@
   </div>
 </template>
 <script setup>
-import styles from './assets/main.module.css'
-</script>
 
+
+</script>
 <style>
 @font-face {
   font-family: 'Inter';
@@ -30,6 +30,5 @@ import styles from './assets/main.module.css'
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

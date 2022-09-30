@@ -1,9 +1,9 @@
 <template>
   <div> 
     <div class = "grid-clip-right-sm">
-        <span>ChangeLog</span>
+        <span class = "">ChangeLog</span>
         <small class = "text-light">
-          <i>BetaVer :</i><strong >[0.2.0]</strong>
+          <i>BetaVer :</i><strong >[0.2.1]</strong>
         </small>
     </div>
     <section class = "section-text-md shadow-inset-1" style = "text-align:left; padding: 10px">
@@ -23,6 +23,7 @@
 
 <script>
 export default {
+  name: "logs-wide",
   methods: {
     activateTab(tab)  {
       console.log(tab, "@tab")

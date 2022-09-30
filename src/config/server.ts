@@ -47,7 +47,7 @@ export default {
    * as good as it was intended.
    * loadtest your app to check and adjust performance,
    * e.g. installing loadtest
-   * loadtest -n 1000 -c 200 http://localhost:3000/app/
+   * loadtest -n 1000 -c 200 http://localhost:3000/api/
    * **
    */
   serviceCluster: {
@@ -62,6 +62,16 @@ export default {
     schedulingPolicy: 2,
   },
 
+  hooks: {
+    beforeApp: async (getConfig: Function) => {
+      let compiler = getConfig("compiler");
+      await Promise.all(
+        compiler.engines.map(async (engine) => {
+          await engine.hook(getConfig, engine);
+        }),
+      );
+    },
+  },
   /**
    * you can setup your own server environment
    * and add that inside [mode] property
@@ -69,7 +79,6 @@ export default {
    * selection, just keep make sure that the selected
    * environment is registered here...
    */
-
   modes: {
     dev: {
       key: checkout(process.env.devKey),

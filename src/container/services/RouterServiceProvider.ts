@@ -64,11 +64,10 @@ export default class RouterServiceProvider
 
         /**
          * Router Hooks
+         *
          */
         data: () => {
-          return {
-            abc: 123,
-          };
+          return {};
         },
         mount: <RouterMountable[]>[
           {
@@ -77,7 +76,9 @@ export default class RouterServiceProvider
             exec: CompilerEngine.instance,
           },
         ],
-        before: (request, response) => {},
+        before: (request, response) => {
+          console.log(process.pid);
+        },
         after: (request, response) => {},
       } as RouterConfigInterface),
 
@@ -91,7 +92,7 @@ export default class RouterServiceProvider
         AuthRouteExceptions: [],
         data: () => {
           return {
-            abc: 321,
+            ver: "ver: 0.2^",
           };
         },
       } as RouterConfigInterface),

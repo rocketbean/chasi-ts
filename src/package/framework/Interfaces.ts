@@ -74,6 +74,10 @@ export type SessionStorageClusterData = {
   serverData: Iobject;
 };
 
+export type ServerHooks = {
+  beforeApp?: any;
+};
+
 export type serverConfig = {
   staticDir: any;
   port: any;
@@ -81,6 +85,7 @@ export type serverConfig = {
   modes: { [key: string]: any };
   cors: Iobject;
   serviceCluster: Iobject;
+  hooks?: ServerHooks;
 };
 
 export type RouterMountable = {

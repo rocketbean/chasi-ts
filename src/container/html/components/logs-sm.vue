@@ -23,3 +23,8 @@
     </section>
   </div>
 </template>
+<script>
+export default {
+  name: "logs-sm"
+}
+</script>

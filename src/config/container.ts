@@ -50,8 +50,6 @@ export default {
 
   session: {
     cache: false,
-    cacheFile: "./package/statics/logs/app.session",
-    logs: "./package/statics/logs/runtime.log",
     useLogStream: true,
   },
 };

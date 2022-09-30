@@ -71,7 +71,7 @@ export default class Consumer {
 
   async mounts(router: Router): Promise<void> {
     await Promise.all(
-      router.property.mount.map(async (mount: RouterMountable) => {
+      router.property?.mount.map(async (mount: RouterMountable) => {
         if (!mount?.props) mount.props = [];
         await mount.exec.mount(router, [...mount.props]);
       }),
@@ -163,7 +163,7 @@ export default class Consumer {
 
     for (let r in this.$routers) {
       let router = this.$routers[r];
-      if (router.property.mount) await this.mounts(router);
+      if (router.property?.mount) await this.mounts(router);
     }
     this.$server.use((req, res, next) => {
       res.status(404).send(Consumer._defaultResponses["404"]);
