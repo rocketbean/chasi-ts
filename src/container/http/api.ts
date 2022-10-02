@@ -12,9 +12,8 @@ export default (route: Route) => {
    */
 
   route.group({ prefix: "user" }, () => {
-    route.post("/", "UserController@create");
-    route.get("/", "UserController@welcome");
-    route.get("/:user", "UserController@index");
+    route.get("/", "UserController@create");
     route.get("create", "UserController@create");
+    route.get("/:user", "UserController@index");
   });
 };

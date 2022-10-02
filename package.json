@@ -1,13 +1,16 @@
 {
   "name": "tst",
-  "version": "0.2.1",
+  "version": "0.3.2",
   "description": "",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "type": "module",
+  "bin": {
+    "chasi": "./src/package/framework/Chasi/commands/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "lite-server",
-    "dev": "npm run postbuild && nodemon ./dist/server.js -e html,js,css --experimental-top-level-await",
+    "dev": "nodemon ./dist/server.js -e html,js,css --experimental-top-level-await",
     "postbuild": "cpy \"./src/container/html/* \" \"./dist/container/html \""
   },
   "nodemonConfig": {
@@ -24,6 +27,7 @@
     "@types/node": "^18.0.0",
     "@types/vue": "^2.0.0",
     "@vitejs/plugin-vue": "^3.1.0",
+    "commander": "^2.20.3",
     "cpy-cli": "^4.2.0",
     "lite-server": "^2.6.1",
     "log-update": "^5.0.1",

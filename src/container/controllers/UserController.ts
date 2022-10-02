@@ -1,22 +1,16 @@
-import { exit } from "process";
 import Service from "../../package/framework/Services/Service.js";
 import Controller from "../../package/statics/Controller.js";
 import User from "../models/user.js";
 export default class UserController extends Controller {
+  get user() {
+    return this.models.user;
+  }
   /**
    * Write a New ModelEntry
    * @param {request} [ExpressRequest] Object
    * @return {} translated as [ExpressResponse] Object
    * */
   async create(request, response) {}
-
-  /**
-   * Single ObjectModel[index]
-   * @param {request} [ExpressRequest] Object
-   * @return {Object} translated as [ExpressResponse] Object
-   *
-   * */
-  async renderHtml(request, response) {}
 
   /**
    * Single ObjectModel[index]
@@ -34,10 +28,7 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    *
    * */
-  async welcome(request, response) {
-    Logger.log(this.$data.abc);
-    return "asdf";
-  }
+  async welcome(request, response) {}
 
   /**
    * Delete an ObjectModel[]

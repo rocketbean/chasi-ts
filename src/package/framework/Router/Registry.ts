@@ -93,15 +93,19 @@ export default class Registry extends Base {
   async expand() {
     await Promise.all(
       this.routes.map(async (ep: Endpoint, index: number) => {
-        try {
-          await this.setRouterLayer(ep);
-          await this.consumeRouteGroup(ep);
-          this.constructEndpoint(ep);
-          this.bindMiddlewares(ep);
-          this.bindMethods(ep);
-          this.pullDynamicRoute(ep);
-        } catch (e) {
-          Caveat.handle({ message: e, interpose: 2 });
+        if (!ep.registered) {
+          try {
+            await this.setRouterLayer(ep);
+            await this.consumeRouteGroup(ep);
+            this.constructEndpoint(ep);
+            this.bindMiddlewares(ep);
+            this.bindMethods(ep);
+            this.pullDynamicRoute(ep);
+            ep.path = ep.path.replace("//", "/");
+            ep.registered = true;
+          } catch (e) {
+            Caveat.handle({ message: e, interpose: 2 });
+          }
         }
       }),
     );
@@ -220,7 +224,6 @@ export default class Registry extends Base {
     this.sanitizeRoute(group.property.prefix, true),
       (group.property.prefix = this.sanitizeRoute(group.property.prefix));
     ep.path += "/" + group.property.prefix;
-    ep.path = ep.path.replace("//", "/");
   }
 
   constructControllerPath(ep: Endpoint, group: Group) {

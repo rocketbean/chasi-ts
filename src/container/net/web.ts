@@ -8,4 +8,8 @@ export default (server: SocketRouter) => {
   server.on("broadcast", (payload) => {
     server.clients.map((client) => client.send(payload));
   });
+
+  server.on("pulls", (payload) => {
+    server.clients.map((client) => client.send(payload));
+  });
 };

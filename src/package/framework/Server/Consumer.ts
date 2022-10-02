@@ -12,8 +12,6 @@ import Express, { response } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
-import { exit } from "process";
-import Service from "../Services/Service.js";
 
 export default class Consumer {
   $server: any = Express();
@@ -73,7 +71,7 @@ export default class Consumer {
     await Promise.all(
       router.property?.mount.map(async (mount: RouterMountable) => {
         if (!mount?.props) mount.props = [];
-        await mount.exec.mount(router, [...mount.props]);
+        await mount.exec?.mount(router, [...mount.props]);
       }),
     );
   }
@@ -148,6 +146,7 @@ export default class Consumer {
    * @param engine CompilerEngine::class
    * @param compiler EngineDriver::class
    * @returns void;
+   *
    */
   async consumeLayers(
     options: Iobject,
@@ -158,13 +157,13 @@ export default class Consumer {
       let router = this.$routers[r];
       await this.consume(router);
     }
-
     await this.bootFromProviders();
 
     for (let r in this.$routers) {
       let router = this.$routers[r];
       if (router.property?.mount) await this.mounts(router);
     }
+
     this.$server.use((req, res, next) => {
       res.status(404).send(Consumer._defaultResponses["404"]);
     });

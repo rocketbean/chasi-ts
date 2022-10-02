@@ -6,6 +6,9 @@ import { pathToFileURL } from "url";
 import { builderConfig } from "../compiler.js";
 import { BundlerInterface } from "./Bundler.js";
 import { exit } from "process";
+import fs from "fs";
+import path from "path";
+
 export interface BuilderInterface {
   $app: Express;
   $server: any;
@@ -43,16 +46,35 @@ export default class Builder implements BuilderInterface {
     return this;
   }
 
-  static async prodSetup(getConfig, ctx) {
-    try {
-      if (ctx.environment !== "dev") {
-        let builderConfig = (await Builder.getConfigs(ctx)) as UserConfig;
-        await prodBundler.clientBuild(ctx, builderConfig);
-        await prodBundler.serverBuild(ctx, builderConfig);
+  static async prodSetup(
+    getConfig: Function,
+    ctx: builderConfig,
+  ): Promise<void> {
+    let conf = getConfig("compiler");
+    if (conf.enabled) {
+      try {
+        if (ctx.environment !== "dev") {
+          let builderConfig = (await Builder.getConfigs(ctx)) as UserConfig;
+          await prodBundler.clientBuild(ctx, builderConfig);
+          await prodBundler.serverBuild(ctx, builderConfig);
+        }
+      } catch (e) {
+        console.log(e);
+        exit();
       }
-    } catch (e) {
-      console.log(e);
-      exit();
+    }
+  }
+
+  /***
+   *
+   */
+  static async distribute(root): Promise<void> {
+    let common = root.replace(__dirname, "");
+    let rootpath = pathToFileURL(path.join(__devDirname, common)).href;
+    try {
+      fs.cpSync(path.join(__devDirname, common), root, { recursive: true });
+    } catch (err) {
+      throw err;
     }
   }
 }

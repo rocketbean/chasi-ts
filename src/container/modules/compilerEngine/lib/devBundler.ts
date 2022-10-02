@@ -17,7 +17,7 @@ export default class devBundler extends Bundler implements BundlerInterface {
 
   async connectMws() {
     this.$app.use(this.base, this.$server.middlewares);
-    this.$app.all("*", async (req, res, next) => {
+    this.$app.all(this.base + "*", async (req, res, next) => {
       if (req.originalUrl.includes(this.base)) {
         try {
           const url = req.originalUrl.replace(this.base, "/");

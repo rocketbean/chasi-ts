@@ -77,13 +77,7 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
         return con;
       })
       .catch((e) => {
-        stop(`[${this.states[1]("•")}]${this.name.toUpperCase()}`);
-        let str = this.hideStrings(this.$property.url);
-        this.logger.write(
-          chalk.redBright(
-            "- " + this.$property.url.replace(/\/\/(.*?)\//g, str),
-          ),
-        );
+        throw e;
       });
   }
 }

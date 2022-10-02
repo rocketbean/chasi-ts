@@ -1,7 +1,7 @@
 export default {
   host: checkout(process.env.database, "local"),
   bootWithDB: false,
-  hideLogConnectionStrings: true,
+  hideLogConnectionStrings: false,
   default: checkout(process.env.database, "local"),
   /**
    * *------------- [ Database Connections ] ---------------*
@@ -22,8 +22,8 @@ export default {
      * | if the declaration is non-existent                   |
      * | to chasi's current connections                       |
      * ********************************************************
+     *
      */
-
     dev: {
       driver: "mongodb",
       url: process.env.dbConStringDev,
@@ -32,7 +32,9 @@ export default {
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        connectTimeoutMS: 10000,
+        connectTimeoutMS: 1000,
+        socketTimeoutMS: 1000,
+        serverSelectionTimeoutMS: 5000,
       },
     },
 
@@ -43,7 +45,9 @@ export default {
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        connectTimeoutMS: 10000,
+        connectTimeoutMS: 4000,
+        socketTimeoutMS: 4000,
+        serverSelectionTimeoutMS: 5000,
       },
     },
 
@@ -54,11 +58,14 @@ export default {
       options: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        connectTimeoutMS: 10000,
+        connectTimeoutMS: 4000,
+        socketTimeoutMS: 4000,
+        serverSelectionTimeoutMS: 5000,
       },
     },
   },
-  /**
+
+  /** modelsDir -
    * Chasi will autoload this dirs,
    * look for models / schemas
    * then bind it to

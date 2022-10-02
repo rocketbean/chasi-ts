@@ -24,7 +24,7 @@ export default class RouterServiceProvider
          * to use any auth for your router
          * {String} {Boolean[false]} {null}
          */
-        auth: "dev",
+        auth: false,
         /**
          * prefix[string]
          * will be appended to all the routes
@@ -76,25 +76,8 @@ export default class RouterServiceProvider
             exec: CompilerEngine.instance,
           },
         ],
-        before: (request, response) => {
-          console.log(process.pid);
-        },
+        before: (request, response) => {},
         after: (request, response) => {},
-      } as RouterConfigInterface),
-
-      new Router({
-        name: "chasi",
-        auth: false,
-        prefix: "/chasi",
-        namespace: "container/http/chasi.js",
-        ControllerDir: ["container/controllers/"],
-        middleware: [],
-        AuthRouteExceptions: [],
-        data: () => {
-          return {
-            ver: "ver: 0.2^",
-          };
-        },
       } as RouterConfigInterface),
     ];
   }

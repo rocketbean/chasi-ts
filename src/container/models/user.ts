@@ -4,14 +4,14 @@ import mongoose from "mongoose";
 import bc from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export interface UserModelInterface {
+export type UserModelSchema = {
   name: string;
   password: string;
   alias: string;
   email: string;
-}
+};
 
-var userSchema = new mongoose.Schema<UserModelInterface>({
+var userSchema = new mongoose.Schema<UserModelSchema>({
   name: {
     type: String,
     required: true,

@@ -52,7 +52,7 @@ export default class RouterList extends Writer implements Writable {
   }
 
   formatHeader(router: Router) {
-    let displayname = `[...${router.property.prefix.toUpperCase()}/]`,
+    let displayname = `[...${router.property.prefix.toUpperCase()}]`,
       _tags = this.setTags({
         auth: router.property.auth ? true : false,
       });

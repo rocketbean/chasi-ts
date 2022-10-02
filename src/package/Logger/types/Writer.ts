@@ -53,11 +53,12 @@ export default abstract class Writer {
         x %= P.length - 1;
       }, 50);
     };
-    let stop = ((_m?: "") => {
+    let stop = ((_m?: "", _subj?: "") => {
       readline.cursorTo(_wr, 0);
       readline.clearLine(_wr, 0);
       if (finalMessage.length > 0) {
-        this.write("\r" + chalk.bold.yellow(_m), "clear", this.subject);
+        let _s = _subj !== "" ? _subj : this.subject;
+        this.write("\r" + chalk.bold.yellow(_m), "clear", "database");
       }
       clearInterval(timer);
     }).bind(this);

@@ -1,9 +1,8 @@
 import { Writable } from "../package/Logger/types/Writer.js";
-import Event from "../package/Observer/Event.js";
 let logger: Writable = Logger.writer();
 
 export default {
-  /**
+  /** events -
    * Register your events here,
    * accesible in controllers via
    * [$observer] property.
@@ -13,7 +12,7 @@ export default {
   events: {
     authorized: "container/events/Authorize",
   },
-  /**
+  /** beforeEmit, afterEmit -
    * [beforeEmit] | [afterEmit] the Event fire() method
    * [onemit()] | [emitted()] method will be called
    * and can be overwritten inside your declared Event
@@ -22,10 +21,6 @@ export default {
    * [NOTE]: this method will refer to the
    * Event instance.
    */
-  beforeEmit: async function (params) {
-    logger.group(this.constructor.name);
-  },
-  afterEmit: async function (params) {
-    logger.endGroup(this.constructor.name);
-  },
+  beforeEmit: async function (params) {},
+  afterEmit: async function (params) {},
 };

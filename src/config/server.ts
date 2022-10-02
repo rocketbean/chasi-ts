@@ -6,7 +6,7 @@ export default {
   port: checkout(process.env.ServerPort, 3010),
   environment: checkout(process.env.environment, "local"),
 
-  /**
+  /** cors -
    * check NPM[Cors] package
    * https://www.npmjs.com/package/cors
    */
@@ -22,7 +22,7 @@ export default {
     enablePreflight: true,
   },
 
-  /**
+  /** serviceCluster -
    * Enables Clustering for the api
    * Chasi instace will be invoked
    * on the number of workers decalared
@@ -62,6 +62,10 @@ export default {
     schedulingPolicy: 2,
   },
 
+  /** hooks -
+   * interacts with
+   * Chasi's lifecycle
+   */
   hooks: {
     beforeApp: async (getConfig: Function) => {
       let compiler = getConfig("compiler");
@@ -72,6 +76,7 @@ export default {
       );
     },
   },
+
   /**
    * you can setup your own server environment
    * and add that inside [mode] property

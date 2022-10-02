@@ -40,7 +40,7 @@ export default class RouterModule implements ModuleInterface {
     let module = new RouterModule(routers);
     await Router.loadMiddlewares(config.middlewares);
     await module.collect();
-    // await module.consume();
+    await module.consume();
     // await module.logRouter();
     module.routers.map((router: Router) => {});
     Logger.writers["Left"].endGroup("RouteRegistry");

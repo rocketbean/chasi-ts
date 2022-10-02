@@ -9,6 +9,7 @@ import Models from "./Models.js";
 import chalk from "chalk";
 import Driver, { DBDriverInterface } from "./drivers/drivers.js";
 import MongoDBDriver from "./drivers/mongodb.js";
+import { exit } from "process";
 
 export default class Database implements ModuleInterface {
   $databases: DatabaseDrivers = {};
@@ -53,6 +54,7 @@ export default class Database implements ModuleInterface {
 
   /***
    * fake loading time for [testing purposes]
+   *
    */
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -71,11 +73,14 @@ export default class Database implements ModuleInterface {
         );
       } catch (e) {
         let message = `Error connecting to [${db}], please check connection settings`;
-        if (this.config.bootWithDB)
+        if (this.config.bootWithDB) {
           message += chalk.red(
             `\n├─○ config.database[bootWithDB] is enabled, the application will terminate process...`,
           );
-        loader.stop(`╕[${chalk.red("•")}${db}] - ${message} \n`);
+        }
+        loader.stop(
+          `  ╕[${chalk.red("•")}]${db.toUpperCase()}      - ${message} \n`,
+        );
         if (this.config.bootWithDB) throw e;
       }
     }
