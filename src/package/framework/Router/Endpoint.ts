@@ -5,6 +5,7 @@ import Group from "./Group.js";
 import Exception from "../ErrorHandler/Exception.js";
 export default class Endpoint {
   public path: string = "";
+  public uPath: string = "";
   public isDynamic: boolean = false;
   public unmatched: boolean = false;
   public registered: boolean = false;
@@ -53,6 +54,23 @@ export default class Endpoint {
     let controllerPath = str.split("@");
     this.controller = controllerPath[0];
     this.method = controllerPath[1];
+  }
+
+  /***
+   * threads the string controller
+   * and dispatches the string to
+   * the class[Endpoint] Vars
+   * @params {exc} String | Array
+   * @returns :void
+   */
+  except(exception: string | string[]) {
+    if (Array.isArray(exception)) {
+      exception.map((middleware: string): void => {
+        this.middlewares.filter((mw) => mw != middleware);
+      });
+    } else if (typeof exception === "string") {
+      this.middlewares.filter((mw) => mw != exception);
+    }
   }
 
   middleware(mw: string | string[]) {

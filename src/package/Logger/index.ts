@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import Writer, { Writable } from "./types/Writer.js";
 import * as writers from "./types/writers.js";
-
+import { inspect } from "util";
 const _writers: { [key: string]: any } = writers;
 
 export default class Logger {
@@ -31,8 +31,14 @@ export default class Logger {
   log(...message: any) {
     let wr = this.writer("Left");
     message.forEach((msg, ind) => {
+      if (typeof msg === "object")
+        msg = inspect(msg, {
+          showHidden: false,
+          depth: null,
+          colors: true,
+        });
       if (ind > 0) wr.write("\n");
-      wr.write(msg);
+      wr.write(msg + "\n");
     });
   }
 

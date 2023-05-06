@@ -16,7 +16,7 @@ export default class Registry extends Base {
     this.property = property;
   }
 
-  /**
+  /***
    * collecting Controller resource
    * registered from RouteService Container
    */
@@ -30,7 +30,7 @@ export default class Registry extends Base {
     }
   }
 
-  /**
+  /***
    * fetch and invokes the [Controller]class
    * @param dir Controller directory
    */
@@ -46,7 +46,7 @@ export default class Registry extends Base {
     );
   }
 
-  /**
+  /***
    * Registers an enpoint
    * • [Registry]instance
    * • assign authentication driver
@@ -67,7 +67,7 @@ export default class Registry extends Base {
     await this.routes.push(endpoint);
   }
 
-  /**
+  /***
    * validate and assigns
    * the Authentication[Driver][authorize] method
    * which should return a function
@@ -84,7 +84,7 @@ export default class Registry extends Base {
     );
   }
 
-  /**
+  /***
    * expanding each routes [routes[]]
    * and consuming Group and Router Layers
    * aligning properties
@@ -100,8 +100,9 @@ export default class Registry extends Base {
             this.constructEndpoint(ep);
             this.bindMiddlewares(ep);
             this.bindMethods(ep);
-            this.pullDynamicRoute(ep);
             ep.path = ep.path.replace("//", "/");
+            ep.uPath = ep.property.method + ep.path.replace("//", "/");
+            this.pullDynamicRoute(ep);
             ep.registered = true;
           } catch (e) {
             Caveat.handle({ message: e, interpose: 2 });
@@ -112,9 +113,9 @@ export default class Registry extends Base {
   }
 
   pullDynamicRoute(ep: Endpoint) {
-    if (ep.path.includes(":")) {
+    if (ep.uPath.includes(":")) {
       ep.isDynamic = true;
-      this.routes = this.routes.filter((e) => e.path !== ep.path);
+      this.routes = this.routes.filter((e) => e.uPath !== ep.uPath);
       this.routes.push(ep);
     }
   }
@@ -155,6 +156,7 @@ export default class Registry extends Base {
 
   /***
    * Route consuming Groups Layer
+   *
    */
   async consumeRouteGroup(ep: Endpoint) {
     if (ep.groups.length > 0) {
@@ -170,7 +172,7 @@ export default class Registry extends Base {
     }
   }
 
-  /**
+  /***
    * binding [Controller]class and method
    * connected to the [Endpoint]class
    * if the route is appointed to a controller
@@ -201,6 +203,12 @@ export default class Registry extends Base {
     }
   }
 
+  /***
+   * binding [Controller]class and method
+   * connected to the [Endpoint]class
+   * if the route is appointed to a controller
+   * @param ep [Endpoint] class that handles the route
+   */
   sanitizeRoute(str: string, log: boolean = false) {
     let length = str.length;
     if (str[0] === "/") str = str.substring(1, str.length);

@@ -76,6 +76,6 @@ export default class Router extends Collector {
   }
 
   async log() {
-    this.$log.RouterList.displayRouter(this);
+    if (this.property.displayLog > 0) this.$log.RouterList.displayRouter(this);
   }
 }

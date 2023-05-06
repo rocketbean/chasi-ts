@@ -67,7 +67,7 @@ export class Handler extends Base {
    */
   $app: App;
 
-  /* * * * * * * * *
+  /* * * * * * * * * *
    * App[state] represents the
    * Handler State with number:
    * * * * * * * * *
@@ -122,13 +122,13 @@ export class Handler extends Base {
    * • setup Observers [emitters]
    */
   protected async start(): Promise<void> {
-    if (!process.stdout.isTTY) {
-      let board = (await this.pipe.getAsync({
-        action: "getTty",
-      })) as Iobject;
-      process.stdout.columns = parseInt(board.columns);
-      process.stdout.rows = parseInt(board.rows);
-    }
+    // if (!process.stdout.isTTY) {
+    //   let board = (await this.pipe.getAsync({
+    //     action: "getTty",
+    //   })) as Iobject;
+    //   process.stdout.columns = parseInt(board.columns);
+    //   process.stdout.rows = parseInt(board.rows);
+    // }
 
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);

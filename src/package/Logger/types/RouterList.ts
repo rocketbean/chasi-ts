@@ -3,13 +3,12 @@ import _style from "../styles/style.js";
 import chalk from "chalk";
 import Router from "../../framework/Router/Router.js";
 import Endpoint from "../../framework/Router/Endpoint.js";
-
 export default class RouterList extends Writer implements Writable {
   format(message: string) {
     return message;
   }
 
-  center(message: string, cols: number) {
+  center(message: string, cols: number = this.cols) {
     let width: number = cols / 2;
     let mw: number = message.length / 2;
     message = this.fill(width - mw) + message + this.fill(width - mw);
@@ -21,7 +20,7 @@ export default class RouterList extends Writer implements Writable {
 
   startTrace(ep: Endpoint, method: string) {
     let message = ep.path;
-    let width: number = Math.floor(this.cols / 1.8);
+    let width: number = Math.floor(this.cols / 1.3);
     let threshold = width - message.length - method.length;
     let fullMessage = this.fill(threshold, "-") + message;
     if (ep.exceptions.length > 0) {
@@ -85,7 +84,12 @@ export default class RouterList extends Writer implements Writable {
       else writeStyle = "warning";
 
       this.write(
-        `${_style[writeStyle](_m)}${this.startTrace(ep, _m)}| ${ep.groups
+        `${_style[writeStyle](_m)}${this.startTrace(ep, _m)}|\n `,
+        "clear",
+        "routeRegistry",
+      );
+      this.write(
+        `♦ ${ep.groups
           .map(
             (group) => `${_style.coolText("[" + group.property.prefix + "]")}`,
           )

@@ -64,8 +64,28 @@ export default class RouterServiceProvider
 
         /**
          * Router Hooks
-         *
          */
+        data: () => {
+          return {};
+        },
+        // mount: <RouterMountable[]>[
+        //   {
+        //     name: "engine",
+        //     props: ["web"],
+        //     exec: CompilerEngine.instance,
+        //   },
+        // ],
+        before: (request, response) => {},
+        after: (request, response) => {},
+      } as RouterConfigInterface),
+      new Router({
+        name: "chasi",
+        auth: false,
+        prefix: "/chasi",
+        namespace: "container/http/chasi.js",
+        ControllerDir: ["container/controllers/"],
+        middleware: [],
+        AuthRouteExceptions: [],
         data: () => {
           return {};
         },

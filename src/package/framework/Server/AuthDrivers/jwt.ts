@@ -32,7 +32,10 @@ export default class JWTDriver implements AuthDriver {
     return async (request, response, next) => {
       try {
         let checkException = AuthRouteExceptions.findIndex((obj) => {
-          if (obj.url == ep.path && obj.m == ep.property.method.toUpperCase())
+          if (
+            obj.url == ep.path &&
+            obj.m.toUpperCase() == ep.property.method.toUpperCase()
+          )
             return obj;
         });
         if (checkException < 0) {

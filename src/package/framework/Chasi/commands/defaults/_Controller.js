@@ -29,8 +29,8 @@ export default {
     };
   },
   modelControllerTemplate: (model) => {
-    return `get ${model}() {
-    return this.models.${model};
+    return `get ${model.toLowerCase()}() {
+    return this.models.${model.toLowerCase()};
   }`;
   },
   template: (controller) => {

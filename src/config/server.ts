@@ -53,7 +53,7 @@ export default {
   serviceCluster: {
     enabled: false,
     trackUsage: {
-      enabled: false,
+      enabled: true,
       interval: 500,
     },
     logs: true,

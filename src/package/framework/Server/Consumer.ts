@@ -12,6 +12,7 @@ import Express, { response } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
+import bodyParser from "body-parser";
 
 export default class Consumer {
   $server: any = Express();
@@ -105,12 +106,12 @@ export default class Consumer {
     try {
       await Promise.all(
         Object.keys(params).map(async (mod) => {
-          if (mod in Models.collection) {
-            params[`__${mod}`] = await Models.collection[mod].findById(
-              params[mod],
-            );
+          if (mod.toLowerCase() in Models.collection) {
+            params[`__${mod.toLowerCase()}`] = await Models.collection[
+              mod.toLowerCase()
+            ].findById(params[mod]);
           } else {
-            params[`__${mod}`] = null;
+            params[`__${mod.toLowerCase()}`] = null;
           }
         }),
       );
@@ -137,6 +138,23 @@ export default class Consumer {
     );
   }
 
+  /** *
+   * invoked before consuming routes
+   * exposing the express instance
+   * where they can use methods like
+   * [express.all(), express.use(), etc...]
+   */
+  async beforeRouteConsume(): Promise<void> {
+    let mods = Handler.Instance.$modules.services["$container"];
+    await Promise.all(
+      Object.values(mods).map(async (service: any) => {
+        if (service.instance?.beforeRoute) {
+          return await service.instance.beforeRoute(this.$server);
+        }
+      }),
+    );
+  }
+
   /** * [consumeLayers]
    * routing layer consumption
    * ♦ consumes the routing layer
@@ -153,6 +171,8 @@ export default class Consumer {
     engine?: Iobject,
     compiler?: any,
   ): Promise<void> {
+    await this.beforeRouteConsume();
+
     for (let r in this.$routers) {
       let router = this.$routers[r];
       await this.consume(router);

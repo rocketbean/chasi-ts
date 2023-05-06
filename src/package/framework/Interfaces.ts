@@ -106,6 +106,7 @@ export type RouterConfigInterface = {
   mount?: RouterMountable[];
   before?: Function;
   after?: Function;
+  displayLog?: number;
 };
 
 export type DBProperty = {
