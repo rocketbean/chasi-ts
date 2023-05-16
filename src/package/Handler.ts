@@ -163,6 +163,7 @@ export class Handler extends Base {
       next: this.$proxy.initialize,
       app: this.$proxy,
     });
+
   }
 
   /* * *

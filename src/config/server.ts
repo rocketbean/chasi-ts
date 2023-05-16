@@ -1,6 +1,5 @@
 import { serverConfig } from "../package/framework/Interfaces.js";
 import os from "os";
-
 export default {
   staticDir: "storage",
   port: checkout(process.env.ServerPort, 3010),

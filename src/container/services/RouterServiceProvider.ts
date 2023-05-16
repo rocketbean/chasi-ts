@@ -16,7 +16,7 @@ export default class RouterServiceProvider
   async boot() {
     return [
       new Router({
-        name: "api",
+        name: "chasi",
         /**
          * authentication can be configured from
          * [./config/authentication]
@@ -84,7 +84,7 @@ export default class RouterServiceProvider
         ],
         before: (request, response) => {},
         after: (request, response) => {},
-        displayLog: 2,
+        displayLog: 1,
       } as RouterConfigInterface),
     ];
   }

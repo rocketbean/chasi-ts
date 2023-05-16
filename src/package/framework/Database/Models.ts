@@ -11,15 +11,19 @@ export default class Models extends Base {
     let dirs = Models.config.modelsDir;
     for (let dir in dirs) {
       (await Models._fsFetchDir(dirs[dir])).map((content: any) => {
-        Models.collection[content.modelName.toLowerCase()] = content;
+        Models.collection[content.modelName?.toLowerCase()] = content;
       });
     }
   }
 
   static async init(dbs: DatabaseDrivers, config: any) {
-    Models.$databases = dbs;
-    Models.config = config;
-    await Models.collect();
-    return;
+    try {
+      Models.$databases = dbs;
+      Models.config = config;
+      await Models.collect();
+      return Models;
+    } catch (e) {
+      Logger.log(e)
+    }
   }
 }

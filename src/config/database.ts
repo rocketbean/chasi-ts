@@ -38,31 +38,31 @@ export default {
       },
     },
 
-    stage: {
-      driver: "mongodb",
-      url: process.env.dbConStringStage,
-      db: process.env.stageDatabaseName,
-      options: {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        connectTimeoutMS: 4000,
-        socketTimeoutMS: 4000,
-        serverSelectionTimeoutMS: 5000,
-      },
-    },
+    // stage: {
+    //   driver: "mongodb",
+    //   url: process.env.dbConStringStage,
+    //   db: process.env.stageDatabaseName,
+    //   options: {
+    //     useNewUrlParser: true,
+    //     useUnifiedTopology: true,
+    //     connectTimeoutMS: 4000,
+    //     socketTimeoutMS: 4000,
+    //     serverSelectionTimeoutMS: 5000,
+    //   },
+    // },
 
-    local: {
-      driver: "mongodb",
-      url: process.env.dbConStringLocal,
-      db: process.env.databaseName,
-      options: {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        connectTimeoutMS: 4000,
-        socketTimeoutMS: 4000,
-        serverSelectionTimeoutMS: 5000,
-      },
-    },
+    // local: {
+    //   driver: "mongodb",
+    //   url: process.env.dbConStringLocal,
+    //   db: process.env.databaseName,
+    //   options: {
+    //     useNewUrlParser: true,
+    //     useUnifiedTopology: true,
+    //     connectTimeoutMS: 4000,
+    //     socketTimeoutMS: 4000,
+    //     serverSelectionTimeoutMS: 5000,
+    //   },
+    // },
   },
 
   /** modelsDir -
