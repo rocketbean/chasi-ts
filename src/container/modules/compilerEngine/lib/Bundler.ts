@@ -3,7 +3,6 @@ import path from "path";
 import { Iobject } from "../../../../package/framework/Interfaces.js";
 import { Express } from "express";
 import { readFileSync } from "fs";
-import { pathToFileURL, urlToHttpOptions } from "url";
 import { builderConfig } from "../compiler.js";
 export interface BundlerInterface {
   mode: string;

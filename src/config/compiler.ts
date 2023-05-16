@@ -74,7 +74,7 @@ const config: CompilerEngineConfig = {
       /** mountedTo
        * string[Router.prefix] - routers prefix where engine is mounted.
        */
-      mountedTo: "/api/",
+      mountedTo: "/",
 
       /**** hook
        * hook["beforeApp"] will be called on production build,

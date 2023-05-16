@@ -5,7 +5,10 @@ import {
 } from "../../package/framework/Interfaces.js";
 import Provider from "../../package/framework/Services/Provider.js";
 import Router from "../../package/statics/Router.js";
+import bodyParser from "body-parser";
+import cors from "cors";
 import CompilerEngine from "../modules/compilerEngine/compiler.js";
+
 export default class RouterServiceProvider
   extends Provider
   implements ServiceProviderInterface
@@ -24,13 +27,15 @@ export default class RouterServiceProvider
          * to use any auth for your router
          * {String} {Boolean[false]} {null}
          */
+
         auth: false,
         /**
          * prefix[string]
          * will be appended to all the routes
          * registered from the namespace.
          */
-        prefix: "/api",
+
+        prefix: "/chasi",
         /**
          * this file directory
          * is where endpoints will be registered
@@ -38,12 +43,14 @@ export default class RouterServiceProvider
          * that will accept [route] as
          * parameter
          */
-        namespace: "container/http/api.js",
+
+        namespace: "container/http/chasi.js",
         /**
          * directories registered
          * here will be overlooked by
          * Chasi App instance.
          */
+
         ControllerDir: ["container/controllers/"],
         /**
          * this list of middleware will be applied to
@@ -68,27 +75,6 @@ export default class RouterServiceProvider
         data: () => {
           return {};
         },
-        // mount: <RouterMountable[]>[
-        //   {
-        //     name: "engine",
-        //     props: ["web"],
-        //     exec: CompilerEngine.instance,
-        //   },
-        // ],
-        before: (request, response) => {},
-        after: (request, response) => {},
-      } as RouterConfigInterface),
-      new Router({
-        name: "chasi",
-        auth: false,
-        prefix: "/chasi",
-        namespace: "container/http/chasi.js",
-        ControllerDir: ["container/controllers/"],
-        middleware: [],
-        AuthRouteExceptions: [],
-        data: () => {
-          return {};
-        },
         mount: <RouterMountable[]>[
           {
             name: "engine",
@@ -98,7 +84,13 @@ export default class RouterServiceProvider
         ],
         before: (request, response) => {},
         after: (request, response) => {},
+        displayLog: 2,
       } as RouterConfigInterface),
     ];
+  }
+
+  async beforeRoute($app: any) {
+    $app.use(cors(RouterServiceProvider.config.server.cors));
+    $app.use(bodyParser.json());
   }
 }

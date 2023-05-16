@@ -1,7 +1,6 @@
 import Bundler, { BundlerInterface } from "./Bundler.js";
 import { createServer as createViteServer, UserConfig } from "vite";
 import { builderConfig } from "../compiler.js";
-import { exit } from "process";
 export default class devBundler extends Bundler implements BundlerInterface {
   constructor(
     protected builderConfig: builderConfig,

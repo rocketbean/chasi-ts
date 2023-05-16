@@ -16,7 +16,7 @@
         <li>• Database</li>
         <li>• Middlewares</li>
         <li>• Controller</li>
-        <li>• View[Nuxt]</li>
+        <li>• View[Vite]</li>
         <li>• Events</li>
         <li>• SocketServer <small><i>[@v0.2.0]</i></small></li>
       </ul>

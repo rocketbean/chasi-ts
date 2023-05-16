@@ -4,7 +4,7 @@
         <ideal style = "display:flex; justify-content: center; align-items: center; " :document = "document"/>
       </div>
       <div class = "flex-center" style = "width:100%; height:100%; display:flex; justify-content: center; align-items:center" >
-        <div class = "content-box" :class="document_cb_class" :style = "document_cb" >
+        <div class = "content-box shadow-1" :class="document_cb_class" :style = "document_cb" >
           <div class = "content-pad" >
             <section>
               <h1 class="title">Chasi-TS </h1>
@@ -15,9 +15,9 @@
               </div>
             </section>
             <div class = "auto-grid-sm grid-gap-sm">
-              <button :class = "document_buttons" class="button is-outlined is-fullwidth" @click = "document = !document">Docs</button>
+              <button class="is-dark button is-outlined is-fullwidth" @click = "document = !document">Docs</button>
               <a href = "https://github.com/rocketbean/chasi-ts" target="_new">
-                <button :class = "document_buttons" class="button is-outlined is-fullwidth">Github</button>
+                <button class="is-dark button is-outlined is-fullwidth">Github</button>
               </a>
             </div>
             </div>
@@ -37,8 +37,8 @@ export default {
       else return ""
     },
     document_cb_class () {
-      if(!this.document) return "bg-dark shadow-2 text-content-light"
-      else return "bg-light shadow-1 text-content-dark"
+      if(!this.document) return "bg-dark  text-content-dark"
+      else return "bg-light text-content-dark"
     },
     document_buttons () {
       if(!this.document) return "is-light"
@@ -61,16 +61,16 @@ export default {
     margin:0px;
     padding:0px;
     text-rendering: optimizeLegibility;
-    -webkit-transition: all 200ms cubic-bezier(0.34, 0.18, 0.23, 0.76);
-    transition: all 200ms cubic-bezier(0.34, 0.18, 0.23, 0.76);
+    -webkit-transition: all 200ms cubic-bezier(.17,.67,.79,.49);
+    transition: all 200ms cubic-bezier(.17,.67,.79,.49);
+    animation: cubic-bezier(.17,.67,.79,.49);
   }
-
   .bg-dark {
-    background: #444;
+    background: rgba(250,250,250,0.9);
   }
 
   .bg-light {
-    background: #fff;
+    background: rgba(250,250,250,0.9);
   }
 
   .text-content-light section > * {
@@ -81,8 +81,6 @@ export default {
     color: #888 !important;
   }
 
-
-
   .flux-container {
     position:relative;
     z-index: 1;
@@ -92,22 +90,9 @@ export default {
     background: linear-gradient(36deg, rgb(171, 169, 169) 0%, rgba(245,245,245,1) 46%, rgba(255,255,255,1) 100%) !important;
   }
 
-  .content-box:hover {
-    transform: none
-  }
+
   .content-box {
-    transform: rotateX(2deg)
-      rotateY(2deg)
-      perspective(1300px)
-      scale(0.98)
-      skew(3deg,0deg);
-      transform-origin: 33% center;
-      box-shadow: -4px 8px 7px -2px rgba(64,64,64,0.59);
-      -webkit-box-shadow: -4px 8px 7px -2px rgba(64,64,64,0.59);
-      -moz-box-shadow: -4px 8px 7px -2px rgba(64,64,64,0.59);
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
     padding: 4px;
     width: 350px;
     border-radius: 4px;
@@ -126,7 +111,6 @@ export default {
   .content-pad > .title, .content-pad > .subtitle {
     color: grey;
   }
-
 
   .containStart {
     position:absolute;
@@ -148,9 +132,9 @@ export default {
   }
 
   .shadow-1 {
-    box-shadow: -4px 8px 12px 3px rgba(64,64,64,0.59);
-    -webkit-box-shadow: -4px 8px 12px 3px rgba(64,64,64,0.59);
-    -moz-box-shadow: -4px 8px 12px 3px rgba(64,64,64,0.59);
+    box-shadow: -2px 4px 4px 2px rgba(177, 177, 177, 0.209);
+    -webkit-box-shadow: -2px 4px 4px 2px rgba(177, 177, 177, 0.209);
+    -moz-box-shadow: -2px 4px 4px 2px rgba(177, 177, 177, 0.209);
   }
 
   .shadow-2 {

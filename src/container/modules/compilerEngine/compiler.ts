@@ -5,7 +5,6 @@ import devBundler from "./lib/devBundler.js";
 import prodBundler from "./lib/prodBundler.js";
 import { Iobject } from "../../../package/framework/Interfaces.js";
 import Router from "../../../package/framework/Router/Router.js";
-import { exit } from "process";
 export { devBundler, prodBundler };
 export { Builder };
 
