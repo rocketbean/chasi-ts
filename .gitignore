@@ -20,4 +20,5 @@ nuxt.config.json
 src/container/html/.api
 src/container/html/.chasi
 src/container/html/.out
+src/container/html/temp
 

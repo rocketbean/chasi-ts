@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import vuePlugin from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-import { fileURLToPath } from "node:url";
 
 export const clientBuild = {
   outDir: "./.out/client",
@@ -18,7 +17,6 @@ export const serverBuild = {
 
 export default defineConfig((command, ssrBuild) => ({
   plugins: [
-    // @ts-ignore
     vuePlugin(),
     vueJsx(),
     {

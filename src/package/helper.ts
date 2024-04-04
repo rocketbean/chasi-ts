@@ -61,7 +61,7 @@ declare global {
 }
 
 export default (async () => {
-  console.clear();
+  // console.clear();
   env.config();
   var configPath = "config";
   global._configpath_ = configPath;

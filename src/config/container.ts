@@ -45,7 +45,6 @@ export default {
      * then you can use it in your routes
      */
     auth: "./container/middlewares/Auth",
-    user: "./container/middlewares/User",
   },
 
   session: {

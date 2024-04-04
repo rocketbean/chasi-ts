@@ -19,7 +19,14 @@
     "noEmitOnError": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "types": ["node"]
+    "types": ["node"],
   },
-  "exclude": ["dist", "*.config.js", "chasi.json", "src/container/html"]
+  "exclude": [
+    "dist", 
+    "*.config.js", 
+    "chasi.json", 
+    "src/container/html", 
+    "src/package/framework/Commands",
+    "chasi.js"
+  ]
 }

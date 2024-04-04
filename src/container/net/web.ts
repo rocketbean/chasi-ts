@@ -9,7 +9,11 @@ export default (server: SocketRouter) => {
     server.clients.map((client) => client.send(payload));
   });
 
-  server.on("pulls", (payload) => {
+  server.on("pull", (payload) => {
+    server.clients.map((client) => client.send(payload));
+  });
+
+  server.on("push", (payload) => {
     server.clients.map((client) => client.send(payload));
   });
 };

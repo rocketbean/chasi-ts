@@ -39,6 +39,7 @@ export default class devBundler extends Bundler implements BundlerInterface {
 
   async render(url) {
     try {
+
       this.$template = await this.$server.transformIndexHtml(
         url,
         this._template_,

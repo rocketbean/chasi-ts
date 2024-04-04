@@ -10,7 +10,10 @@ export default class UserController extends Controller {
    * @param {request} [ExpressRequest] Object
    * @return {} translated as [ExpressResponse] Object
    * */
-  async create(request, response) {}
+  async create(request, response) {
+    const user = await User.find({})
+    return user;
+  }
 
   /**
    * Single ObjectModel[index]

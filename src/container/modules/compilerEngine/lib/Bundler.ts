@@ -63,8 +63,7 @@ export default abstract class Bundler implements BundlerInterface {
   async rebase(basepath) {
     this.base = basepath;
     this._config.base = basepath;
-    let cdir = basepath.replace(/\//g, "");
-    this._config.cacheDir = "./." + cdir;
+    this._config.cacheDir = "./temp/." + basepath.replace(/\//g, "");;
   }
 
   async setup($app: Express) {

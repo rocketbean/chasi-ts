@@ -34,6 +34,7 @@ const config: CompilerEngineConfig = {
     {
       /** Name
        * required for matching up with routers.mount()
+       * RouterServiceProvider[route.props]
        */
       name: "web",
 
@@ -71,8 +72,8 @@ const config: CompilerEngineConfig = {
        */
       configPath: resolve(join(dirpath, "container/html/ssr.config.js")),
 
-      /** mountedTo
-       * string[Router.prefix] - routers prefix where engine is mounted.
+      /** mountedTo 
+       * string[@Router.prefix] - routers prefix where engine is mounted.
        */
       mountedTo: "/chasi/",
 
