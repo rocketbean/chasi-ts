@@ -1,7 +1,8 @@
-import { Iobject, RouterConfigInterface } from "../Interfaces.js";
+import { Iobject } from "../Interfaces.js";
 import Collector from "./Collector.js";
 import Controller from "./Controller.js";
 import Base from "../../Base.js";
+import {RouterConfigInterface} from "./Router.types.js"
 
 export default class Router extends Collector {
   /**
@@ -41,7 +42,7 @@ export default class Router extends Collector {
 
   constructor(public property: RouterConfigInterface) {
     super(property);
-    this.validate(property);
+    // this.validate(property);
     this.property = property;
   }
 
