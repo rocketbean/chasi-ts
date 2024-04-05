@@ -1,6 +1,5 @@
 import { RouteEndpointProperty } from "../Interfaces.js";
 import Controller from "./Controller.js";
-import Router from "./Router.js";
 import Group from "./Group.js";
 import Exception from "../ErrorHandler/Exception.js";
 export default class Endpoint {

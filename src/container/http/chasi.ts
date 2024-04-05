@@ -15,4 +15,5 @@ export default (route: Route) => {
   route.get("index", (request: Request, response: Response) => {
     return "Welcome";
   });
+
 };

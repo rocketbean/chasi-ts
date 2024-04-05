@@ -24,7 +24,9 @@ export default class RouterServiceProvider
         middleware: [],
         AuthRouteExceptions: [],
         data: (): {} => {
-          return {};
+          return {
+            test: "test"
+          };
         },
         mount: <RouterMountable[]>[
           {

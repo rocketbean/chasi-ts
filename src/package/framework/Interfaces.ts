@@ -1,6 +1,6 @@
 import { DBDriverInterface } from "./Database/drivers/drivers.js";
-import Router from "./Router/Router.js";
 export * from "./Router/Router.types.js"
+export * from "./Server/Server.types.js"
 
 export interface AuthDriver {
   property: Iobject;
@@ -70,20 +70,6 @@ export type SessionStorageClusterData = {
   pids: any;
   scheduling: number;
   serverData: Iobject;
-};
-
-export type ServerHooks = {
-  beforeApp?: any;
-};
-
-export type serverConfig = {
-  staticDir: any;
-  port: any;
-  environment: any;
-  modes: { [key: string]: any };
-  cors: Iobject;
-  serviceCluster: Iobject;
-  hooks?: ServerHooks;
 };
 
 

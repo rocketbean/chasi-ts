@@ -3,12 +3,10 @@ import Base from "../../Base.js";
 import SessionWriter from "./writers/FileWriter.js";
 import ServiceCluster from "./ServiceCluster.js";
 import horizon from "../../statics/horizon/config.js";
-import SessionStorage from "./Storage.js";
 import Writer from "../../Logger/types/Writer.js";
 import { v4 as uuidv4 } from "uuid";
 import { Handler } from "../../Handler.js";
 import { Iobject } from "./../Interfaces.js";
-import { exit } from "process";
 import PipeHandler from "./PipeHandler.js";
 
 export default class Session {
@@ -29,7 +27,6 @@ export default class Session {
   }
 
   /**
-   *
    * checking [node version]
    * to return [isMaster] || [isPrimary] property
    **/

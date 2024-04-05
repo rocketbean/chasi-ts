@@ -89,6 +89,10 @@ export type RouterConfigInterface = {
    * declared data inside this hook
    * will be avilable throughout 
    * this Router[Instance]
+   * you can access data property
+   * via this.$data inside a controller/method
+   * or by adding a 3rd argument in a
+   * route function
    */
   data?: () => Iobject;
 
@@ -101,13 +105,14 @@ export type RouterConfigInterface = {
    * ref: https://vitejs.dev/
    */
   mount?: RouterMountable[];
+
   /** ?before
    * @before [Router LifeCycle Hook] 
    * this function will be invoke 
    * before a request is passed
    * into controller.
    */
-  before?: Function;
+  before?: () => void;
 
   /** ?after
    * @after [Router LifeCycle Hook] 
@@ -115,10 +120,9 @@ export type RouterConfigInterface = {
    * before a response 
    * is sent back.
    */
-  after?: Function;
+  after?: () => void;
 
   /** ?displayLog
-   * @displayLog 
    * [0] to disable router logs
    * [1] to enable router logs
    */

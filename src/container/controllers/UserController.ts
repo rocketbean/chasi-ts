@@ -47,4 +47,5 @@ export default class UserController extends Controller {
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async update(request, response) {}
+
 }

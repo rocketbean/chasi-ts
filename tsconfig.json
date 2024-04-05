@@ -16,7 +16,7 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "noImplicitReturns": false,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "types": ["node"],

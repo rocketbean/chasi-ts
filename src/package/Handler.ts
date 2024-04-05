@@ -1,6 +1,5 @@
 import App from "./framework/Server/App.js";
 import Obsesrver from "./Observer/index.js";
-import Chasi from "./framework/Chasi/Terminal.js";
 import horizon from "./statics/horizon/config.js";
 import Service from "./framework/Services/Service.js";
 import Controller from "./framework/Router/Controller.js";
@@ -10,7 +9,6 @@ import { Writable } from "./Logger/types/Writer.js";
 import { Iobject } from "./framework/Interfaces.js";
 import {
   ModuleInterface,
-  ServiceProviderInterface,
 } from "./framework/Interfaces.js";
 import { EventEmitter } from "events";
 import Consumer from "./framework/Server/Consumer.js";

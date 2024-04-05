@@ -1,7 +1,25 @@
 export default {
   host: checkout(process.env.database, "local"),
+
+  /** 
+  * throws an error if one of 
+  * the specified DB 
+  * connections failed
+  */
   bootWithDB: false,
+
+  /** 
+  * hides the 
+  * connection string
+  */
   hideLogConnectionStrings: false,
+
+  /** 
+  * this option will be used as
+  * a default DB for models
+  * that did not specify 
+  * a DB connection.
+  */
   default: checkout(process.env.database, "local"),
   /**
    * *------------- [ Database Connections ] ---------------*
@@ -38,31 +56,18 @@ export default {
       },
     },
 
-    // stage: {
-    //   driver: "mongodb",
-    //   url: process.env.dbConStringStage,
-    //   db: process.env.stageDatabaseName,
-    //   options: {
-    //     useNewUrlParser: true,
-    //     useUnifiedTopology: true,
-    //     connectTimeoutMS: 4000,
-    //     socketTimeoutMS: 4000,
-    //     serverSelectionTimeoutMS: 5000,
-    //   },
-    // },
-
-    // local: {
-    //   driver: "mongodb",
-    //   url: process.env.dbConStringLocal,
-    //   db: process.env.databaseName,
-    //   options: {
-    //     useNewUrlParser: true,
-    //     useUnifiedTopology: true,
-    //     connectTimeoutMS: 4000,
-    //     socketTimeoutMS: 4000,
-    //     serverSelectionTimeoutMS: 5000,
-    //   },
-    // },
+    local: {
+      driver: "mongodb",
+      url: process.env.dbConStringLocal,
+      db: process.env.databaseName,
+      options: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        connectTimeoutMS: 4000,
+        socketTimeoutMS: 4000,
+        serverSelectionTimeoutMS: 5000,
+      },
+    },
   },
 
   /** modelsDir -
