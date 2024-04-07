@@ -18,7 +18,7 @@ export default class RouterServiceProvider
       new Router({
         name: "chasi",
         auth: false,
-        prefix: "/chasi",
+        prefix: "/",
         namespace: "container/http/chasi.js",
         ControllerDir: ["container/controllers/"],
         middleware: [],

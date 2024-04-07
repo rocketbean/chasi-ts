@@ -1,6 +1,6 @@
 import { serverConfig } from "../package/framework/Interfaces.js";
 import os from "os";
-export default {
+export default <serverConfig>{
   port: checkout(process.env.ServerPort, 3010),
   environment: checkout(process.env.environment, "local"),
 
@@ -15,7 +15,7 @@ export default {
       "Authorization",
       "Access-Control-Allow-Methods",
       "Access-Control-Request-Headers",
-    ],
+    ], 
     credentials: false,
     enablePreflight: true,
   },
@@ -94,4 +94,4 @@ export default {
       protocol: "http",
     },
   },
-} as serverConfig;
+} ;

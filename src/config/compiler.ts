@@ -7,7 +7,6 @@ import {
 import { serverBuild, clientBuild } from "../container/html/ssr.config.js";
 
 let environment: "dev" | "prod" = "dev";
-// @ts-ignore
 let dirpath = environment == "dev" ? __devDirname : __dirname;
 
 /***
