@@ -2,18 +2,6 @@ import { defineConfig } from "vite";
 import vuePlugin from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 
-export const clientBuild = {
-  outDir: "./.out/client",
-  emptyOutDir: true,
-  manifest: true,
-  ssrManifest: true,
-};
-
-export const serverBuild = {
-  outDir: "./.out/server",
-  emptyOutDir: true,
-  ssr: "./entry-server.js",
-};
 
 export default defineConfig((command, ssrBuild) => ({
   plugins: [
@@ -40,6 +28,15 @@ export default defineConfig((command, ssrBuild) => ({
                 rel: "stylesheet",
                 type: "text/css",
                 href: "assets/main.css",
+              },
+              injectTo: ctx.server ? "body-prepend" : "head",
+            },
+            {
+              tag: "link",
+              attrs: {
+                rel: "stylesheet",
+                type: "text/css",
+                href: "assets/app.scss",
               },
               injectTo: ctx.server ? "body-prepend" : "head",
             },

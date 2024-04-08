@@ -9,8 +9,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node ./dist/server.js -e ts --experimental-top-level-await --exec \"npm run exec\"",
-    "exec": "tsc && node dist/server.js",
+    "start": "tsc && node ./dist/server.js -e ts --experimental-top-level-await ",
+    "dev": "tsc-watch --onSuccess \"node ./dist/server.js -e ts  --experimental-top-level-await \"",
     "postbuild": "cpy \"./src/container/html/* \" \"./dist/container/html \""
   },
   "nodemonConfig": {
@@ -33,6 +33,7 @@
     "lite-server": "^2.6.1",
     "log-update": "^5.0.1",
     "os-utils": "^0.0.14",
+    "tsc-watch": "^6.2.0",
     "typescript": "^4.8.0-dev.20220630",
     "vite": "^3.2.10",
     "vue-router": "^4.1.5"
@@ -51,10 +52,14 @@
     "mongodb": "^4.7.0",
     "mongoose": "^6.4.4",
     "npm-cache": "^0.7.0",
+    "sass": "^1.74.1",
     "serve-static": "^1.13.2",
-    "three": "^0.163.0",
     "uuid": "^8.3.2",
     "vue": "^3.2.39",
     "ws": "^8.2.3"
+  },
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.0.0"
   }
 }

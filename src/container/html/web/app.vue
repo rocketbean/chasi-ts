@@ -1,9 +1,7 @@
 <template>
   <div>
     <router-view v-slot="{ Component }">
-        <div>
           <component :is="Component" ></component>
-        </div>
     </router-view>
   </div>
 </template>
@@ -21,7 +19,7 @@
     url('./assets/fonts/Inter-Italic.woff') format('woff');
 }
 .inter {
-  font-family: 'Inter';
+  font-family: 'Inter'; 
 }
 
 #app {

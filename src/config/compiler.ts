@@ -4,10 +4,10 @@ import {
   builderConfig,
   Builder,
 } from "../container/modules/compilerEngine/compiler.js";
-import { serverBuild, clientBuild } from "../container/html/ssr.config.js";
 
 let environment: "dev" | "prod" = "dev";
-let dirpath = environment == "dev" ? __devDirname : __dirname;
+//@ts-ignore
+let dirpath = environment == "dev" ? __devDirname: __dirname;
 
 /***
  * @type {CompilerEngineConfig}
@@ -49,7 +49,7 @@ const config: CompilerEngineConfig = {
       /** root
        * vite project root.
        */
-      root: join(dirpath, "/container/html"),
+      root: join(dirpath, "container/html/web"),
 
       /** ssrServerModule
        * server entry
@@ -59,17 +59,26 @@ const config: CompilerEngineConfig = {
       /** serverBuild
        * [vite.UserConfig.build] - build options for server[SSR].
        */
-      serverBuild,
+      serverBuild: {
+        outDir: "./.out/server",
+        emptyOutDir: true,
+        ssr: "./entry-server.js",
+      },
 
       /** clientBuild
        * [vite.UserConfig.build] - build options for client[SSR].
        */
-      clientBuild,
+      clientBuild: {
+        outDir: "./.out/client",
+        emptyOutDir: true,
+        manifest: true,
+        ssrManifest: true,
+      },
 
       /** configPath
        * string[vite.UserConfig] - path/to/*.config.js.
        */
-      configPath: resolve(join(dirpath, "container/html/ssr.config.js")),
+      configPath: resolve(join(dirpath, "container/html/web/ssr.config.js")),
 
       /** mountedTo 
        * string[@Router.prefix] - routers prefix where engine is mounted.
@@ -85,6 +94,7 @@ const config: CompilerEngineConfig = {
        * is enabled
        */
       hook: async (getConfig: Function, ctx: builderConfig): Promise<void> => {
+        //@ts-ignore
         if (environment === "prod") await Builder.distribute(ctx.root); // execs only on TS
         await Builder.prodSetup(getConfig, ctx);
       },

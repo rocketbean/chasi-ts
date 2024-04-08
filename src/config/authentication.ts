@@ -21,7 +21,8 @@ export default {
        * value stored in the machine's environment
        * variables list.
        */
-      key: "Chasi",
+      key: checkout(process.env.oauthkey, "chasi-dev")
+,
       /**
        * Chasi will automatically attach
        * the authenticated data
