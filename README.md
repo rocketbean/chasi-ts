@@ -17,10 +17,12 @@ this framework implements services such as
 - Controller
 
 # Installation
-  > fork this repo,
+  > you can install Chasi-TS via npm init
   ```
-    $ npm i
+    > $ npm init @rocketbean/chasi
   ```
+  >OR you can fork this repo (https://github.com/rocketbean/chasi-ts)
+
 ## starting the server
     // after setting up your .env file 
 run local development environment
@@ -28,8 +30,6 @@ run local development environment
   $ npm run dev
 ```
 # Scripts
-
-
  *you can install chasi-cli globally by running or you can just run it via npx.*
  > $ npm i -g @rocketbean/chasis
 
