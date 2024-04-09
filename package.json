@@ -1,6 +1,6 @@
 {
   "name": "chasi-ts",
-  "version": "2.3.3",
+  "version": "2.3.5",
   "description": "",
   "main": "dist/server.js",
   "type": "module",
@@ -23,7 +23,7 @@
   "email": "buzzrocketbeab@gmail.com",
   "license": "ISC",
   "devDependencies": {
-    "@rocketbean/chasis": "^1.0.1",
+    "@rocketbean/create-chasi": "^1.0.3",
     "@types/chalk": "^2.2.0",
     "@types/express": "^4.17.13",
     "@types/node": "^18.0.0",
