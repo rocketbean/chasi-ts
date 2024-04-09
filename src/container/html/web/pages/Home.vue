@@ -1,7 +1,7 @@
 <template>
   <div class="flux-container">
-      <div class = "containStart flex-center" >
-        <ideal style = "display:flex; justify-content: center; align-items: center; " :document = "document"/>
+      <div class = "containStart gradient-bg " >
+        <ideal />
       </div>
       <div class = "flex-center" style = "width:100%; height:100%; display:flex; justify-content: center; align-items:center" >
         <div class = "content-box shadow-1" :class="document_cb_class" :style = "document_cb" >
@@ -51,7 +51,6 @@ export default {
     }
   },
   mounted () {
-    console.log("test")
   }
 }
 </script>
@@ -86,8 +85,7 @@ export default {
     z-index: 1;
     width:100vw;
     height: 100vh;
-    background: rgb(217,217,217);
-    background: linear-gradient(36deg, rgb(171, 169, 169) 0%, rgba(245,245,245,1) 46%, rgba(255,255,255,1) 100%) !important;
+    overflow: hidden;
   }
 
 
@@ -116,8 +114,8 @@ export default {
     position:absolute;
     z-index: -1 !important;
     background: transparent;
-    width:100%;
-    height:100%;
+    width:100vw;
+    height:100vh;
     left:0;
     top: 0;
   }

@@ -10,6 +10,7 @@ export async function render(url, manifest) {
   await router.push(url);
   await router.isReady();
 
+  
   const ctx = {};
   const html = await renderToString(app, ctx);
 
