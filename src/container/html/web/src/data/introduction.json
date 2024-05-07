@@ -1,0 +1,19 @@
+{
+  "introduction": {
+    "keywords": ["chasi-ts", "introduction"],
+    "id": "intro",
+    "label": "introduction",
+    "display": true,
+    "text": "A Rest-API framework that will boost the development, Secure the production, and ensures the scalability of your project. Chasi is modeled after an auto-mobile production, which may start with the chassis, and serve's as the car's foundation. Engineers can then layout plan/layout/design which engine to use, wheels, transmissions, electrical components, and some other modules.",
+    "controls": {
+      "right": {
+        "open": false
+      },
+      "header": {
+        "subheader": {
+          "open": true
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
-src/container/services/LoadModuleServiceProvider.ts
-src/container/views/nuxt.config.json
+src/container/html/web/temp
+src/package/statics/logs/*
 src/package/statics/logs/*
 dist/package/statics/logs/*
 statics/*
@@ -13,12 +13,5 @@ certs
 package-lock.json
 dist/*
 .gitmodules
-chasi.json
 rest.http
-nuxt.config.json
-.nuxt
-src/container/html/.api
-src/container/html/.chasi
-src/container/html/.out
-src/container/html/temp
 

@@ -1,4 +1,6 @@
-export default {
+import { DatabaseConfig } from "../package/framework/Interfaces.js";
+
+export default <DatabaseConfig> {
   host: checkout(process.env.database, "local"),
 
   /** 
@@ -12,7 +14,7 @@ export default {
   * hides the 
   * connection string
   */
-  hideLogConnectionStrings: false,
+  hideLogConnectionStrings: true,
 
   /** 
   * this option will be used as

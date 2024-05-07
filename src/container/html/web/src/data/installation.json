@@ -1,0 +1,62 @@
+{
+  "installation": {
+    "keywords": ["install"],
+    "id": "install",
+    "label": "installation",
+    "display": true,
+    "subcats": [
+      {
+        "to": "NpmInit",
+        "label": "npm"
+      },
+      {
+        "to": "chasiInstall",
+        "label": "chasi-cli"
+      },
+      {
+        "to": "Github",
+        "label": "Github"
+      },
+      {
+        "to": "GettingStarted",
+        "label": "Getting Started"
+      }
+    ],
+    "glossary": [
+      {
+        "id": "NpmInit",
+        "label": "Initializing npm",
+        "keywords": ["initialize", "init", "npm"],
+        "text": "this is the most recommended way of initializing chasi, please note that this step requires node, npm and git installed in your environment."
+      },
+      {
+        "id": "chasiInstall",
+        "label": "via chasi-cli",
+        "keywords": ["chasi-cli", "cli","init"],
+        "text": "this requires chasi-cli to be globally installed on the system."
+      },
+      {
+        "id": "Github",
+        "label": "Github",
+        "keywords": ["Github", "fork","clone"],
+        "text": "via Github fork/clone, etc."
+      },
+      {
+        "id": "GettingStarted",
+        "label": "Getting Started",
+        "keywords": ["start", "boot","run"],
+        "text": "there is a template of environment file right after installation (./template.env), which can be copied as a reference for setting up a .env file."
+      }
+    ],
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": false
+        }
+      }
+    }
+  }
+}

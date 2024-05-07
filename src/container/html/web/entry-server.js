@@ -1,7 +1,7 @@
 import { basename } from "node:path";
 import { renderToString } from "vue/server-renderer";
-import { createApp } from "./main.js";
-import { buildroutes } from "./router.js";
+import { createApp } from "./src/main.js";
+import { buildroutes } from "./src/router.js";
 
 export { buildroutes };
 export async function render(url, manifest) {

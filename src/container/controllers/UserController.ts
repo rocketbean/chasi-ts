@@ -1,6 +1,4 @@
-import Service from "../../package/framework/Services/Service.js";
 import Controller from "../../package/statics/Controller.js";
-import User from "../models/user.js";
 export default class UserController extends Controller {
   get user() {
     return this.models.user;
@@ -11,27 +9,28 @@ export default class UserController extends Controller {
    * @return {} translated as [ExpressResponse] Object
    * */
   async create(request, response) {
-    const user = await User.find({})
-    return user;
+    // maybe add some validations here ?
+    return await this.user.create({...request.body})
   }
 
+
   /**
-   * Single ObjectModel[index]
-   *
+   * refers to a single (User) ObjectModel[index]
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
   async index(request, response) {
-    return request.params.__user;
+    return await this.user.findOne({id: request.params.user})
   }
 
   /**
-   * Single ObjectModel[index]
+   * lists a (User) ObjectModel[index]
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
-   *
    * */
-  async welcome(request, response) {}
+  async list(request, response) {
+    return await this.user.find({})
+  }
 
   /**
    * Delete an ObjectModel[]
@@ -39,13 +38,20 @@ export default class UserController extends Controller {
    * @return {Bool} translated as [ExpressResponse] Object
    *
    * */
-  async delete(request, response) {}
+  async delete(request, response) {
+    return await request.params.__user.delete()
+  }
 
   /**
    * Update an ObjectModel[]
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
-  async update(request, response) {}
+  async update(request, response) {
+    let user = request.params.__user;
+    // maybe add some validations here ?
+    user = Object.assign(user, request.body)
+    return await user.save();
+  }
 
 }

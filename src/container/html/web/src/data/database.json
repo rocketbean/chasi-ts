@@ -1,0 +1,115 @@
+{
+  "database": {
+    "keywords": ["database", "mongodb", "nosql"],
+    "id": "database",
+    "label": "Database",
+    "display": true,
+    "subcats": [
+      {
+        "to": "database",
+        "label": "Database"
+      },
+      {
+        "to": "DatabaseConfig",
+        "label": "Database Config",
+        "group": [
+          "dc-host", 
+          "dc-bootWithDB",
+          "dc-hideLogConnectionStrings",
+          "dc-default",
+          "dc-connections"
+        ]
+      },
+      {
+        "to": "db-model",
+        "label": "Model",
+        "group": [
+          "db-model-con"
+        ]
+      }
+    ],
+    "glossary": [
+      {
+        "id": "database",
+        "label": "Database",
+        "sublabel": "[./src/config/database.ts]",
+        "keywords": ["database", "db"],
+        "text": "Chasi Database Handler automatically connects on the declared named connection in [DatabaseConfig.connections], the handler also supports multi-tenancy which should be declared in the connections config first, and models will be switched vie the connect() method. the Hanlder is currently focused on MongoDB, however there future plans to adopt ORM to support multiple types of databases."
+      },
+      {
+        "id": "db-model",
+        "label": "Model",
+        "sublabel": "[./src/container/models]",
+        "keywords": ["model", "database model", "methods"],
+        "text": "Chasi Model wraps and extends Mongoose Model, and will inherit mongoose model methods. Chasi Model also can handle different database connections by specifying the name of the connection to use [./config/database::connections] in the model."
+      },
+      {
+        "id": "db-model",
+        "label": "Model",
+        "sublabel": "[./src/container/models]",
+        "keywords": ["model", "database model", "methods"],
+        "text": "Chasi Model wraps and extends Mongoose Model, and will inherit mongoose model methods. Chasi Model also can handle different database connections by specifying the name of the connection to use [./config/database::connections] in the model."
+      },
+      {
+        "id": "db-model-con",
+        "label": "Model Connection",
+        "reference": ["db-model"],
+        "keywords": ["model", "connection","database"],
+        "text": "for multiple database connection, a connection can be specified by adding a third argument in the Model.connect() wrapper. please note that models will connect to the default connection if none is specified."
+      },
+      {
+        "id": "dc-host",
+        "label": "Host",
+        "reference": ["DatabaseConfig"],
+        "type": "<string>",
+        "keywords": ["DatabaseConfig", "host","db", "config"],
+        "text": "a connection name to connect."
+      },
+      {
+        "id": "dc-bootWithDB",
+        "label": "BootWithDB",
+        "reference": ["DatabaseConfig"],
+        "type": "<boolean>",
+        "keywords": ["DatabaseConfig", "BootWithDB","db", "config"],
+        "text": "if enabled, chasi will throw an execution error if one of the DBConnections failed."
+      },
+      {
+        "id": "dc-hideLogConnectionStrings",
+        "label": "hideLogConnectionStrings",
+        "reference": ["DatabaseConfig"],
+        "type": "<boolean>",
+        "keywords": ["DatabaseConfig", "hideLogConnectionStrings","db", "config"],
+        "text": "hides the connection string"
+      },
+      {
+        "id": "dc-default",
+        "label": "default",
+        "reference": ["DatabaseConfig"],
+        "type": "<string>",
+        "keywords": ["DatabaseConfig", "default","db", "config"],
+        "text": "the default connection to be used by the models if none is specified"
+      },
+      {
+        "id": "dc-connections",
+        "label": "Connections",
+        "reference": ["DatabaseConfig"],
+        "type": "<{[key: string]: DBProperty}>",
+        "keywords": ["DatabaseConfig", "connections","db", "config"],
+        "text": "a database connection declaration, entries will be process in DB Handler's registry and will try to connect upon boot.",
+        "coderef": {
+          "ref": "database/config/connections"
+        }
+      }
+    ],
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": false
+        }
+      }
+    }
+  }
+}

@@ -54,7 +54,6 @@ export default class Database implements ModuleInterface {
 
   /***
    * fake loading time for [testing purposes]
-   *
    */
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

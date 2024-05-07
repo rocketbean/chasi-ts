@@ -83,10 +83,39 @@ export type DBProperty = {
 };
 
 export type DatabaseConfig = {
+  /**
+   * Connection name
+   * declared in 
+   * [DatabaseConfig.connections]
+   */
   host: string;
+
+  /**
+   * will throw an
+   * execution error 
+   * if one of the DB connections
+   * failed to connect
+   */
   bootWithDB: boolean;
+
+  /**
+   * the default connection
+   * to be used by the models
+   * if none is specified
+   */
   default: string;
+
+  /**
+   * hides the connection 
+   * string in terminal
+   * logging
+   */
   hideLogConnectionStrings: boolean;
+
+  /**
+   * this is where database connections 
+   * should be declared.
+   */
   connections: { [key: string]: DBProperty };
 };
 

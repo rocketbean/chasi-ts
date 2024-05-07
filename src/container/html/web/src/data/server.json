@@ -1,0 +1,156 @@
+{
+  "server": {
+    "id": "server",
+    "label": "Server",
+    "display": true,
+    "keywords": ["server"],
+    "subcats": [
+      {
+        "to": "serverConfig",
+        "label": "Server Configuration",
+        "group": [
+          "scport",
+          "scenvi",
+          "sccors",
+          "scserviceCluster",
+          "schooks",
+          "scmodes"
+        ]
+      },
+      {
+        "to": "serverContainer",
+        "label": "Container",
+        "group": [
+          "sc-name",
+          "sc-controllerDir",
+          "sc-serviceBootstrap",
+          "sc-middlewares"
+        ]
+      }
+    ],
+    "glossary": [
+      {
+        "id": "serverConfig",
+        "label": "Configuration",
+        "keywords": ["server", "config", "serverconfig"],
+        "text": "configurations applied to the server"
+      },
+      {
+        "id": "server-ssr",
+        "label": "SSR",
+        "keywords": ["ssr", "build", "compilerEngine"],
+        "text": "Chasi's server side rendering is powered by vitejs, a powerful compiler that uses roll-up to compile files. checkout ref: https://vitejs.dev/ to learn more."
+      },
+      {
+        "id": "scport",
+        "label": "via chasi-cli",
+        "reference": ["serverConfig"],
+        "keywords": ["port", "config","serverconfig"],
+        "text": "This value will be passed to chasi's core upon booting, and will serve as local serving port."
+      },
+      {
+        "id": "scenvi",
+        "label": "environment",
+        "reference": ["serverConfig"],
+        "keywords": ["environment", "config","serverconfig"],
+        "text": "via Github fork/clone, etc."
+      },
+      {
+        "id": "sccors",
+        "label": "cors",
+        "reference": ["serverConfig"],
+        "keywords": ["cors", "config","serverconfig"],
+        "text": "this object will be passed to NPM[Cors] package. reference: https://www.npmjs.com/package/cors"
+      },
+      {
+        "id": "scserviceCluster",
+        "label": "serviceCluster",
+        "reference": ["serverConfig"],
+        "keywords": ["serviceCluster", "clustering", "config","serverconfig"],
+        "text": "Enables Clustering for the api Chasi instace will be invoked on the number of workers decalared at serviceCluster[workers], it will be equal to the available cpus by default."
+      },
+      {
+        "id": "schooks",
+        "label": "hooks",
+        "reference": ["serverConfig"],
+        "keywords": ["hooks", "config","serverconfig"],
+        "sub": ["hookBeforeApp", "hookAfterApp"],
+        "text": "interact with Chasi's lifecycle"
+      },
+      {
+        "id": "scmodes",
+        "label": "modes",
+        "reference": ["serverConfig"],
+        "keywords": ["modes", "config","serverconfig"],
+        "text": "for setting up a specific server environment and add that inside [modes]property change the [environment] property to a specific selection, please note that the selected environment must be registered in this property."
+      },
+      {
+        "id": "serverContainer",
+        "label": "Container",
+        "reference": ["server", "serverConfig"],
+        "keywords": ["server", "container","serverconfig"],
+        "sub": "[./src/config/container]",
+        "text": "Container configuration is for managing the container registry. E.G controllers directory, middlewares and service providers, as well as the API/APP name of the project. The idea of this configurations is to isolate developers interaction to chasi's internal modules."
+      },
+      {
+        "id": "sc-name",
+        "label": "Name",
+        "reference": ["serverContainer", "serverConfig"],
+        "keywords": ["serverContainer name", "name","serverconfig"],
+        "text": "target name for the APP/API/etc."
+      },
+      {
+        "id": "sc-controllerDir",
+        "label": "ControllerDir",
+        "reference": ["serverContainer", "serverConfig"],
+        "keywords": ["serverContainer controllerDir", "controllerDir","serverconfig"],
+        "text": "Default Controllers Directory, Chasi will autoload this directoy as controllers, when [Router][controllersDir] property is missing from the config. this controllers will only be registered if the [JS][TS]file is a type of controller"
+      },
+      {
+        "id": "sc-serviceBootstrap",
+        "label": "ServiceBootstrap",
+        "reference": ["serverContainer", "serverConfig"],
+        "keywords": ["serverContainer serviceBootstrap", "serviceBootstrap","serverconfig"],
+        "text": "this is an outside chasi module registry, ideally a logic gate in between controller's request and response, socket server's logic. services are ideal for wrapping the API's logic and processes."
+      },
+      {
+        "id": "sc-middlewares",
+        "label": "Middlewares",
+        "reference": ["serverContainer", "serverConfig"],
+        "keywords": ["serverContainer middlewares", "middlewares","serverconfig"],
+        "text": "middlewares must be registered here before it can be applied to any routing container, group, endpoint, or even in the websockets or channels. It is good to put request validations or verifications in middlewares to centralize gates in the environment."
+      },
+      {
+        "id": "ev-start",
+        "label": "Server Start",
+        "reference": ["server", "serverConfig"],
+        "keywords": ["server start", "start","event", "@start"],
+        "text": "state[0] server @start lifecycle this event is mainly for setting up Observer module to run and read the lifecycle of everything. and data collection and registries in service providers/ third party module before instantiation."
+      },
+      {
+        "id": "ev-initialize",
+        "label": "Server Start",
+        "reference": ["server", "serverConfig"],
+        "keywords": ["server initialize", "initialize","event", "@initialize"],
+        "text": "state[1|2] server @init lifecycle, which initializes DB and routers. as well as consuming route layers."
+      },
+      {
+        "id": "ev-boot",
+        "label": "Server boot",
+        "reference": ["server", "serverConfig"],
+        "keywords": ["server boot", "initialize","event", "@boot", "ready"],
+        "text": "state[3] server @boot or server readystate lifecycle, which checks and returns the error container, instantiation of modules, and consuming layer for controllers. Then the actual booting of the server"
+      }
+    ],
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": false
+        }
+      }
+    }
+  }
+}

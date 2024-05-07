@@ -11,7 +11,7 @@ export default (route: Route) => {
    * [AuthRouteExceptions] array option.
    *
    */
-
+  
   route.get("index", (request: Request, response: Response) => {
     return "Welcome";
   });

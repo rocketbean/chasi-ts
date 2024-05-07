@@ -1,7 +1,10 @@
 import { defineConfig } from "vite";
+import {resolve} from "path";
 import vuePlugin from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-
+const useEngine = "web";
+const engineConfig = global?.$app?.config?.compiler.engines.find(eng => eng.name === useEngine);
+const root = engineConfig ? engineConfig.root : "./dist/container/html/web";
 
 export default defineConfig((command, ssrBuild) => ({
   plugins: [
@@ -10,33 +13,13 @@ export default defineConfig((command, ssrBuild) => ({
     {
       name: "external-css",
       transformIndexHtml: {
-        enforce: "post",
-        transform(html, ctx) {
+        order: "post",
+        handler(html, ctx) {
           return [
             {
-              tag: "link",
+              tag: "script",
               attrs: {
-                rel: "stylesheet",
-                type: "text/css",
-                href: "assets/bulma/css/bulma.min.css",
-              },
-              injectTo: ctx.server ? "body-prepend" : "head",
-            },
-            {
-              tag: "link",
-              attrs: {
-                rel: "stylesheet",
-                type: "text/css",
-                href: "assets/main.css",
-              },
-              injectTo: ctx.server ? "body-prepend" : "head",
-            },
-            {
-              tag: "link",
-              attrs: {
-                rel: "stylesheet",
-                type: "text/css",
-                href: "assets/app.scss",
+                src: "https://cdn.jsdelivr.net/npm/letterizejs@2.0.1/lib/letterize.min.js",
               },
               injectTo: ctx.server ? "body-prepend" : "head",
             },
@@ -46,19 +29,23 @@ export default defineConfig((command, ssrBuild) => ({
     },
   ],
   optimizeDeps: {
+    force: true,
     inlcude: [
-      "./assets/**/*",
-      "./plugins/**/*",
-      "./components/**/*.vue",
-      "pages/**/*",
+      "./src/assets/**/*",
+      "./src/plugins/**/*",
+      "./src/components/***/**/*.vue",
+      "./src/pages/**/*",
     ],
+    exclude: ["fsevents"]
   },
   server: {
     middlewareMode: true,
   },
   resolve: {
-    alias: [],
-    extensions: [".vue", ".js"],
+    alias: {
+      '@': resolve(root,"src")
+    },
+    extensions: [".vue", ".js", ".scss", ".ts", ".css"],
   },
   appType: "custom",
 }));

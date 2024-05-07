@@ -12,6 +12,7 @@ export default class devBundler extends Bundler implements BundlerInterface {
 
   async routeRegistry() {
     return (await this.$server.ssrLoadModule(this.getSsrModule())).buildroutes;
+    
   }
 
   async connectMws() {

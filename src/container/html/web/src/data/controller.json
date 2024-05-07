@@ -1,0 +1,90 @@
+{
+  "controller": {
+    "keywords": ["controller"],
+    "id": "controller",
+    "label": "Controller",
+    "display": true,
+    "subcats": [
+      {
+        "to": "controller",
+        "label": "Controller"
+      },
+      {
+        "to": "example-usage",
+        "label": "Example Usage",
+        "group": ["usage-namespace", "usage-controller", "usage-model"]
+      },
+      {
+        "to": "example-responses",
+        "label": "Responses",
+        "group": [
+          "res-post", 
+          "res-get", 
+          "res-get-user",
+          "res-patch-user", 
+          "res-del-user"
+        ]
+      }
+    ],
+    "glossary": [
+      {
+        "id": "controller",
+        "label": "Controller",
+        "sublabel": "[./src/container/controllers]",
+        "keywords": ["controller", "methods"],
+        "text": "Handles incoming request and client response, Controllers are the process in between the logic of an endpoint."
+      },
+      {
+        "id": "usage-namespace",
+        "label": "Namespace Example",
+        "keywords": ["Controller usage", "example", "namespace"]
+      },
+      {
+        "id": "usage-controller",
+        "label": "Controller Example",
+        "keywords": ["Controller usage", "example"]
+      },
+      {
+        "id": "usage-model",
+        "label": "DBModel Example",
+        "keywords": ["DBModel usage", "example", "DBModel"]
+      },
+      {
+        "id": "res-post",
+        "label": "Example Post Request",
+        "keywords": ["Controller usage", "example"]
+      },
+      {
+        "id": "res-get",
+        "label": "Example Get Request",
+        "keywords": ["Controller usage", "example"]
+      },
+      {
+        "id": "res-get-user",
+        "label": "Example Dynamic Get Request",
+        "keywords": ["Controller usage", "example"]
+      },
+      {
+        "id": "res-patch-user",
+        "label": "Example Dynamic Patch Request ",
+        "keywords": ["Controller usage", "example"]
+      },
+      {
+        "id": "res-del-user",
+        "label": "Example Dynamic Delete Request ",
+        "keywords": ["Controller usage", "example"]
+      }
+
+    ],
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": false
+        }
+      }
+    }
+  }
+}

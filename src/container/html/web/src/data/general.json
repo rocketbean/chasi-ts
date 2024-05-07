@@ -1,0 +1,35 @@
+{
+  "general": {
+    "keywords": ["general"],
+    "id": "general",
+    "label": "general",
+    "display": false,
+    "glossary": [
+      {
+        "id": "expressjs",
+        "label": "express",
+        "keywords": ["initialize", "init", "npm"],
+        "text": "Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications"
+      },
+      {
+        "id": "ServiceProvider",
+        "label": "ServiceProvider",
+        "keywords": ["ServiceProvider"],
+        "text": "A way to manage inner/outer modules, chasi allows separation of logic/implementation. Developers can utilize this implementation to further isolate logic."
+      },
+      {
+        "id": "CompilerEngine",
+        "label": "CompilerEngine",
+        "keywords": ["compilerengine", "compiler", "engine"],
+        "text": "chasi internal module that handles SSR and frontend stuff"
+      },
+      {
+        "id": "HTTPMethod",
+        "label": "HTTP Method",
+        "keywords": ["HTTP", "HTTPMethod", "protocol"],
+        "text": "HTTP method of an endpoint, e.g. (GET, POST, PUT, DELETE, OPTIONS, PATCH, SEARCH). a full route endpoint can be similar but have a different HTTP method, and will be routed accordingly."
+      }
+      
+    ]
+  }
+}

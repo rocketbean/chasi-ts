@@ -51,8 +51,10 @@ export default class Endpoint {
    */
   handleStringController(str: string) {
     let controllerPath = str.split("@");
-    this.controller = controllerPath[0];
-    this.method = controllerPath[1];
+    if(controllerPath.length > 1) {
+      this.controller = controllerPath[0];
+      this.method = controllerPath[1];
+    } else this.method = controllerPath[0];
   }
 
   /***

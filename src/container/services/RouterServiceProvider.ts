@@ -15,17 +15,17 @@ export default class RouterServiceProvider
 {
   async boot() {
     return [
-      new Router({
+      new Router(<RouterConfigInterface>{
         name: "chasi",
         auth: false,
         prefix: "/",
         namespace: "container/http/chasi.js",
-        ControllerDir: ["container/controllers/"],
+        ControllerDir: ["container/controllers"],
         middleware: [],
         AuthRouteExceptions: [],
         data: (): {} => {
           return {
-            test: "test"
+            chasiVer: "2.3.5"
           };
         },
         mount: <RouterMountable[]>[
@@ -38,7 +38,7 @@ export default class RouterServiceProvider
         before: (request, response) => {},
         after: (request, response) => {},
         displayLog: 1,
-      } as RouterConfigInterface),
+      }),
     ];
   }
 

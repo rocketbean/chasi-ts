@@ -1,0 +1,19 @@
+{
+  "compiler": {
+    "keywords": ["compiler", "engine", "SSR", "rendering", "vitejs"],
+    "id": "compiler",
+    "label": "Compiler Engine",
+    "display": true,
+    "text": "chasi's database handler",
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": true
+        }
+      }
+    }
+  }
+}
