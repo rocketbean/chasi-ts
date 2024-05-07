@@ -39,9 +39,18 @@ export default class Base {
     this.getFileDirectories(path.join(__dirname, dir), _mods)
     await Promise.all( Object.keys(_mods).map( async key => {
       let _fp = path.join(__filepath + dir);
-      key.split("\\").forEach(p => {
-        if(!(_fp.split("\\").includes(p))) _fp = path.join(_fp, p) 
-      })
+      if(key.includes("\\")) {
+        key.split("\\").forEach(p => {
+          if(!(_fp.split("\\").includes(p))) _fp = path.join(_fp, p) 
+        })
+      }
+
+      if(key.includes("/")) {
+        key.split("/").forEach(p => {
+          if(!(_fp.split("/").includes(p))) _fp = path.join(_fp, p) 
+        })
+      }
+
       _mods[key] = await import(_fp + ".js")
           .then((_content) => _content.default)
           .catch((e) => {

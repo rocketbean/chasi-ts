@@ -1,6 +1,7 @@
 {
   "server": {
     "id": "server",
+    "icon": "dns",
     "label": "Server",
     "display": true,
     "keywords": ["server"],

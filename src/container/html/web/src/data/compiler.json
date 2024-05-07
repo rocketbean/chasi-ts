@@ -2,6 +2,7 @@
   "compiler": {
     "keywords": ["compiler", "engine", "SSR", "rendering", "vitejs"],
     "id": "compiler",
+    "icon": "category",
     "label": "Compiler Engine",
     "display": true,
     "text": "chasi's database handler",

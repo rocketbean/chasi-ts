@@ -5,7 +5,7 @@
         <div class="media-left">
           <figure class="image is-48x48">
             <img
-              src="https://bulma.io/assets/images/placeholders/96x96.png"
+              src="/src/assets/logo-s.svg"
               alt="Placeholder image"
               class = "curved-border"
             />
@@ -16,9 +16,7 @@
           <p class="subtitle is-7 has-text-grey-light">@rocketbean</p>
         </div>
       </div>
-  
       <div class="content">
-
       </div>
     </div>
   </div>
@@ -26,6 +24,9 @@
 
 <script>
 import { defineComponent } from "vue";
+import logoUrl from "@/assets/logo.png"
+
+console.log(logoUrl)
 export default defineComponent({
   name: "chasi",
   mounted() {

@@ -2,6 +2,7 @@
   "observer": {
     "keywords": ["observer", "event", "event-handler"],
     "id": "observer",
+    "icon": "local_activity",
     "label": "Observer",
     "display": true,
     "text": "Observer API",

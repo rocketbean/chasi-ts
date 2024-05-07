@@ -1,6 +1,7 @@
 {
   "router": {
     "id": "router",
+    "icon": "fork_right",
     "label": "Router",
     "display": true,
     "keywords": ["router", "routing"],

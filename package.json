@@ -1,6 +1,6 @@
 {
   "name": "chasi-ts",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "description": "",
   "main": "dist/server.js",
   "type": "module",

@@ -2,6 +2,7 @@
   "installation": {
     "keywords": ["install"],
     "id": "install",
+    "icon": "settings_input_svideo",
     "label": "installation",
     "display": true,
     "subcats": [

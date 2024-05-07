@@ -29,6 +29,11 @@ export const useControlStore = defineStore( "ControlStore", {
         rows: [],
         key: ''
       },
+      about: {
+        controls: {
+          open: false,
+        }
+      },
       active: {
         context: {
         },
@@ -46,6 +51,9 @@ export const useControlStore = defineStore( "ControlStore", {
     },
     searchModal() {
       return this.search.controls;
+    },
+    aboutModal () {
+      return this.about.controls
     },
     headerControls() {
       return this.header.controls;
@@ -67,7 +75,7 @@ export const useControlStore = defineStore( "ControlStore", {
     },
     searchRows () {
       return this.search.rows
-    }
+    },
   },
   actions: {
     setRows (arr) {
@@ -75,6 +83,9 @@ export const useControlStore = defineStore( "ControlStore", {
     },
     setModal (val) {
       this.searchModal.open = val 
+    },
+    setAboutModal (val) {
+      this.aboutModal.open = val 
     },
     toggleModal () {
       this.searchModal.open = !this.searchModal.open 

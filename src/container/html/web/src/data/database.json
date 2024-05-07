@@ -2,6 +2,7 @@
   "database": {
     "keywords": ["database", "mongodb", "nosql"],
     "id": "database",
+    "icon": "storage",
     "label": "Database",
     "display": true,
     "subcats": [

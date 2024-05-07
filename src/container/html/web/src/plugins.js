@@ -6,7 +6,9 @@ const globalComponents = [
   'inline-separator',
   'tag', 
   'hook', 
-  'search'];
+  'search',
+  'about'
+];
 
 export default async (app) => {
   Object.keys(plugins).forEach((plugin) => {

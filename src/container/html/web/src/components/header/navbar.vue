@@ -1,12 +1,18 @@
 <template>
+  <about/>
   <nav class="navbar glass curved-border" role="navigation" aria-label="dropdown navigation">
     <span class="navbar-item is-size-5">
       /{{ controlStore.ctx.label }}{{ activeScr?.target?.id ? `@${activeScr.target.id}` : ''}}
     </span>
     <div class="navbar-item navbar-end ">
       <div class="buttons">
-        <button class="button  is-primary is-small">Github</button>
-        <button class="button  is-info is-small">Docs</button>
+        <a class="button  is-info is-small is-dark" href = "https://github.com/rocketbean/chasi-ts" target="new">Github</a>
+        <a class="button is-info is-small is-dark" href = "https://www.npmjs.com/package/@rocketbean/create-chasi" target = "new">CLI</a>
+        <button class="button  button-round  is-success  is-dark" @click = "openAbout">
+          <span class="material-symbols-rounded" >
+            account_circle
+          </span>
+        </button>
       </div>
 
     </div>
@@ -39,6 +45,9 @@ export default {
     const activeScr = computed(() => {
       return controlStore.scr
     })
+    const openAbout = () => {
+      controlStore.setAboutModal(true);
+    }
     watch(controls, (val) => {
       let subheader = val.subheader
       let pos = '150px';
@@ -54,6 +63,7 @@ export default {
     return {
       controlStore,
       activeScr,
+      openAbout,
       ctx
     }
   }
@@ -61,10 +71,16 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .subheader {
   height:auto;
   position: relative;
   overflow: hidden;
+}
+
+.button-round {
+  border-radius: 50% !important;
+  height:auto;
+  width:30px;
 }
 </style>
