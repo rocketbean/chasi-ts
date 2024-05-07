@@ -34,7 +34,7 @@ export default class prodBundler extends Bundler implements BundlerInterface {
   }
 
   async routeRegistry() {
-    let manifest = await this.getDistFile("./ssr-manifest.json", {
+    let manifest = await this.getDistFile("./.vite/ssr-manifest.json", {
       assert: {
         type: "json",
       },
@@ -52,8 +52,7 @@ export default class prodBundler extends Bundler implements BundlerInterface {
     });
   }
 
-  async connectMws() {
-    this.$app.use(
+  async connectMws() {    this.$app.use(
       this.base,
       //@ts-ignore
       serveStatic(this.clientPath, {
@@ -67,7 +66,7 @@ export default class prodBundler extends Bundler implements BundlerInterface {
           let html = await this.render(url);
           res.status(200).set({ "Content-Type": "text/html" }).end(html);
         } catch (e) {
-          Logger.log(e, "@devBuildError");
+          Logger.log(e, "@build error");
         }
       } else next();
     });
@@ -103,7 +102,7 @@ export default class prodBundler extends Bundler implements BundlerInterface {
     await this.connectMws();
     let _r = pathToFileURL(this.getSsrModule()).href;
     this.$render = (await import(_r)).render;
-    this.ssrManifest = await this.getDistFile("./ssr-manifest.json", {
+    this.ssrManifest = await this.getDistFile("./.vite/ssr-manifest.json", {
       assert: {
         type: "json",
       },

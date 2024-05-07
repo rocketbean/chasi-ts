@@ -1,0 +1,19 @@
+{
+  "observer": {
+    "keywords": ["observer", "event", "event-handler"],
+    "id": "observer",
+    "label": "Observer",
+    "display": true,
+    "text": "Observer API",
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": true
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ import Router from "./Router.js";
 import Base from "../../Base.js";
 import { RouterConfigInterface } from "../Interfaces.js";
 import Authentication from "../Server/Authentication.js";
+import path from "path";
 import { exit } from "process";
 export default class Registry extends Base {
   controllers: Controller[] = [];
@@ -184,9 +185,9 @@ export default class Registry extends Base {
         if (!ep.controller.includes("/")) {
           ep.controller = Router.defaultControllerDir + "/" + ep.controller;
         }
-        let controller = Object.keys(Router.Controllers).find((key) =>
-          key.toLowerCase().includes(ep.controller.toLowerCase()),
-        );
+
+        let controller = Object.keys(Router.Controllers).find((key) => 
+          key.toLowerCase().includes(ep.controller.toLowerCase()));
         ep.$controller = Router.Controllers[controller].instance;
         ep.$method = Router.Controllers[controller].instance[ep.method].bind(
           Router.Controllers[controller].instance,
@@ -221,6 +222,8 @@ export default class Registry extends Base {
   constructEndpoint(ep: Endpoint) {
     ep.property.endpoint = this.sanitizeRoute(ep.property.endpoint);
     ep.path += "/" + ep.property.endpoint;
+    ep.path = "/" + ep.path.split("/").filter(p => p !== '').join('/')
+
   }
 
   constructRouterEp(ep: Endpoint) {
@@ -232,12 +235,20 @@ export default class Registry extends Base {
     this.sanitizeRoute(group.property.prefix, true),
       (group.property.prefix = this.sanitizeRoute(group.property.prefix));
     ep.path += "/" + group.property.prefix;
+
   }
 
   constructControllerPath(ep: Endpoint, group: Group) {
     if (group.property.controller != "") {
-      group.property.controller = group.property.controller.replace(/\//g, "");
-      ep.controller = group.property.controller + "/" + ep.controller;
+      let controllerPath = group.property.controller.split("@");
+      if(controllerPath.length > 1) {
+        if(!ep.controller) {
+          ep.property.controller = `${controllerPath[1]}@${ep.property.controller}`;
+          ep.controller = `${controllerPath[1]}`;
+        }
+
+      };
+      ep.controller = controllerPath[0] + "/" + ep.controller;
     }
   }
 

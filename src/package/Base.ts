@@ -36,19 +36,35 @@ export default class Base {
 
   async NamespacedfetchFilesFromDir(dir: string): Promise<object> {
     let _mods: { [key: string]: object } = {};
-
-    let _fp = path.join(__filepath + dir);
-    await Promise.all(
-      fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
-        _mods[path.join(__dirname, dir) + "/" + file.replace(".js", "")] =
-          await import(path.join(_fp, file))
-            .then((_content) => _content.default)
-            .catch((e) => {
-              console.log(e);
-            });
-      }),
+    this.getFileDirectories(path.join(__dirname, dir), _mods)
+    await Promise.all( Object.keys(_mods).map( async key => {
+      let _fp = path.join(__filepath + dir);
+      key.split("\\").forEach(p => {
+        if(!(_fp.split("\\").includes(p))) _fp = path.join(_fp, p) 
+      })
+      _mods[key] = await import(_fp + ".js")
+          .then((_content) => _content.default)
+          .catch((e) => {
+            console.log(e);
+          });
+      })
     );
     return _mods;
+  }
+
+  getFileDirectories(distPath, _mods) {
+    try {
+      return fs.readdirSync(distPath).filter( function (file) {
+        let stat = fs.statSync(distPath + '/' + file).isDirectory();
+        if(!stat) _mods[path.join(distPath, file.replace(".js", ""))] = file
+        if(stat) return fs.statSync(path.join(distPath, file)).isDirectory();
+    }).reduce((all, subDir) => {
+        return [...all, ...this.getFileDirectories(path.join(distPath, subDir), _mods).map(e => subDir + '/' + e)]
+    }, []);
+    } catch(e) {
+      Logger.log(e, "@er")
+    }
+
   }
 
   async fetchFilesFromDirs(dirs: string[]) {

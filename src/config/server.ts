@@ -28,7 +28,6 @@ export default <serverConfig>{
    * it will be equal to the available
    * cpus by default.
    * ---------------------------------------------------------------------------
-   *
    * enabled[boolean]:  enables the clustering
    * logs[boolean]: logs the cluster when enabled
    * trackUsage.enabled[boolean]: tracks memory heaps

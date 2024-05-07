@@ -21,7 +21,6 @@ export default {
     },
     hooks: {
       beforeApp(getConfig) {
-        console.log("msmsmsm");
       },
     },
   },

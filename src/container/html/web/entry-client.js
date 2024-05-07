@@ -1,5 +1,4 @@
-import { createApp } from "./main.js";
-
+import { createApp } from "./src/main.js";
 const { app, router } = createApp();
 
 router.isReady().then(() => {

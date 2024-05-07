@@ -1,0 +1,74 @@
+:root {
+  --trans-animate: ease;
+  --trans-speed: 400ms;
+}
+
+.slide-right-move,
+.slide-right-enter-active {
+  transition: all var(--trans-speed) var(--trans-animate);
+}
+
+.slide-right-leave-active {
+  transition: all var(--trans-speed) var(--trans-animate);
+  transform: translateX(950px);
+}
+
+.slide-right-enter-from {
+  transition: all var(--trans-speed) var(--trans-animate);
+  transform: translateX(-500px);
+}
+
+.slide-right-leave-to {
+  transition: all var(--trans-speed) var(--trans-animate);
+}
+
+.slide-right-leave-active {
+  position: absolute;
+}
+
+
+.slide-left-move,
+.slide-left-enter-active {
+  transition: all var(--trans-speed) var(--trans-animate);
+}
+
+.slide-left-leave-active {
+  transition: all var(--trans-speed) var(--trans-animate);
+  transform: translateX(-950px);
+}
+
+.slide-left-enter-from {
+  transition: all var(--trans-speed) var(--trans-animate);
+  transform: translateX(500px);
+}
+
+.slide-left-leave-to {
+  transition: all var(--trans-speed) var(--trans-animate);
+}
+
+.slide-left-leave-active {
+  position: absolute;
+}
+
+.slide-down-move,
+.slide-down-enter-active {
+  transition: all var(--trans-speed) var(--trans-animate);
+}
+
+.slide-down-leave-active {
+  transition: all var(--trans-speed) var(--trans-animate);
+  transform: translateY(50px);
+}
+
+.slide-down-enter-from {
+  transition: all var(--trans-speed) var(--trans-animate);
+  transform: translateY(-50px);
+}
+
+.slide-down-leave-to {
+  transition: all var(--trans-speed) var(--trans-animate);
+}
+
+.slide-down-leave-active {
+  position: absolute;
+}

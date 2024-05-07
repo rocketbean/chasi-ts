@@ -1,0 +1,131 @@
+{
+  "nav" : [
+    {
+      "label": "Introduction",
+      "icon": "info",
+      "name": "intro",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": true
+          }
+        },
+        "right": {
+          "open": false
+        },
+        "main": "intro"
+      }
+    },
+    {
+      "label": "Installation",
+      "icon": "deployed_code_update",
+      "name": "install",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": false
+          }
+        },
+        "right": {
+          "open": true,
+          "module": "installation"
+        },
+        "main": "installation"
+      }
+    },
+    {
+      "label": "Server",
+      "icon": "dns",
+      "name": "server",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": false
+          }
+        },
+        "right": {
+          "open": true,
+          "module": "server"
+        },
+        "main": "server"
+
+      }
+    },
+    {
+      "label": "Router",
+      "icon": "fork_right",
+      "name": "router",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": false
+          }
+        },
+        "right": {
+          "open": true,
+          "module": "router"
+        },
+        "main": "router"
+      }
+    },
+    {
+      "label": "Database",
+      "icon": "database",
+      "name": "database",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": true
+          }
+        },
+        "main": "intro"
+      }
+    },
+    {
+      "label": "Container",
+      "icon": "category",
+      "name": "container",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": false
+          }
+        },
+        "right": {
+          "open": false
+        },
+        "main": "server"
+      }
+    }
+  ]
+}

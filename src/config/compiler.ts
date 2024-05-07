@@ -82,8 +82,12 @@ const config: CompilerEngineConfig = {
 
       /** mountedTo 
        * string[@Router.prefix] - routers prefix where engine is mounted.
+       * this must be pointed to the router's prefix
+       * set to "/" if prefix is not declared.
+       * this path will also be used for serving static files
+       * after a compilation
        */
-      mountedTo: "/chasi/",
+      mountedTo: "/",
 
       /**** hook
        * hook["beforeApp"] will be called on production build,

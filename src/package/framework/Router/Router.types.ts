@@ -50,37 +50,31 @@ export type RouterConfigInterface = {
    * registered from the namespace.
    */
   prefix: string;
+
   /** *namespace
-   * this file directory
-   * is where endpoints will be registered
-   * this file must contain a function
-   * that will accept [route] as
-   * parameter
+   * a string path to a router container file.
    */
   namespace: string;
 
   /** *middleware
-   * this list of middleware will be applied to
-   * all of the routes registered at
-   * this namespace
+   * middleware/s listed under this property will be implemented, 
+   * to all the routes
+   * registered in the instance, 
+   * <strong>except*</strong> if the route  
+   * endpoint/group have a declaration of a middleware excemption
    */
   middleware: string | string[];
 
   /** *ControllerDir
-   * directories registered
-   * here will be overlooked by
-   * Chasi App instance.
+   * a string path/s that will be added 
+   * to router's controller path registry.
    */
   ControllerDir: string | string[];
 
   /** ?AuthRouteExceptions
-   * if there's an instance where
-   * you will have route/s that needs to
-   * be excempted from Authentication Guards
-   * you can register those endpoint here.
-   * and please note that unauthorized guard
-   * will not be able to access params like
-   * [request.auth]
+   * Option to excempt a route endpoint/s from AuthGuards,
+   * all routes that will be excempted in Auth implementations will have 
+   * the [request.auth] property in the <Request>
    */
   AuthRouteExceptions?: RouteExceptions[];
 
@@ -97,26 +91,23 @@ export type RouterConfigInterface = {
   data?: () => Iobject;
 
   /** ?mount
-   * [CompilerEngine]
-   * after enabling CompilerEngine module,
-   * Engine instance can be mounted
-   * in this router by registering
-   * Engine here.
-   * ref: https://vitejs.dev/
+   * a router hook where third party modules 
+   * can be registered/mounted
+   * @params <RouterMountable[]>
    */
   mount?: RouterMountable[];
 
   /** ?before
-   * @before [Router LifeCycle Hook] 
-   * this function will be invoke 
+   * @before [Router Hook] 
+   * this function will be invoked
    * before a request is passed
-   * into controller.
+   * into controller/handler function.
    */
   before?: () => void;
 
   /** ?after
-   * @after [Router LifeCycle Hook] 
-   * this function will be invoke 
+   * @after [Router Hook] 
+   * this function will be invoked 
    * before a response 
    * is sent back.
    */
