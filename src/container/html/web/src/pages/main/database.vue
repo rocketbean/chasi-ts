@@ -3,7 +3,7 @@
     <div class="hero is-small is-dark">
       <div class="hero-body">
         <p class="title">Database</p>
-        <p class="subtitle">database</p>
+        <p class="subtitle">store <strong>meaningful</strong> information</p>
       </div>
     </div>
     <div class="content">
