@@ -20,7 +20,6 @@ export const ProxyHandler = {
 export default class Base {
   async fetchFilesFromDir(dir: string): Promise<object> {
     let _mods: { [key: string]: object } = {};
-
     let _fp = path.join(__filepath + dir);
     await Promise.all(
       fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
@@ -38,19 +37,7 @@ export default class Base {
     let _mods: { [key: string]: object } = {};
     this.getFileDirectories(path.join(__dirname, dir), _mods)
     await Promise.all( Object.keys(_mods).map( async key => {
-      let _fp = path.join(__filepath + dir);
-      if(key.includes("\\")) {
-        key.split("\\").forEach(p => {
-          if(!(_fp.split("\\").includes(p))) _fp = path.join(_fp, p) 
-        })
-      }
-
-      if(key.includes("/")) {
-        key.split("/").forEach(p => {
-          if(!(_fp.split("/").includes(p))) _fp = path.join(_fp, p) 
-        })
-      }
-
+      let _fp = path.join("file:",key);
       _mods[key] = await import(_fp + ".js")
           .then((_content) => _content.default)
           .catch((e) => {

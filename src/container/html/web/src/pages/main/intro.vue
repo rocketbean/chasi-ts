@@ -20,13 +20,12 @@
     <div class="content" style="padding:20px; margin-top:10px">
       <hr style="color:white" />
       <p class="margin:20px">
-        A Rest-API framework that will boost the development,
-        Secure the production, and ensures the scalability of your project.
+        A Rest-API framework that will boosts the development,
+        secures the production, and ensures the scalability of your project.
         Chasi is modeled after an auto-mobile production, which may start with
-        the chassis, and serve's as the car's foundation. Engineers can then
-        layout plan/layout/design which engine to use, wheels, transmissions, electrical components, and some
-        other modules.
-
+        the chassis, and serve's as the car's foundation. Routing container allows chasi to manage multiple API's
+        within the same cluster, supplying each their requirements from a centralized abstract environment. the 
+        framework also provides an option to manage processes since NodeJS provides great flexibility on managing performance via it's Cluster API, therefore improving scalabilty accross the project. 
       </p>
       <h4>Requirements</h4>
       <ul class="is-size-6">
@@ -34,8 +33,6 @@
         <li>NPM (>=v8.0.0)</li>
         <li>Git (>=2.0.0)</li>
       </ul>
-
-
     </div>
   </div>
 </template>
