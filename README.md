@@ -5,6 +5,10 @@ CLI: https://www.npmjs.com/package/@rocketbean/chasis
 
 github: https://github.com/rocketbean/chasi-ts
 
+[docs] - documentation is available on localserver by default,
+* run the server [npm run serve]
+* headover to [protocol<http|https>]://localhost:<port_number>
+* default: http://localhost:3010
 # Chasi
 **RESTApi** Framework for **node.js**
 this framework implements services such as
