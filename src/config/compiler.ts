@@ -5,7 +5,7 @@ import {
   Builder,
 } from "../container/modules/compilerEngine/compiler.js";
 
-let environment: "dev" | "prod" = "dev";
+let environment: "dev" | "prod" = "prod";
 //@ts-ignore
 let dirpath = environment == "dev" ? __devDirname: __dirname;
 

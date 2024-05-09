@@ -57,6 +57,7 @@ export default class Builder implements BuilderInterface {
           let builderConfig = (await Builder.getConfigs(ctx)) as UserConfig;
           await prodBundler.clientBuild(ctx, builderConfig);
           await prodBundler.serverBuild(ctx, builderConfig);
+          await Builder.sanitize(ctx)
         }
       } catch (e) {
         console.log(e);
@@ -65,9 +66,13 @@ export default class Builder implements BuilderInterface {
     }
   }
 
-  /***
-   *
-   */
+  static async sanitize(ctx): Promise<void> {
+    let common = ctx.root.replace(__dirname, "");
+    let rootpath = path.join(__dirname, common);
+    fs.rmSync(path.join(rootpath, "src"), { recursive: true, force: true });
+    fs.rmSync(path.join(rootpath, "temp"), { recursive: true, force: true });
+  }
+
   static async distribute(root): Promise<void> {
     let common = root.replace(__dirname, "");
     let rootpath = pathToFileURL(path.join(__devDirname, common)).href;
