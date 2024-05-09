@@ -1,5 +1,6 @@
 <template>
   <div class="main-content" style="width:100%;">
+
     <transition name="slide-left" >
       <div v-if="ctx.id === 'intro'" class = "bottom-padding">
         <intro />
@@ -11,7 +12,7 @@
         <server />
       </div>
       <div v-else-if="ctx.id === 'router'" class = "bottom-padding">
-        <router />
+        <router  />
       </div>
       <div v-else-if="ctx.id === 'controller'" class = "bottom-padding">
         <controller />
@@ -19,14 +20,14 @@
       <div v-else-if="ctx.id === 'database'" class = "bottom-padding">
         <database />
       </div>
-
       <div v-else style="width:100%; height: 100%; ">
         <catcher/>
       </div>
     </transition>
+
   </div>
 </template>
-<script lang="ts" setup>
+<script setup>
 import { useControlStore } from "@/stores/ControlStore.js"
 import intro from "./intro.vue"
 import installation from "./installation.vue";
@@ -51,6 +52,14 @@ onMounted(() => {
 </script>
 
 <style>
+.z-box {
+  width:150px;
+  height:150px;
+  background: red;
+  position:absolute;
+  top:-50px;
+  z-index: 1000;
+}
 .main-content {
   min-width: 100%;
   width: 100%;

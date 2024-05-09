@@ -56,7 +56,7 @@ const data = reactive({
       title: "cors",
       sub: "[serverConfig.cors]",
       tag: "<CorsOptions>",
-      desc: `this object will be passed to <a class = "tag is-dark">NPM[Cors]</a> 
+      desc: `This object will be passed to <a class = "tag is-dark">NPM[Cors]</a> 
         package. <br/>
         reference: <a ref "https://www.npmjs.com/package/cors" target="_new">
         https://www.npmjs.com/package/cors</a>`
@@ -91,7 +91,7 @@ const data = reactive({
       title: "hooks",
       sub: "[serverConfig.hooks]",
       tag: "<beforeApp><afterApp>",
-      desc: `interact with Chasi's lifecycle<br/>
+      desc: `Interact with Chasi's lifecycle<br/>
       - <a class = "tag is-dark is-small" style = "margin:2px">
         beforeApp()</a> hook will be called before booting the server <br/>
       - <a class = "tag is-dark is-small" style = "margin:2px">
@@ -110,7 +110,7 @@ const data = reactive({
       title: "modes",
       sub: "[serverConfig.modes]",
       tag: "modes<serverModeConfig>",
-      desc: `setup your own server environment
+      desc: `Set up your own server environment
       and add that inside [modes]property
       change the [environment] property to a specific
       selection, please note that the selected environment 

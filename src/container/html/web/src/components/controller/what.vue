@@ -38,7 +38,7 @@
       </template>
     </code-container>
     <small class="sub-text">
-      the namespace above will register 5 endpoints, the endpoints might look similar to each other, but it is under different 
+      The namespace above will register 5 endpoints, the endpoints might look similar to each other, but it is under different 
       <tag v-bind="{ name: 'HTTPMethod', style: 'is-primary', reference: 'HTTPMethod' } " />. Listed below is the exposed endpoints:
       <ul>
         <li>[POST] http://localhost:3010/api/user</li>
@@ -58,7 +58,7 @@
       </span>
     </div>
     <small class="sub-text">
-      the enpoints declared above will be routed to this controller[UserController]. let's assume the file will exist on [./container/controllers/UserController.ts]
+      The enpoints declared above will be routed to this controller[UserController]. let's assume the file will exist on [./container/controllers/UserController.ts]
     </small>
     <code-container mapping="controller/implementation/controller" :options="{ theme: 'vitesse-dark', lang: 'ts' }">
       <template v-slot:comment>
@@ -107,7 +107,7 @@ const data = reactive({
       title: "[POST]",
       sub: "/api/user",
       desc: `
-<small>let's assume the request to the endpoint will have this JSON body</small>
+<small>Let's assume the request to the endpoint will have this JSON body</small>
 <pre style = "border-radius: 10px">
 body: {
     "email": "john@doe.com",
@@ -136,7 +136,7 @@ body: {
       hook: "res-get",
       title: "[GET]",
       sub: "/api/user",
-      desc: `<small>get the list of all users</small>`,
+      desc: `<small>Get the list of all users</small>`,
       codeContent: {
         mapping: `
 [
@@ -161,7 +161,7 @@ body: {
       title: "[GET]",
       sub: "/api/user/:user",
       tag: "<user>",
-      desc: `<small>if a dynamic route matches a model name, Chasi will try to resolve the index and will add a variable to the <Request> param with a prefix of "__" + the dynamic route name. like on this example, user exist as a model, Chasi will automatically bind the user to the <Request> param accesible in the controller. you can check how to use this binding in the controller displayed above.</small>`,
+      desc: `<small>If a dynamic route matches a model name, Chasi will try to resolve the index and will add a variable to the <Request> param with a prefix of "__" + the dynamic route name. like on this example, user exist as a model, Chasi will automatically bind the user to the <Request> param accesible in the controller. you can check how to use this binding in the controller displayed above.</small>`,
       codeContent: {
         mapping: `
 {
@@ -184,7 +184,7 @@ body: {
       title: "[PATCH] ",
       sub: "/api/user/:user",
       tag: "<user>",
-      desc: `<small>update a user, in this case we'll choose to update the alias</small>
+      desc: `<small>Update a user, in this case we'll choose to update the alias</small>
 <pre style = "border-radius: 10px">
 body: {
     "alias": "johnd"

@@ -1,16 +1,16 @@
 <template>
-  <div class="">
+  <div >
     <section class="section ">
       <div class="pan-title">
         <div class="x-center is-size-3">
           <span> Router as a Module </span>
         </div>
       </div>
-      <div class="sub-text ">
+      <div class="sub-text " >
         Router is an instance of a
         <tag v-bind="{ name: 'ServiceProvider', style: 'is-primary', reference: 'ServiceProvider' }" />
         module, that acts like a module, but is running inside
-        chasi's core process. Router was modularized to extend the flexibility
+        Chasi's core process. Router was modularized to extend the flexibility
         of a routing service instead of having a fixed boundary in a
         process that requires flexibility, therefore providing its users with
         extended abstraction and fluidity, while keeping the Router instances isolated
@@ -21,7 +21,7 @@
         single source. Routers can also implement different types of modules like, the
         <tag v-bind="{ name: 'CompilerEngine', style: 'is-link', reference: 'CompilerEngine' }" /> which is a different
         <tag v-bind="{ name: 'ServiceProvider', style: 'is-primary', reference: 'ServiceProvider' } " /> module, and is
-        mounted in the default Router Instance chasi provides, that is possibly running this page.
+        mounted in the default Router Instance Chasi provides, that is possibly running this page.
       </div>
     </section>
 
@@ -41,7 +41,7 @@
         In RouterServiceProvider file, Routers are registered inside the boot method, which is a ServiceProvider method,
         that is being executed before the server(
         <tag v-bind="{ name: '@start', style: 'is-link', reference: 'ev-start' }" />)
-        event, which is part of chasi's lifecycle.
+        event, which is part of Chasi's lifecycle.
         <tag v-bind="{ name: 'ServiceProvider@boot', style: 'is-link', reference: 'ServiceProvider' }" />
         method is mainly for collecting information, before it runs in the registry.
         Router instance needs to be invoked inside the boot function

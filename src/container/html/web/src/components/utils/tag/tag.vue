@@ -1,7 +1,7 @@
 <template>
-  <a class="tag in-tag" :class="props.style" >
-    <div class="on-hover ">
-      <div class="hover-container shadow-2">
+  <a class="tag in-tag" :class="props.style"  >
+    <div class="on-hover " >
+      <div class="hover-container shadow-2" >
         <div class="hover-content">
           <div class="content" v-if="data">
             <h1>{{ data.label }}</h1>
@@ -26,7 +26,7 @@
   </a>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { useControlStore } from "@/stores/ControlStore"
 import { ref } from "vue"
 let ctx = useControlStore();
@@ -61,7 +61,7 @@ if (props.reference) {
     display: none;
     position: absolute;
     bottom: 100%;
-    z-index:99999;
+    z-index:200 !important; 
     left: 0px;
   }
 
@@ -76,6 +76,7 @@ if (props.reference) {
     margin:10px;
     background: rgb(15, 15, 15);
     border-radius: 10px;
+    z-index:200;
   }
 
   .hover-content {
@@ -88,12 +89,11 @@ if (props.reference) {
     text-align: start;
     word-wrap: break-word;
     place-items: center;
+    z-index:200 !important; 
   }
 
   .in-tag:hover .on-hover,
   .on-hover:hover {
-    display: inline-block;
-
-
+    display:inline-flex;
   }
 </style>

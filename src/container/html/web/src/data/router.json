@@ -90,7 +90,7 @@
         "label": "RouterServiceProvider",
         "sublabel": "[./src/container/services/RouterServiceProvider]",
         "keywords": ["RouterConfig", "RouterServiceProvider", "router"],
-        "text": "In RouterServiceProvider file, Routers are registered inside the boot method, which is a ServiceProvider method, that is being executed before the server( @start) event, which is part of chasi's lifecycle. ServiceProvider@boot method is mainly for collecting information, before it runs in the registry. Router instance needs to be invoked inside the boot function"
+        "text": "In RouterServiceProvider file, Routers are registered inside the boot method, which is a ServiceProvider method, that is being executed before the server( @start) event, which is part of Chasi's lifecycle. ServiceProvider@boot method is mainly for collecting information, before it runs in the registry. Router instance needs to be invoked inside the boot function"
       },
       {
         "id": "RouterConfigInterface",

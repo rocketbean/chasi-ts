@@ -23,7 +23,7 @@
     
     <h5> <hook id = "NpmInit" /> initializing npm </h5>
     <span class = "sub-text">
-      this is the most recommended way of initializing chasi, 
+      This is the most recommended way of initializing chasi, 
       please note that this step requires 
       node, npm and git installed in your environment.
     </span>
@@ -34,7 +34,7 @@
   <section class = "section" >
     <h5> <hook id = "chasiInstall" /> via chasi-cli </h5>
     <span class = "sub-text">
-      this requires chasi-cli to be globally installed on your system.
+      This requires chasi-cli to be globally installed on your system.
     </span>
     <code-container mapping = "installation/installcli" >
       <template v-slot:comment>
@@ -58,7 +58,7 @@
     <h5> <hook id = "Github" /> Github </h5>
     <div class="notification is-dark">
       <span class = "sub-text">
-        you can headover to the 
+        You can headover to the 
         <a href = "https://github.com/rocketbean/chasi-ts" class = "tag is-link" target="_new">chasi-ts</a> github page,
         and fork it in your github or use chasi-ts as a template
       </span>

@@ -56,7 +56,7 @@
         "label": "Model Connection",
         "reference": ["db-model"],
         "keywords": ["model", "connection","database"],
-        "text": "for multiple database connection, a connection can be specified by adding a third argument in the Model.connect() wrapper. please note that models will connect to the default connection if none is specified."
+        "text": "For multiple database connection, a connection can be specified by adding a third argument in the Model.connect() wrapper. please note that models will connect to the default connection if none is specified."
       },
       {
         "id": "dc-host",
@@ -64,7 +64,7 @@
         "reference": ["DatabaseConfig"],
         "type": "<string>",
         "keywords": ["DatabaseConfig", "host","db", "config"],
-        "text": "a connection name to connect."
+        "text": "A connection name to connect."
       },
       {
         "id": "dc-bootWithDB",
@@ -72,7 +72,7 @@
         "reference": ["DatabaseConfig"],
         "type": "<boolean>",
         "keywords": ["DatabaseConfig", "BootWithDB","db", "config"],
-        "text": "if enabled, chasi will throw an execution error if one of the DBConnections failed."
+        "text": "If enabled, chasi will throw an execution error if one of the DBConnections failed."
       },
       {
         "id": "dc-hideLogConnectionStrings",
@@ -80,7 +80,7 @@
         "reference": ["DatabaseConfig"],
         "type": "<boolean>",
         "keywords": ["DatabaseConfig", "hideLogConnectionStrings","db", "config"],
-        "text": "hides the connection string"
+        "text": "Hides the connection string"
       },
       {
         "id": "dc-default",
@@ -88,7 +88,7 @@
         "reference": ["DatabaseConfig"],
         "type": "<string>",
         "keywords": ["DatabaseConfig", "default","db", "config"],
-        "text": "the default connection to be used by the models if none is specified"
+        "text": "The default connection to be used by the models if none is specified"
       },
       {
         "id": "dc-connections",
@@ -96,7 +96,7 @@
         "reference": ["DatabaseConfig"],
         "type": "<{[key: string]: DBProperty}>",
         "keywords": ["DatabaseConfig", "connections","db", "config"],
-        "text": "a database connection declaration, entries will be process in DB Handler's registry and will try to connect upon boot.",
+        "text": "A database connection declaration, entries will be process in DB Handler's registry and will try to connect upon boot.",
         "coderef": {
           "ref": "database/config/connections"
         }

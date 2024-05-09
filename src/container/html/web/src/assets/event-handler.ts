@@ -22,7 +22,6 @@ export class EventHandler {
   static events = {};
 
   static emit (event: string, data: anyObject): void {
-    console.log("hooking to: ", data)
     EventHandler.events[event].ignite.map((ig) => {
       ig.fn(data);
     })

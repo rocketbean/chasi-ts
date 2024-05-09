@@ -25,7 +25,7 @@
         </span>
       </div>
       <small>
-        for multiple database connection, a connection can be specified by adding a third argument in the Model.connect() wrapper. please note that models will connect to the default connection if none is specified.
+        For multiple database connection, a connection can be specified by adding a third argument in the Model.connect() wrapper. please note that models will connect to the default connection if none is specified.
       </small>
     </div>
     <code-container :mapping="modelConScript" :options="{ theme: 'vitesse-dark', lang: 'ts' }">

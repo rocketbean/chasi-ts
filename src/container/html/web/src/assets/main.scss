@@ -20,13 +20,17 @@ hr {
   padding:30px
 }
 
+.title-container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+}
+
 .text-light {
   color:white
 }
 
 .container {
   height: 100vh;
-  overflow: hidden;
   display: grid;
   place-items: stretch;
 }
@@ -34,7 +38,7 @@ hr {
 .page {
   height:100%;
   padding: 10px;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .position-relative {
@@ -46,6 +50,7 @@ hr {
   display: grid;
   grid-gap: 10px;
   grid-template: auto 1fr auto  / auto 1fr auto ;
+  z-index: 10;
 }
 
 header {
@@ -62,12 +67,14 @@ header {
 }
 
 main {
-  position:relative;
-  z-index: 10;
+  overflow: hidden scroll; 
+  padding:5px; 
   grid-column: 2 / 3;
+  min-height: 100%;
 }
 
 .right-panel {
+  z-index: 10;
   grid-column: 3 / 4;
 }
 

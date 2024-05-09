@@ -4,7 +4,7 @@
     
       <h3> <hook id = "GettingStarted" /> Getting Started </h3>
       <span class = "sub-text">
-        there is a template of environment file right after installation 
+        There's a template of environment file right after installation 
         (<a class = "tag is-dark" ><i>./template.env</i></a>), which can be copied as a reference for setting up 
         a <a class = "tag is-link" >.env</a> file.
       </span>

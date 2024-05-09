@@ -1,7 +1,7 @@
 <template >
   <div 
     data-theme="dark" 
-    class = "main-container position-relative" 
+    class = "main-container" 
     @keydown.ctrl.k.prevent="toggleModal"
     @keydown.esc="escapeModal"
     tabindex="-1"
@@ -9,7 +9,7 @@
     <ideal />
     <search />
     
-    <div class="container text-light position-relative" >
+    <div class="container text-light" >
       <div class="parent page" >
         <header class="">
           <navbar />
@@ -18,7 +18,7 @@
           <chasi />
           <left-menu />
         </div>
-        <main class="glass position-relative" style="padding:5px; overflow-y: auto; z-index: 900">
+        <main class="glass" >
           <container />
         </main>
         <div class="right-panel">
@@ -64,6 +64,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>

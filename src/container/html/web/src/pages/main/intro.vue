@@ -23,7 +23,7 @@
         A Rest-API framework that will boosts the development,
         secures the production, and ensures the scalability of your project.
         Chasi is modeled after an auto-mobile production, which may start with
-        the chassis, and serve's as the car's foundation. Routing container allows chasi to manage multiple API's
+        the chassis, and serves as the car's foundation. Routing container allows chasi to manage multiple APIs
         within the same cluster, supplying each their requirements from a centralized abstract environment. the 
         framework also provides an option to manage processes since NodeJS provides great flexibility on managing performance via it's Cluster API, therefore improving scalabilty accross the project. 
       </p>

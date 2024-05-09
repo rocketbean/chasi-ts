@@ -47,7 +47,7 @@
         "label": "via chasi-cli",
         "reference": ["serverConfig"],
         "keywords": ["port", "config","serverconfig"],
-        "text": "This value will be passed to chasi's core upon booting, and will serve as local serving port."
+        "text": "This value will be passed to Chasi's core upon booting, and will serve as local serving port."
       },
       {
         "id": "scenvi",
@@ -119,7 +119,7 @@
         "label": "Middlewares",
         "reference": ["serverContainer", "serverConfig"],
         "keywords": ["serverContainer middlewares", "middlewares","serverconfig"],
-        "text": "middlewares must be registered here before it can be applied to any routing container, group, endpoint, or even in the websockets or channels. It is good to put request validations or verifications in middlewares to centralize gates in the environment."
+        "text": "Middlewares must be registered here before it can be applied to any routing container, group, endpoint, or even in the websockets or channels. It is good to put request validations or verifications in middlewares to centralize gates in the environment."
       },
       {
         "id": "ev-start",
