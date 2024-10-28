@@ -45,7 +45,7 @@ export default class Group {
 
   id: string = new ObjectId().toString();
 
-  constructor(property) {
+  constructor(property: RouteGroupProperty) {
     Object.assign(this.property, property);
   }
 }

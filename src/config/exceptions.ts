@@ -46,8 +46,7 @@ export default {
    * **** please register exception as .js file
    */
   registry: {
-    ChasiException:
-      "./package/framework/ErrorHandler/exceptions/ChasiException.js",
+    ChasiException: "./package/framework/ErrorHandler/exceptions/ChasiException.js",
     APIException: "./package/framework/ErrorHandler/exceptions/APIException.js",
   },
 
@@ -58,10 +57,10 @@ export default {
    * will fill in the client Responses.
    */
   responses: {
-    302: "sos ",
+    302: "SOS",
     401: "we can't verify your token! ",
     404: "Oops, we can't find what you're looking for.",
-    500: "Oops, we can't find what you're looking for.",
+    500: "It seems we have a problem processing your request",
     default: "ServerError, please try again later!",
   },
 };

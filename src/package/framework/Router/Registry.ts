@@ -151,7 +151,10 @@ export default class Registry extends Base {
             hide: true,
           }),
         );
-      } else ep.$middlewares.push(Router.Middlewares[mw]);
+      } else {
+        if(!ep.excludeFromMw.includes(mw))
+          ep.$middlewares.push(Router.Middlewares[mw])
+      };
     });
   }
 

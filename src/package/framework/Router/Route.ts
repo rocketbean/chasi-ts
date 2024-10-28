@@ -2,7 +2,7 @@ import Group from "./Group.js";
 import Registry from "./Registry.js";
 import * as methods from "./Methods/methods.js";
 import Endpoint from "./Endpoint.js";
-
+import { RouteGroupProperty } from "../Interfaces.js";
 export default class Route {
   groups: Group[] = [];
   constructor(public $registry: Registry) {
@@ -203,7 +203,7 @@ export default class Route {
     return ep;
   }
 
-  group(stack: any, fn: Function) {
+  group(stack: RouteGroupProperty, fn: Function) {
     let _g = this.stackGroup(stack);
     fn();
     this.removeGroupStack(_g);
