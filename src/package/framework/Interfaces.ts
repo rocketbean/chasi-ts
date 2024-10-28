@@ -127,10 +127,44 @@ export type RouteEndpointProperty = {
 };
 
 export type RouteGroupProperty = {
-  middleware: any[];
+  /** RouteGroup Middleware
+   * middlewares listed under this group
+   * will be implemented across the group endpoints
+   */
+  middleware?: string[];
+
+  /** RouteGroup controller
+   * controller path must be under
+   * ./config/container.ts[ControllerDir]
+   * path declaration.
+   * 
+   * can be shorthanded if '@' is present
+   * before the file declaration
+   * e.g. : "posts@PostController"
+   * then your routes can be shorthanded as
+   * route.post("index", "index");
+   * ** this will translate to
+   * (posts/PostController@index)
+   */
   controller?: string;
+
+  /** RouteGroup prefix
+   * value will be prepended to
+   * the endpoint path.
+   */
   prefix?: string;
+
+  /** RouteGroup before event
+   * before() will be emitted before
+   * function/controller execution.
+   */
   before?: Function;
+
+  /** RouteGroup after event
+   * after() will be emitted before
+   * sending a response object 
+   * to the client
+   */
   after?: Function;
 };
 

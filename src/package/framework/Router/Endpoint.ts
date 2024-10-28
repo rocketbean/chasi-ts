@@ -9,6 +9,7 @@ export default class Endpoint {
   public unmatched: boolean = false;
   public registered: boolean = false;
   public middlewares: string[] = [];
+  public excludeFromMw: string[] = [];
   public $middlewares: Function[] = [];
   public beforeFns: Function[] = [];
   public afterFns: Function[] = [];
@@ -68,9 +69,11 @@ export default class Endpoint {
     if (Array.isArray(exception)) {
       exception.map((middleware: string): void => {
         this.middlewares.filter((mw) => mw != middleware);
+        this.excludeFromMw.push(middleware)
       });
     } else if (typeof exception === "string") {
       this.middlewares.filter((mw) => mw != exception);
+      this.excludeFromMw.push(exception)
     }
   }
 
