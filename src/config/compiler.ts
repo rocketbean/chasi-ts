@@ -7,10 +7,13 @@ import {
 
 let environment: "dev" | "prod" = "prod";
 //@ts-ignore
-let dirpath = environment == "dev" ? __devDirname: __dirname;
+let dirpath = environment == "dev" ? __devDirname: ___location;
 
 /***
  * @type {CompilerEngineConfig}
+ * Compiler Engines will
+ * not compile on testMode
+ * process.env["testMode"] == 'enabled'.
  */
 const config: CompilerEngineConfig = {
   enabled: true,
@@ -22,7 +25,7 @@ const config: CompilerEngineConfig = {
    * in vite.createViteServer()
    * to enable vite's HMR upon updating vite files
    * inside ts directory.
-   * - __dirname[js_path[/dist]] will be served
+   * - ___location[js_path[/dist]] will be served
    * as static build, please note that
    * vite's HMR is disabled if on prod.
    * ----------------------------------------
@@ -92,10 +95,10 @@ const config: CompilerEngineConfig = {
       /**** hook
        * hook["beforeApp"] will be called on production build,
        * the compiler will execute before the
-       * app is initialized. this is improve performance
+       * app is initialized. this is to improve performance
        * and to avoid multiple build execution
        * when serviceCluster [server.serviceCluster]
-       * is enabled
+       * is enabled.
        */
       hook: async (getConfig: Function, ctx: builderConfig): Promise<void> => {
         //@ts-ignore

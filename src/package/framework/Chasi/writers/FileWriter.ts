@@ -6,7 +6,7 @@ export default class SessionWriter {
   public writer;
   public rawPath;
   constructor(public storage: string) {
-    this.storage = path.join(__dirname + storage);
+    this.storage = path.join(___location + storage);
     this.rawPath = storage;
     this.checkDir();
   }
@@ -20,7 +20,7 @@ export default class SessionWriter {
   checkDir() {
     this.rawPath.split("/").reduce((prev, cur, i) => {
       if (!cur.includes(".chasi")) {
-        if (i == 1) prev = path.join(__dirname + prev);
+        if (i == 1) prev = path.join(___location + prev);
         cur = path.join(prev, cur);
         if (!existsSync(cur)) mkdirSync(cur, { recursive: true });
       }

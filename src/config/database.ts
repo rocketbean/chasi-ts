@@ -58,6 +58,20 @@ export default <DatabaseConfig> {
       },
     },
 
+    test: {
+      driver: "mongodb",
+      url: process.env.dbConStringDev,
+      db: "dbmocks",
+      params: "?authSource=admin",
+      options: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        connectTimeoutMS: 1000,
+        socketTimeoutMS: 1000,
+        serverSelectionTimeoutMS: 5000,
+      },
+    },
+
     local: {
       driver: "mongodb",
       url: process.env.dbConStringLocal,

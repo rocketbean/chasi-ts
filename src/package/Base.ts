@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs";
 import _ from "lodash";
 import { Iobject } from "./framework/Interfaces.js";
-
 export const ProxyHandler = {
   get: (target, prop, receiver) => {
     if (prop in target && prop[0] !== "_") {
@@ -22,8 +21,9 @@ export default class Base {
     let _mods: { [key: string]: object } = {};
     let _fp = path.join(__filepath + dir);
     await Promise.all(
-      fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
-        _mods[file.replace(".js", "")] = await import(path.join(_fp, file))
+      fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
+        let _fn_ = file.replace(".js", "").replace(".ts", "")
+        _mods[_fn_] = await import(path.join(_fp, file))
           .then((_content) => _content.default)
           .catch((e) => {
             console.log(e);
@@ -35,10 +35,11 @@ export default class Base {
 
   async NamespacedfetchFilesFromDir(dir: string): Promise<object> {
     let _mods: { [key: string]: object } = {};
-    this.getFileDirectories(path.join(__dirname, dir), _mods)
+    this.getFileDirectories(path.join(___location, dir), _mods)
     await Promise.all( Object.keys(_mods).map( async key => {
       let _fp = path.join("file:",key);
-      _mods[key] = await import(_fp + ".js")
+      _fp = __testMode() ? _fp : _fp + ".js"
+      _mods[key] = await import(_fp)
           .then((_content) => _content.default)
           .catch((e) => {
             console.log(e);
@@ -92,7 +93,8 @@ export default class Base {
   static async _fetchFile(filepath: string) {
     try {
       let ext = path.extname(filepath);
-      if (!ext) filepath += ".js";
+      ext = ext == ".mw" ? null : ext;
+      if (!ext) filepath += __testMode() ? ".ts": ".js";
       let _fp = path.join(__filepath, filepath);
       return (await import(_fp)).default;
     } catch (e) {
@@ -103,7 +105,7 @@ export default class Base {
   static async _fsFetchDir(dir: string): Promise<any> {
     let _p = path.join(__filepath, dir);
     return await Promise.all(
-      fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
+      fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
         try {
           return (await import(`${path.join(_p, file)}`)).default;
         } catch (e) {
@@ -117,7 +119,7 @@ export default class Base {
     filepath: string,
     options: Iobject = { encoding: "utf-8" },
   ) {
-    return fs.readFileSync(path.resolve(__dirname, filepath), options);
+    return fs.readFileSync(path.resolve(___location, filepath), options);
   }
 
   static _resetApp() {
@@ -129,8 +131,9 @@ export default class Base {
     let _mods: { [key: string]: object } = {};
     let _fp = path.join(__filepath + dir);
     await Promise.all(
-      fs.readdirSync(path.join(__dirname, dir)).map(async (file: string) => {
-        _mods[file.replace(".js", "")] = await import(path.join(_fp, file))
+      fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
+        let _fn_ = file.replace(".js", "").replace(".ts", "")
+        _mods[_fn_] = await import(path.join(_fp, file))
           .then((_content) => _content.default)
           .catch((e) => {
             console.log(e);

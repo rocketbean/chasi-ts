@@ -270,6 +270,7 @@ export class Handler extends Base {
     Handler._instance = new Handler(config, pipe);
     global.$app = Handler._instance;
     await Handler._instance.start();
+    if(__testMode()) console.clear();
     return Handler._instance;
   }
 }

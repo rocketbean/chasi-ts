@@ -51,7 +51,7 @@ export default class Builder implements BuilderInterface {
     ctx: builderConfig,
   ): Promise<void> {
     let conf = getConfig("compiler");
-    if (conf.enabled) {
+    if (conf.enabled && !__testMode()) {
       try {
         if (ctx.environment !== "dev") {
           let builderConfig = (await Builder.getConfigs(ctx)) as UserConfig;
@@ -67,19 +67,29 @@ export default class Builder implements BuilderInterface {
   }
 
   static async sanitize(ctx): Promise<void> {
-    let common = ctx.root.replace(__dirname, "");
-    let rootpath = path.join(__dirname, common);
+    let common = ctx.root.replace(___location, "");
+    let rootpath = path.join(___location, common);
     fs.rmSync(path.join(rootpath, "src"), { recursive: true, force: true });
     fs.rmSync(path.join(rootpath, "temp"), { recursive: true, force: true });
   }
 
+  /**
+   * distributes the build
+   * specifically to [__devDirname]
+   * if not on testMode.
+   * as testMode runs 
+   * already in /src dir
+   * @param root dirpath
+   */
   static async distribute(root): Promise<void> {
-    let common = root.replace(__dirname, "");
-    let rootpath = pathToFileURL(path.join(__devDirname, common)).href;
-    try {
-      fs.cpSync(path.join(__devDirname, common), root, { recursive: true });
-    } catch (err) {
-      throw err;
+    if(!__testMode()) {
+      let common = root.replace(___location, "");
+      let rootpath = pathToFileURL(path.join(__devDirname, common)).href;
+      try {
+        fs.cpSync(path.join(__devDirname, common), root, { recursive: true });
+      } catch (err) {
+        throw err;
+      }
     }
   }
 }

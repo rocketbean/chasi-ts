@@ -3,6 +3,8 @@ import Authorization from "../../package/statics/Authorization.js";
 import mongoose from "mongoose";
 import bc from "bcryptjs";
 import jwt from "jsonwebtoken";
+import Exception from "../../package/framework/ErrorHandler/Exception.js";
+import CustomError from "../errors/CustomError.js";
 
 export type UserModelSchema = {
   name: string;
@@ -51,15 +53,21 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.statics.findByCredentials = async (email, pass) => {
+  if(!email || !pass) throw new CustomError("missing required parameters['email','password']", 422)
   const user = await User.findOne({ email });
-  if (!user) throw new Error("email can't be found");
-
+  if (!user) throw new CustomError("email can't be found", 422)
   const isMatch = await bc.compare(pass, user.password);
-  if (!isMatch) throw new Error("wrong credentials have been supplied");
+  if (!isMatch) throw new CustomError("wrong credentials have been supplied", 401);
   user.appSession = user.email;
   return user;
 };
 
+/**
+ * @param authType string : must be the same as what is configured in 
+ * RouterServiceProvider.Router[auth],
+ * and must be registered to config/authentication[driver]
+ * @returns JWTToken
+ */
 userSchema.methods.generateAuthToken = async function (authType = "_") {
   const user = this;
   const gateway = Authorization.$drivers[authType];
