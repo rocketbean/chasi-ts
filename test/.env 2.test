@@ -1,0 +1,26 @@
+## app ##
+APP_NAME=CHASI2TEST
+APP_VERSION=2.0
+database=test
+databaseName=defaultDb
+devDatabaseName=devdb
+stageDatabaseName=stageDb
+dbConStringLocal=mongodb://localhost:27017/
+dbConStringStage=mongodb://localhost:27017/
+dbConStringDev=mongodb://localhost:27017/
+SSLcontainerKey=null
+SSLcontainerCrt=null
+ServerPort=3011
+oauthkey=chasi
+
+## environment ##
+testMode="enabled"
+environment=local
+devProtocol=https
+devCert=../_security/cert.pem
+devKey=../_security/key.pem
+
+
+## log controls ##
+Log_History=false
+Log_Level=0

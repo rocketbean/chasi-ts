@@ -42,14 +42,14 @@ export default class RouterServiceProvider
       new Router(<RouterConfigInterface>{
         name: "api",
         auth: "dev",
-        prefix: "/",
+        prefix: "/api",
         namespace: "container/http/api.js",
         ControllerDir: ["container/controllers"],
         middleware: [],
         AuthRouteExceptions: [
-          {m: "post", url: "/users/signin"},
-          {m: "post", url: "/users/signup"},
-          {m: "post", url: "/users/forget"},
+          {m: "post", url: "/api/users/signin"},
+          {m: "post", url: "/api/users/signup"},
+          {m: "post", url: "/api/users/forget"},
         ],
         data: (): {} => {
           return {
