@@ -158,14 +158,14 @@ export type RouteGroupProperty = {
    * before() will be emitted before
    * function/controller execution.
    */
-  before?: Function;
+  before?: (request?: any, response?: any, data?: any) => {};
 
   /** RouteGroup after event
    * after() will be emitted before
    * sending a response object 
    * to the client
    */
-  after?: Function;
+  after?: (request?: any, response?: any, data?: any) => {};
 };
 
 export type ExceptionProperty = {
