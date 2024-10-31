@@ -28,7 +28,7 @@ export default abstract class Bundler implements BundlerInterface {
    * file resolver FN
    */
   protected resolve: Function = (p, cwd = null) =>
-    cwd == null ? path.resolve(__dirname, p) : path.resolve(cwd, p);
+    cwd == null ? path.resolve(___location, p) : path.resolve(cwd, p);
 
   public ssrManifest: Iobject = {};
 

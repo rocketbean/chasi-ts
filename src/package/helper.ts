@@ -28,14 +28,14 @@ declare global {
   /**
    * BasePath
    * similar to default
-   * __dirname
+   * ___location
    */
-  var __dirname: string;
+  var ___location: string;
 
   /**
    * BasePath for development[TS]
    * similar to default
-   * __dirname
+   * ___location
    */
   var __devDirname: string;
 
@@ -46,6 +46,8 @@ declare global {
    * getting files
    */
   var __filepath: string;
+
+  var __testMode: Function
 
   /**
    * the Chasi::configuration
@@ -58,14 +60,15 @@ declare global {
   var _getMethods: Function;
 
   var $app: any;
+
 }
 
 export default (async () => {
-  // console.clear();
   env.config();
   var configPath = "config";
   global._configpath_ = configPath;
 
+  global.__testMode = () => process.env["testMode"] == "enabled";
   global.checkout = (val: any, backup: any) => {
     if (val == undefined || val == null) return backup;
     else return val;
@@ -73,7 +76,7 @@ export default (async () => {
 
   global.Logger = Logger.init();
 
-  global.__dirname = path.join(
+  global.___location = path.join(
     path.normalize(fileURLToPath(import.meta.url)),
     "../../",
   );

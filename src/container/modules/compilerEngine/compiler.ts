@@ -70,7 +70,7 @@ export default class CompilerEngine {
   public builders: Builder[] = [];
   static instance: CompilerEngine;
   private resolve: Function = (p, cwd = null) =>
-    cwd == null ? path.resolve(__dirname, p) : path.resolve(cwd, p);
+    cwd == null ? path.resolve(___location, p) : path.resolve(cwd, p);
 
   public $staticPath: Iobject = {
     assets: "/assets/",
@@ -98,7 +98,7 @@ export default class CompilerEngine {
   }
 
   async setupEngines() {
-    if (this.config.enabled) {
+    if (this.config.enabled && process.env["testMode"] != "enabled") {
       this.builders = await Promise.all(
         this.config.engines.map(async (engine): Promise<Builder> => {
           return await new Builder(this.$app, engine).setup();

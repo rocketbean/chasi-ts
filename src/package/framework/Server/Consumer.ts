@@ -12,7 +12,6 @@ import Express, { response } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
-import bodyParser from "body-parser";
 
 export default class Consumer {
   $server: any = Express();
@@ -91,6 +90,10 @@ export default class Consumer {
     e.message = e.message ? e.message : autoMs;
     if (!(e instanceof exception)) {
       e = new APIException(e, status, ep);
+    }
+    let contentType = response.getHeaders()["content-type"];
+    if(contentType?.includes("application/json") && typeof e.message !== 'object') {
+      e.message = {message: e.message}
     }
     ep.addExceptions(e);
     response.statusCode = status;

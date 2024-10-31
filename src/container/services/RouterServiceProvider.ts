@@ -39,6 +39,34 @@ export default class RouterServiceProvider
         after: (request, response) => {},
         displayLog: 1,
       }),
+      new Router(<RouterConfigInterface>{
+        name: "api",
+        auth: "dev",
+        prefix: "/",
+        namespace: "container/http/api.js",
+        ControllerDir: ["container/controllers"],
+        middleware: [],
+        AuthRouteExceptions: [
+          {m: "post", url: "/users/signin"},
+          {m: "post", url: "/users/signup"},
+          {m: "post", url: "/users/forget"},
+        ],
+        data: (): {} => {
+          return {
+            chasiVer: "2.3.5"
+          };
+        },
+        before: (request, response) => {
+          try {
+            response.set("Content-Type", "application/json")
+          } catch (e) {
+            console.log(e)
+          }
+        },
+        after: (request, response) => {
+        },
+        displayLog: 1,
+      }),
     ];
   }
 

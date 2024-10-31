@@ -19,7 +19,7 @@
     "noEmitOnError": false,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "types": ["node"],
+    "types": ["node", "vitest/globals"],
   },
   "exclude": [
     "dist", 
@@ -27,6 +27,8 @@
     "chasi.json", 
     "src/container/html", 
     "src/package/framework/Commands",
-    "chasi.js"
+    "chasi.js",
+    "test",
+    "vitest.config.ts"
   ]
 }

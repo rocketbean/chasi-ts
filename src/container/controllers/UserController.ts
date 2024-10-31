@@ -1,4 +1,5 @@
 import Controller from "../../package/statics/Controller.js";
+
 export default class UserController extends Controller {
   get user() {
     return this.models.user;
@@ -52,6 +53,27 @@ export default class UserController extends Controller {
     // maybe add some validations here ?
     user = Object.assign(user, request.body)
     return await user.save();
+  }
+
+  /**
+   * return the user object 
+   * with JWT Auth token
+   * @param {request} [ExpressRequest] Object
+   * @return {Object} translated as [ExpressResponse] Object
+   * */
+  async signin (request, response) {
+    try {
+      let {email, pass} = request?.body
+      let user = await this.user.findByCredentials(email, pass)
+      let token = await user.generateAuthToken("dev");
+      return {user, token};
+    } catch(e: any) {
+      throw e;
+    }
+  }
+
+  async forget (request, response) {
+    return await this.user.collection.drop();
   }
 
 }

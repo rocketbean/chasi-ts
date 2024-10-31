@@ -45,6 +45,7 @@ export default {
      * then you can use it in your routes
      */
     auth: "./container/middlewares/Auth",
+    testmode: "./container/middlewares/TestMode.mw",
   },
 
   session: {
