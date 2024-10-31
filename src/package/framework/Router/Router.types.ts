@@ -103,7 +103,7 @@ export type RouterConfigInterface = {
    * before a request is passed
    * into controller/handler function.
    */
-  before?: () => void;
+  before?: (request?: any, response?: any, data?: any) => void;
 
   /** ?after
    * @after [Router Hook] 
@@ -111,7 +111,7 @@ export type RouterConfigInterface = {
    * before a response 
    * is sent back.
    */
-  after?: () => void;
+  after?: (request?: any, response?: any, data?: any) => void;
 
   /** ?displayLog
    * [0] to disable router logs

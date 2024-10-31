@@ -23,11 +23,6 @@ export default class RouterServiceProvider
         ControllerDir: ["container/controllers"],
         middleware: [],
         AuthRouteExceptions: [],
-        data: (): {} => {
-          return {
-            chasiVer: "2.3.5"
-          };
-        },
         mount: <RouterMountable[]>[
           {
             name: "engine",
@@ -35,8 +30,6 @@ export default class RouterServiceProvider
             exec: CompilerEngine.instance,
           },
         ],
-        before: (request, response) => {},
-        after: (request, response) => {},
         displayLog: 1,
       }),
       new Router(<RouterConfigInterface>{
@@ -53,17 +46,13 @@ export default class RouterServiceProvider
         ],
         data: (): {} => {
           return {
-            chasiVer: "2.3.5"
+            chasiVer: "2.3.9"
           };
         },
-        before: (request, response) => {
+        before: (request: any, response: any, data: any) => {
           try {
             response.set("Content-Type", "application/json")
-          } catch (e) {
-            console.log(e)
-          }
-        },
-        after: (request, response) => {
+          } catch (e) {}
         },
         displayLog: 1,
       }),
