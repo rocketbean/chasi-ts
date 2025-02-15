@@ -1,14 +1,19 @@
-import { Iobject } from "../Interfaces.js";
+import { Iobject, serviceClusterConfig } from "../Interfaces.js";
 import Session from "./Session.js";
 import cluster from "cluster";
 import Storage from "./Storage.js";
-import { exit } from "process";
-import { PassThrough } from "stream";
+import Pipeline from "./Pipeline.js"
+import StreamBucket from "./StreamBucket.js";
+export type ServicePipeProp = {
+  service: string
+  action: string
+  transmit: any
+}
 
 export default class ServiceCluster {
   static nodeVer = Number(process.version.match(/^v(\d+\.\d+)/)[1]);
 
-  public config: Iobject;
+  public config: serviceClusterConfig;
   public storage: Storage;
   public pids: any[] = [];
   public ids: any[] = [];
@@ -23,6 +28,10 @@ export default class ServiceCluster {
     this.config = $session.config.server.serviceCluster;
   }
 
+  /**
+   * Stores Cluster
+   * information.
+   */
   get ClusterData() {
     return {
       threads: this.config.workers,
@@ -32,9 +41,14 @@ export default class ServiceCluster {
       scheduling: this.config.schedulingPolicy,
     };
   }
+
   getMethods = (obj) =>
     Object.getOwnPropertyNames(obj).filter((item) => typeof obj[item]);
 
+  /**
+   * returns process
+   * performance
+   */
   get ClusterPerf() {
     return {
       cpuAvg: process.cpuUsage(),
@@ -77,26 +91,36 @@ export default class ServiceCluster {
       cluster.setupMaster({
         ...this.config.settings,
         silent: true,
-        stdio: [null, "inherit", null, "pipe", "pipe", "ipc"],
+        stdio: [null, null, null, "pipe", "pipe", "ipc"],
       });
     } else {
       cluster.setupPrimary({
         ...this.config.settings,
         silent: true,
-        stdio: [null, "inherit", null, "pipe", "pipe", "ipc"],
+        stdio: [null, null, null, "pipe", "pipe", "ipc"],
       });
     }
   }
 
-  broadcast(message) {
-    this.workers.map((worker) => {
-      worker.process.stdio[4].write(message);
-    });
+  async broadcast(message) {
+    await Promise.all(this.workers.map(async (worker) => {
+      await worker.process.stdio[4].write(message);
+    }));
   }
 
-  setMessagingProto(worker) {
-    let tunnel = new PassThrough();
-    tunnel.on("data", (chunk) => {
+  async setMessagingProto(worker) {
+    let pl = new Pipeline()
+    let data = ""
+    let streamBucket: StreamBucket = new StreamBucket(worker, this.consumeStream.bind(this))
+    pl.on("data", (chunk) => {
+      streamBucket.appendStreamData(chunk.toString())
+    })
+
+    worker.process.stdio[3].pipe(pl)
+  }
+
+  async consumeStream(worker, chunk: string) {
+    try {
       let _prop = JSON.parse(chunk);
       if (_prop.action.includes("getTty")) {
         let { columns, rows } = process.stdout;
@@ -108,35 +132,68 @@ export default class ServiceCluster {
         );
       }
 
-      if (_prop.action.includes("getClusterData")) {
-        worker.process.stdio[4].write(
-          JSON.stringify({
-            action: _prop.action,
-            transmit: this.ClusterData,
-          }),
-        );
+      if (cluster.isPrimary) {
+        if (_prop.action.includes("getClusterData")) {
+          this.storage.setClusterData(this.ClusterData)
+        }
+
+        if (_prop.action.includes("logData")) {
+          Logger.clusterLog(_prop.worker, _prop.transmit.message);
+        }
+
+        if (_prop.action.includes("server::ready")) {
+          Logger.clusterLogSystem(_prop.worker, `[Server {${_prop.worker.pid}} onReady state]`);
+        }
       }
 
-      if (_prop.action.includes("logData")) {
-        console.log(_prop.transmit);
+      if (_prop.action.includes("service:")) {
+        await this.handleServiceActions(worker, _prop);
       }
 
       if (_prop.action.includes("websock")) {
-        this.handleSocketActions(worker, _prop);
+        await this.handleSocketActions(worker, _prop);
       }
 
       if (_prop.action.includes("clearAll")) {
         console.clear();
       }
-    });
-    worker.process.stdio[3].pipe(tunnel);
+
+      return chunk;
+    } catch (e) {
+      Logger.log("SERVCLUSTERR::", e)
+    }
   }
 
-  handleSocketActions(worker, _prop) {
+  /**
+   * 
+   * @param worker Worker
+   * @param _prop any
+   */
+  async handleServiceActions(worker: Worker, _prop: ServicePipeProp) {
+    setTimeout(async () => {
+      await this.broadcast(
+        JSON.stringify({
+          service: _prop.service,
+          action: `service:${_prop.service}`,
+          transmit: _prop,
+        }),
+      );
+    }, 20)
+
+  }
+
+  async handleSocketActions(worker, _prop) {
     if (_prop.action.includes("event")) {
-      this.broadcast(
+      await this.broadcast(
         JSON.stringify({
           action: "socket:fire",
+          transmit: _prop,
+        }),
+      );
+    } else {
+      await this.broadcast(
+        JSON.stringify({
+          action: _prop.action,
           transmit: _prop,
         }),
       );
@@ -150,31 +207,34 @@ export default class ServiceCluster {
    */
   async createCluster() {
     return new Promise((res, rej): void => {
-      this.setupPrimaryThread();
-      for (let worker = 0; worker < this.config.workers; worker++) {
-        process.env["lead"] = "0";
-        if (worker === 0) process.env["lead"] = "1";
-        let w = cluster.fork(this.forkOpts);
+      try {
+        this.setupPrimaryThread();
+        for (let worker = 0; worker < this.config.workers; worker++) {
+          process.env["lead"] = "0";
+          if (worker === 0) process.env["lead"] = "1";
+          let w = cluster.fork(this.forkOpts);
+        }
+
+        cluster.on("fork", (worker: Iobject) => {
+          worker.process.stderr.pipe(process.stderr);
+          this.setMessagingProto(worker);
+          this.workers.push(worker);
+          this.pids.push(`${worker.process.pid}`);
+          this.ids.push(`${worker.id}`);
+        });
+        cluster.on("exit", (worker, code, sig) => {
+          cluster.fork(this.forkOpts);
+        });
+
+        cluster.on("message", (worker, m) => {
+          // Logger.log("message from worker", m)
+        });
+        res(1);
+      } catch (e) {
+        console.log(e)
+        process.exit(1)
       }
 
-      cluster.on("fork", (worker: Iobject) => {
-        worker.process.stderr.pipe(process.stderr);
-        this.setMessagingProto(worker);
-        this.workers.push(worker);
-        this.pids.push(`${worker.process.pid}`);
-        this.ids.push(`${worker.id}`);
-        if (worker.id == 1) {
-          worker.process.stdout = process.stdout;
-        }
-      });
-
-      cluster.on("exit", (worker, code, sig) => {
-        cluster.fork(this.forkOpts);
-      });
-
-      cluster.on("message", (worker, m) => {});
-
-      res(1);
     });
   }
 }

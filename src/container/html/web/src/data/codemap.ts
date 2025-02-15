@@ -242,5 +242,170 @@ connections: {
 },
 `
     }
+  },
+  testing:{
+    vitestConfig: `
+/// <reference types="vitest" />
+import { defineConfig} from 'vitest/config'
+import { loadEnv } from 'vite'
+
+export default defineConfig({
+  test: {
+    exclude: ['dist/*', "node_modules"],
+    globals: true,
+    environment: 'node',
+    passWithNoTests: true,
+    env: loadEnv('test', process.cwd() + "/test", "")
+  },
+})`,
+    env: 
+`## environment ##
+testMode="enabled"
+environment=<SERVER_ENVIRONMENT>
+ServerPort=<SERVER_PORT>
+
+
+## app ##
+database=<DB_REGISTRY>
+testDatabaseName=<DB_NAME>
+dbConStringTest=<DB_CONNECTION_STRING>
+
+## log controls ##
+Log_History=false
+Log_Level=0`,
+    usage: {
+      initial: `import { describe } from 'vitest'
+import request from "supertest"
+import instance from "../src/server"
+let app = instance.$app.$server
+
+console.clear();
+describe("[api]/Users endpoint", async () => {
+  const basepath = "/api/users"
+})
+`,
+      signup: `import { describe, expect, test } from 'vitest'
+import request from "supertest"
+import instance from "../src/server"
+let app = instance.$app.$server
+
+console.clear();
+describe("[api]/Users endpoint", async () => {
+  const basepath = "/api/users"
+
+  describe("[POST /signup]", async () => {
+    test("status 200: must be able to signup", async() => {
+      let res = await request(app).post(basepath + "/signup")
+      .send({
+        "name": "test user",
+        "password": "securepass",
+        "alias": "test",
+        "email": "test@test.com"
+      })
+      expect(res.statusCode).toBe(200)
+    })
+  })
+})`,
+    signin: `import { describe, expect, test } from 'vitest'
+import request from "supertest"
+import instance from "../src/server"
+let app = instance.$app.$server
+
+console.clear();
+const user = {
+  "name": "test user",
+  "password": "securepass",
+  "alias": "test",
+  "email": "test@test.com"
+}
+
+describe("[api]/Users endpoint", async () => {
+  const basepath = "/api/users"
+  describe("[POST /signup]", async () => {
+    test("status 200: must be able to signup", async() => {
+      let res = await request(app).post(basepath + "/signup")
+      .send(user)
+      expect(res.statusCode).toBe(200)
+    })
+  })
+})
+
+describe("[POST /signin]", async () => {
+  test("status 422: must return an error when params is missing", async() => {
+    let res = await request(app).post(basepath + "/signin").send({email: "testemail@test.com"})
+    expect(res.statusCode).toBe(422)
+    expect(res.body.message).toBe("missing required parameters['email','password']")
+  })
+
+  test("status 200: must return a valid token", async() => {
+    let res = await request(app).post(basepath + "/signin").send({email:user.email, pass: user.password})
+    expect(res.statusCode).toBe(200)
+    expect(res.body.user.email).toBe(user.email)
+    expect(res.body).toHaveProperty("token")
+  })
+})`,
+    addBeforeAll: `import { describe, expect, test, beforeAll } from 'vitest'
+    import request from "supertest"
+    import instance from "../src/server"
+    let app = instance.$app.$server
+    
+    console.clear();
+    const basepath = "/api/users"
+    const user = {
+      "name": "test user",
+      "password": "securepass",
+      "alias": "test",
+      "email": "test@test.com"
+    }
+
+    beforeAll(async () =>{ 
+      //endpoint to drop user collections before the test begin
+      await request(app).post(basepath+"/forget").send()
+    })
+    
+    describe("[api]/Users endpoint", async () => {
+      describe("[POST /signup]", async () => {
+        test("status 200: must be able to signup", async() => {
+          let res = await request(app).post(basepath + "/signup")
+          .send(user)
+          expect(res.statusCode).toBe(200)
+        })
+      })
+    })
+    
+    describe("[POST /signin]", async () => {
+      test("status 422: must return an error when params is missing", async() => {
+        let res = await request(app).post(basepath + "/signin").send({email: "testemail@test.com"})
+        expect(res.statusCode).toBe(422)
+        expect(res.body.message).toBe("missing required parameters['email','password']")
+      })
+    
+      test("status 200: must return a valid token", async() => {
+        let res = await request(app).post(basepath + "/signin").send({email:user.email, pass: user.password})
+        expect(res.statusCode).toBe(200)
+        expect(res.body.user.email).toBe(user.email)
+        expect(res.body).toHaveProperty("token")
+      })
+    })`,
+    onSuccessTest: `$ npm run test
+RERUN  test/user.test.ts x2
+
+✓ test/user.test.ts (3)
+  ✓ [api]/Users endpoint (1)
+    ✓ [POST /signup] (1)
+      ✓ status 200: must be able to signup
+  ✓ [POST /signin] (2)
+    ✓ status 422: must return an error when params is missing
+    ✓ status 200: must return a valid token
+
+Test Files  1 passed (1)
+      Tests  3 passed (3)
+  Start at  10:32:40
+  Duration  510ms
+
+
+PASS  Waiting for file changes...
+      press h to show help, press q to quit`
+    }
   }
 }

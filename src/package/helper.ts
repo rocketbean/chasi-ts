@@ -47,6 +47,12 @@ declare global {
    */
   var __filepath: string;
 
+  /**
+   * server basepath
+   */
+  var __basepath: string;
+
+
   var __testMode: Function
 
   /**
@@ -57,7 +63,13 @@ declare global {
 
   var __deepEqual: Function;
 
+  var __deepMerge: Function;
+
   var _getMethods: Function;
+
+  var __getRandomStr: Function;
+
+  var __getRandomNum: Function;
 
   var $app: any;
 
@@ -97,6 +109,22 @@ export default (async () => {
     return Object.getOwnPropertyNames(obj).filter((item) => item);
   };
 
+  global.__getRandomStr = (length: number) => {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
+
+  global.__getRandomNum = (min: number, max: number): number => {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
   global.Caveat = new ExceptionHandler();
   await ExceptionHandler.handleProcessError();
 
@@ -125,4 +153,26 @@ export default (async () => {
     }
     return true;
   };
+
+  global.__deepMerge = function (target, ...sources) {
+    function isObject(item) {
+      return (item && typeof item === 'object' && !Array.isArray(item));
+    }
+
+    if (!sources.length) return target;
+    const source = sources.shift();
+
+    if (isObject(target) && isObject(source)) {
+      for (const key in source) {
+        if (isObject(source[key])) {
+          if (!target[key]) Object.assign(target, { [key]: {} });
+          __deepMerge(target[key], source[key]);
+        } else {
+          Object.assign(target, { [key]: source[key] });
+        }
+      }
+    }
+    return __deepMerge(target, ...sources);
+
+  }
 })();

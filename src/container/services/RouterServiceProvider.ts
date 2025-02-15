@@ -8,6 +8,8 @@ import Router from "../../package/statics/Router.js";
 import bodyParser from "body-parser";
 import cors from "cors";
 import CompilerEngine from "../modules/compilerEngine/compiler.js";
+import express from "express"
+import path from "path"
 
 export default class RouterServiceProvider
   extends Provider
@@ -46,7 +48,7 @@ export default class RouterServiceProvider
         ],
         data: (): {} => {
           return {
-            chasiVer: "2.3.9"
+            chasiVer: "2.4.1"
           };
         },
         before: (request: any, response: any, data: any) => {
@@ -62,5 +64,6 @@ export default class RouterServiceProvider
   async beforeRoute($app: any) {
     $app.use(cors(RouterServiceProvider.config.server.cors));
     $app.use(bodyParser.json());
+    $app.use(express.static(path.join(___location, "../public")));
   }
 }

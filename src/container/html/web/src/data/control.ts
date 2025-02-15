@@ -7,6 +7,7 @@ import controller from "./controller.json"
 import compiler from "./compiler.json"
 import observer from "./observer.json"
 import database from "./database.json"
+import testing from "./testing.json"
 
 type PanelControl = {
   right?: {
@@ -76,9 +77,10 @@ collect([
   router.router,
   controller.controller,
   database.database,
-  compiler.compiler,
-  observer.observer,
-  general.general
+  // compiler.compiler,
+  // observer.observer,
+  general.general,
+  testing.testing
 ]);
 
 export default data;

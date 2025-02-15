@@ -18,11 +18,11 @@ export default class Event {
   public options: any;
   public listeners: Listener[] = [];
 
-  async emitted() {
+  async emitted(): Promise<void> {
     Reflect.apply(this.props.afterEmit, this, [this.options]);
   }
 
-  async fireListeners() {
+  async fireListeners(): Promise<void> {
     await Promise.all(
       this.listeners.map(async (ls) => {
         await ls.callback(ls.options.params, this.options);
@@ -30,7 +30,7 @@ export default class Event {
     );
   }
 
-  async onemit() {
+  async onemit(): Promise<void> {
     Reflect.apply(this.props.beforeEmit, this, [this.options]);
   }
 }

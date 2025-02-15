@@ -35,7 +35,7 @@ export default class prodBundler extends Bundler implements BundlerInterface {
 
   async routeRegistry() {
     let manifest = await this.getDistFile("./.vite/ssr-manifest.json", {
-      assert: {
+      with: {
         type: "json",
       },
     });
@@ -103,7 +103,7 @@ export default class prodBundler extends Bundler implements BundlerInterface {
     let _r = pathToFileURL(this.getSsrModule()).href;
     this.$render = (await import(_r)).render;
     this.ssrManifest = await this.getDistFile("./.vite/ssr-manifest.json", {
-      assert: {
+      with: {
         type: "json",
       },
     });

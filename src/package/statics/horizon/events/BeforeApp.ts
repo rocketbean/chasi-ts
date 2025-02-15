@@ -2,15 +2,20 @@ import Event from "./../../../Observer/Event.js";
 import Database from "../../../framework/Database/Database.js";
 import RouterModule from "./../../../framework/Router/RouterModule.js";
 export default class BeforeApp extends Event {
+
   async validate(params: any, next: Function) {
-    params.app.state = 1;
-    params.database = await Database.init(params.app.config.database);
-    await params.app.$app.setAuthLayer(params.app.config.authentication);
-    params.routers = await RouterModule.init(
-      params.app.$services.routers,
-      params.app.config.container,
-    );
-    next();
+    try {
+      params.app.state = 1;
+      params.database = await Database.init(params.app.config.database);
+      await params.app.$app.setAuthLayer(params.app.config.authentication);
+        params.routers = await RouterModule.init(
+          params.app.$services.routers,
+          params.app.config.container,
+        );
+      next();
+    } catch (e: unknown) {
+      Logger.log(e)
+    }
   }
 
   /**

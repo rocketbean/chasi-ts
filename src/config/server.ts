@@ -50,7 +50,7 @@ export default <serverConfig>{
   serviceCluster: {
     enabled: false,
     trackUsage: {
-      enabled: true,
+      enabled: false,
       interval: 500,
     },
     logs: true,
@@ -78,7 +78,7 @@ export default <serverConfig>{
    * you can setup your own server environment
    * and add that inside [mode] property
    * change the [environment] property to the desired
-   * selection, just keep make sure that the selected
+   * selection, just make sure that the selected
    * environment is registered here...
    */
   modes: {
@@ -88,8 +88,8 @@ export default <serverConfig>{
       protocol: "https",
     },
     local: {
-      key: checkout(process.env.SSLcontainerKeyLocal),
-      cert: checkout(process.env.SSLcontainerKeyLocal),
+      key: null,
+      cert: null,
       protocol: "http",
     },
   },

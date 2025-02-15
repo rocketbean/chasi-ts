@@ -35,7 +35,7 @@ export type serviceClusterConfig = {
     *  unit [ms]
     * logging frequency
     */
-    interval: 500,
+    interval: number,
   },
 
   /** *logs

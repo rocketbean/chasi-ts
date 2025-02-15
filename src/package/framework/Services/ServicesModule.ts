@@ -2,10 +2,7 @@ import Base from "../../Base.js";
 import Service from "./Service.js";
 import Provider from "./Provider.js";
 import {
-  Iobject,
   ModuleInterface,
-  ServiceProviderInterface,
-  BootableInterface,
 } from "../Interfaces.js";
 
 export default class ServicesModule extends Base implements ModuleInterface {

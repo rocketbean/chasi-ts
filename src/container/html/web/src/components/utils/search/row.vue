@@ -58,6 +58,7 @@ const activateAndScroll = () => {
   border-radius: 5px;
   display: flex;
   padding:10px;
+  max-height: 200px;
 }
 
 .row-item:hover {

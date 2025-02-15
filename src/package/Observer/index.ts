@@ -1,16 +1,39 @@
 import AsyncEventEmitter from "asynchronous-emitter";
 import Base from "../Base.js";
 import Writer from "../Logger/types/Writer.js";
-import Event, { EventInterface } from "./Event.js";
-import { Iobject } from "./../framework/Interfaces.js";
+import { EventInterface } from "./Event.js";
 import Listener from "./Listener.js";
 
+export type ObserverConfig = {
+  events: events,
+  beforeEmit: Function,
+  afterEmit: Function
+}
+
+export type events = {
+  [key: string]: string
+}
+
+/**
+ * Observer - event handler class
+ */
 export default class Observer extends Base {
+  /** 
+  * Global Event registry
+  */
   $events: { [key: string]: any } = {};
+
+  /** 
+  * handles async events
+  */
   emitter: AsyncEventEmitter = new AsyncEventEmitter();
+
+  /** 
+  * Log Writer class
+  */
   logger: Writer;
 
-  constructor(private config: Iobject) {
+  constructor(private config: ObserverConfig) {
     super();
     this.config = config;
     this.logger = Logger.writer();
@@ -22,7 +45,7 @@ export default class Observer extends Base {
    * config [EventRegistry]
    * @returns :void
    */
-  async setup() {
+  async setup(): Promise<void> {
     await Promise.all(
       Object.keys(this.config.events).map(async (ev) => {
         await this.register(
@@ -41,12 +64,12 @@ export default class Observer extends Base {
    * @param instance {EventInterface} Event instance
    * @returns Observer.watch
    */
-  async register(key: string, instance: EventInterface): Promise<object> {
+  async register(key: string, instance: EventInterface): Promise<events> {
     let onEmit: { [key: string]: any } = {};
     if (typeof instance["beforeEmit"] !== "function")
-      onEmit["beforeEmit"] = <Event>this.config.beforeEmit;
+      onEmit["beforeEmit"] = this.config.beforeEmit;
     if (typeof instance["afterEmit"] !== "function")
-      onEmit["afterEmit"] = <Event>this.config.afterEmit;
+      onEmit["afterEmit"] = this.config.afterEmit;
     if (
       typeof instance["beforeEmit"] !== "function" ||
       typeof instance["afterEmit"] !== "function"
@@ -63,7 +86,7 @@ export default class Observer extends Base {
    * @param instance {EventInterface} Event instance
    * @returns Observer.$events
    */
-  async watch(key: string, instance: EventInterface) {
+  async watch(key: string, instance: EventInterface): Promise<events> {
     this.$events[key] = instance;
     this.emitter.on(key, async (property: any = {}) => {
       Reflect.set(instance, "options", property);
@@ -74,18 +97,18 @@ export default class Observer extends Base {
           await instance.fireListeners();
           await instance.emitted();
         });
-      } catch (e) {}
+      } catch (e) { }
     });
     return this.$events;
   }
 
-  when(key, fn, opts = {}) {
+  when(key: string, fn: Function, opts: object = {}): void {
     let ev = this.$events[key];
     let lis = new Listener(key, fn, opts);
     ev.listeners.push(lis);
   }
 
-  async emit(event: string, params?: any) {
+  async emit(event: string, params?: any): Promise<void> {
     await this.emitter.emit(event, params);
   }
 }

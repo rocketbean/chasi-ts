@@ -126,6 +126,27 @@
         },
         "main": "server"
       }
+    },
+    {
+      "label": "Api Testing",
+      "icon": "labs",
+      "name": "testing",
+      "path": "",
+      "content": "",
+      "submenu": {},
+      "header": {},
+      "keywords": [],
+      "config": {
+        "top": {
+          "subheader": {
+            "open": false
+          }
+        },
+        "right": {
+          "open": false
+        },
+        "main": "server"
+      }
     }
   ]
 }
