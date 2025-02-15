@@ -4,29 +4,30 @@
       <div class="title-container">
         <div style = "display:grid; place-items: center;width: 70px">
           <span class="material-symbols-rounded is-size-1" style = "border:3px solid white; border-radius: 50%;">
-            videogame_asset
+            labs
           </span>
         </div>
         <div class="hero-body" style="padding-left: 0px">
-          <p class="title">Controller</p>
-          <p class="subtitle">in between the <strong>Logic.</strong></p>
+          <p class="title">API Testing</p>
+          <p class="subtitle">build with <strong>confidence</strong>.</p>
         </div>
         <div>
+          
         </div>
       </div>
     </div>
     <div class="content">
-      <controller-what/>
+      <testing-what/>
     </div>
   </div>
 </template>
 
 <script>
-  import controllerWhat from "@/components/controller/what.vue"
+  import testingWhat from "@/components/testing/what.vue"
 
   export default {
     components: {
-      controllerWhat,
+      testingWhat,
     }
   }
 </script>

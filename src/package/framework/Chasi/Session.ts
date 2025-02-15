@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Handler } from "../../Handler.js";
 import { Iobject } from "./../Interfaces.js";
 import PipeHandler from "./PipeHandler.js";
+import Logger from "../../Logger/index.js";
 
 export default class Session {
   public id = uuidv4();
@@ -72,11 +73,12 @@ export default class Session {
     await cluster.createStorage();
     Writer.log = cluster.storage.write.bind(cluster.storage);
     if (config.server.serviceCluster.enabled) {
+      let pipe = new PipeHandler();
+      global.Logger = Logger.init()
       if (Session.checkMainThread()) {
         await Session.validates(config);
         await cluster.createCluster();
       } else {
-        let pipe = new PipeHandler();
         await cluster.storage.setPipe(pipe);
         return await Session.createHandler(session, config, pipe);
       }

@@ -14,6 +14,7 @@ export default class App extends Consumer {
   mode: { [key: string]: any };
   protocol: any;
   private auth: Authentication;
+  private _basepath: string;
   constructor(
     public config: serverConfig,
     private loggers: { [key: string]: Writable },
@@ -33,6 +34,10 @@ export default class App extends Consumer {
     this.mode = this.config.modes[this.config.environment];
     if (this.mode.protocol == "https") this.protocol = https;
     else this.protocol = http;
+  }
+
+  get basepath(): string {
+    return `${this.mode.protocol}://localhost:${this.config.port}`
   }
 
   /**
@@ -61,6 +66,7 @@ export default class App extends Consumer {
   }
 
   async bootup(): Promise<void> {
+    global.__basepath = `${this.mode.protocol}://localhost:${this.config.port}`
     return await new Promise(async (res, rej) => {
       await this.install();
       this.$server.on("error", (err) => rej(err));

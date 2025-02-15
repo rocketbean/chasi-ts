@@ -163,7 +163,7 @@ async boot() {
            * will be accessed through
            * this router instance.
            */
-          chasiVer: "2.3.5"
+          chasiVer: "2.3.9"
         };
       }
     }),

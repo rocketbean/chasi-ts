@@ -4,7 +4,7 @@
       <div class="pan-title">
         <div class="x-center is-size-3">
           <span>
-            <hook id="controller" />
+            <hook id="database" />
             {{ db.label }}
           </span>
         </div>

@@ -1,6 +1,6 @@
 {
   "name": "chasi-ts",
-  "version": "2.3.9",
+  "version": "2.4.1",
   "description": "",
   "main": "dist/server.js",
   "type": "module",
@@ -10,7 +10,8 @@
   "scripts": {
     "test": "vitest --config ./vitest.config.ts",
     "start": "tsc && node ./dist/server.js -e ts --experimental-top-level-await ",
-    "dev": "tsc-watch --onSuccess \"node ./dist/server.js -e ts  --experimental-top-level-await \"",
+    "dev": "tsc-watch --resolveJsonModule --onSuccess  \"node ./dist/server.js -e ts  --experimental-top-level-await \"",
+    "dev:html": "npm run postbuild && nodemon ./dist/server.js -e html,js,css,vue --experimental-top-level-await",
     "postbuild": "cpy \"./src/container/html/* \" \"./dist/container/html \""
   },
   "nodemonConfig": {
@@ -56,7 +57,7 @@
     "letterizejs": "^2.0.1",
     "lodash": "^4.17.21",
     "mongodb": "^4.7.0",
-    "mongoose": "^6.4.4",
+    "mongoose": "^8.8.0",
     "npm-cache": "^0.7.0",
     "pinia": "^2.1.7",
     "sass": "^1.74.1",

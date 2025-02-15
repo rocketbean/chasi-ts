@@ -1,8 +1,6 @@
 import Router from "./Router.js";
 import { ModuleInterface } from "../Interfaces.js";
-import Collector from "./Collector.js";
-import Route from "./Route.js";
-import Controller from "./Controller.js";
+
 export default class RouterModule implements ModuleInterface {
   constructor(public routers: Router[]) {}
 
@@ -35,15 +33,20 @@ export default class RouterModule implements ModuleInterface {
   }
 
   static async init(routers: Router[], config: any) {
-    Logger.writers["Left"].group("RouteRegistry");
-    Router.defaultControllerDir = config.ControllerDir;
-    let module = new RouterModule(routers);
-    await Router.loadMiddlewares(config.middlewares);
-    await module.collect();
-    await module.consume();
-    // await module.logRouter();
-    module.routers.map((router: Router) => {});
-    Logger.writers["Left"].endGroup("RouteRegistry");
-    return module;
+    try {
+      Logger.writers["Left"].group("RouteRegistry");
+      Router.defaultControllerDir = config.ControllerDir;
+      let module = new RouterModule(routers);
+      await Router.loadMiddlewares(config.middlewares);
+      await module.collect();
+      await module.consume();
+      // await module.logRouter();
+      module.routers.map((router: Router) => {});
+      Logger.writers["Left"].endGroup("RouteRegistry");
+      return module;
+    } catch(e: any) {
+      throw new Error(`RouterERR:: ${e.message}`)
+    }
+
   }
 }

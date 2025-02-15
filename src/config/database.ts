@@ -50,8 +50,6 @@ export default <DatabaseConfig> {
       db: process.env.devDatabaseName,
       params: "?authSource=admin",
       options: {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         connectTimeoutMS: 1000,
         socketTimeoutMS: 1000,
         serverSelectionTimeoutMS: 5000,
@@ -60,12 +58,10 @@ export default <DatabaseConfig> {
 
     test: {
       driver: "mongodb",
-      url: process.env.dbConStringDev,
-      db: "dbmocks",
+      url: process.env.dbConStringTest,
+      db: process.env.testDatabaseName,
       params: "?authSource=admin",
       options: {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         connectTimeoutMS: 1000,
         socketTimeoutMS: 1000,
         serverSelectionTimeoutMS: 5000,
@@ -77,8 +73,6 @@ export default <DatabaseConfig> {
       url: process.env.dbConStringLocal,
       db: process.env.databaseName,
       options: {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         connectTimeoutMS: 4000,
         socketTimeoutMS: 4000,
         serverSelectionTimeoutMS: 5000,

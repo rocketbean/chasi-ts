@@ -28,8 +28,13 @@
         "label": "HTTP Method",
         "keywords": ["HTTP", "HTTPMethod", "protocol"],
         "text": "HTTP method of an endpoint, e.g. (GET, POST, PUT, DELETE, OPTIONS, PATCH, SEARCH). a full route endpoint can be similar but have a different HTTP method, and will be routed accordingly."
+      },
+      {
+        "id": "vitest",
+        "label": "Vitest",
+        "keywords": ["vitest", "testing", "test runner", "tdd"],
+        "text": "A native test runner that magically works with TypeScript, and follows most common patterns in testing, but is lightning fast. You can check vitest website for more info: https://vitest.dev/"
       }
-      
     ]
   }
 }

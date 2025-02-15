@@ -12,8 +12,6 @@ export default (route: Route) => {
    *
    */
 
-
-
   route.group({prefix: "/users"}, () => {
     route.post("/signin", "UserController@signin");
     route.post("/signup", "UserController@create");

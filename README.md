@@ -118,3 +118,13 @@ and `./config/compiler` to configure the compiler engine.
 this template requires 
 - nodejs: ^16.0.0
 - mongoDB: ^3.0.0
+
+### Chasi [2.4.1] ReleaseNotes
+** v2.4.1 >> v2.3.9 **
+
+- added StreamBucket class to handle cluster worker signals to the parent thread.
+- Server storage update [workers will now send signals to the parent thread].
+- removed signal logs handler from the lead worker,  re appointed to the parent thread.
+- Channels have been added to the SocketServer module.
+- worker signals for service modules ([action: “service:<modulename>”])
+- global.__basepath (server basepath) is added as a global variable.

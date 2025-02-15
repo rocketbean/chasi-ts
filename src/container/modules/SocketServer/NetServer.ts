@@ -1,12 +1,19 @@
-import { Iobject } from "../../../package/framework/Interfaces.js";
 import { parse } from "url";
 import SocketRouter from "./lib/SocketRouter.js";
+import Observer from "../../../package/Observer/index.js";
 
 export default class NetServer {
-  private static $routers: Iobject = {};
+  private static $routers: { [key: string]: SocketRouter } = {};
 
-  constructor(public $pipe?: any) {
+  /**
+   * constructor fn
+   * @param $pipe distributes the message
+   * within the cluster / workers.
+   * @param $observer Observer instance
+   */
+  constructor(public $pipe?: any, public $observer?: Observer) {
     if (this.$pipe) this.listenToPipe();
+    SocketRouter.$observer = this.$observer;
   }
 
   /** static [register()]
@@ -15,8 +22,12 @@ export default class NetServer {
    * @param path [string] path to [WS] server
    * @param router [SocketRouter] router instance
    */
-  static register(path, router) {
+  static register(path: string, router: SocketRouter) {
     NetServer.$routers[path] = router;
+  }
+
+  get routers() {
+    return NetServer.$routers
   }
 
   /** [listenToPipe()]
@@ -29,6 +40,20 @@ export default class NetServer {
     this.$pipe.on("socket:fire", (payload) => {
       payload = payload.transmit;
       NetServer.$routers[payload.path].emit(payload.event, payload.payload);
+    });
+    this.$pipe.on("websock:channel", (payload) => {
+      if (payload.event == "create") {
+        NetServer.$routers[payload.transmit.props.path].channel.create(
+          payload.transmit.name,
+          payload.transmit.props,
+          false)
+      } else if (payload.event == "send") {
+        let ch = NetServer.$routers[payload.transmit.props.path].channel.get(payload.channel)
+        ch.send(
+          payload.transmit.payload,
+          payload.transmit.props,
+          false)
+      }
     });
   }
 

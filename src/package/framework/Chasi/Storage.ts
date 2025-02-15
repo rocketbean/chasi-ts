@@ -6,6 +6,7 @@ import {
 import readline from "readline";
 import chalk from "chalk";
 import PipeHandler from "./PipeHandler.js";
+import cluster from "cluster";
 
 export default class SessionStorage {
   public data: SessionStorageData = {
@@ -17,20 +18,17 @@ export default class SessionStorage {
     boot: [],
     exceptions: [],
     logs: [],
+    workers: {}
   };
 
   public strData: string = "";
-
   public clusterData: Iobject = {};
-
   public enabled;
-
   public pipe: PipeHandler;
-
   public ReportLog: any = Logger.writers["Reporter"];
 
   constructor(public config: Iobject) {
-    if (process.env.lead === "1") {
+    if (cluster.isPrimary) {
       if (this.config.trackUsage.enabled) {
         let cb = this.reportPerf.bind(this);
         setInterval(cb, this.config.trackUsage.interval);
@@ -40,11 +38,16 @@ export default class SessionStorage {
 
   async setPipe(pipe) {
     this.pipe = pipe;
-    this.pipe.on("getClusterData", (d) => {
+    if (cluster.isWorker) {
+      await this.pipe.write({ action: "getClusterData" });
+    }
+  }
+
+  setClusterData(d) {
+    if (cluster.isPrimary) {
       this.clusterData = d;
-      if (this.config.logs) this.appendClusterData();
-    });
-    await this.pipe.write({ action: "getClusterData" });
+      this.appendClusterData();
+    }
   }
 
   reportPerf() {
@@ -72,21 +75,27 @@ export default class SessionStorage {
     };
   }
 
+  getWorkerData() {
+    return
+  }
+
   appendClusterData() {
     let sched =
       this.clusterData.scheduling == 1 ? "[1]os specified" : "[2]RoundRobin";
-    this.data.threads.push(
-      chalk.bold.magentaBright(`Active thread/s : `) +
+    if (this.data.threads.length == 0) {
+      this.data.threads.push(
+        chalk.bold.magentaBright(`Active thread/s : `) +
         `[${this.clusterData.threads}]\n`,
-      chalk.bold.magentaBright(`Scheduling      : `) + sched + "\n",
-      chalk.bold.magentaBright(`MainThread      : `) +
+        chalk.bold.magentaBright(`Scheduling      : `) + sched + "\n",
+        chalk.bold.magentaBright(`MainThread      : `) +
         this.clusterData.process +
         "\n",
-      chalk.bold.magentaBright(`Lead            : `) + process.pid + "\n",
-      chalk.bold.magentaBright(`PIDs            : `) +
+        chalk.bold.magentaBright(`Lead            : `) + process.pid + "\n",
+        chalk.bold.magentaBright(`PIDs            : `) +
         this.clusterData?.pids?.join(" ") +
         "\n",
-    );
+      );
+    }
   }
 
   format(data: any) {
@@ -114,21 +123,27 @@ export default class SessionStorage {
       }
     });
     str += "\n";
-
     return str;
   }
 
   write(message: any, target: string = "logs") {
     if (this.config.enabled) {
-      if (process.env.lead == "1") {
+      if (cluster.isPrimary) {
         readline.cursorTo(process.stdout, 0, 0);
         readline.clearLine(process.stdout, -1);
         this.data[target].push(message);
         process.stdout.write(this.format(this.data));
+      } else {
+        if (target == "logs" || target == "exceptions") {
+          setTimeout(() => {
+            this.pipe.write({ action: "logData", transmit: { message, target } })
+          }, 20)
+        }
       }
     } else {
       this.data[target].push(message);
       process.stdout.write(this.format(this.data));
     }
+
   }
 }

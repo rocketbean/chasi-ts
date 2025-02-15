@@ -45,13 +45,6 @@
         "text": "Chasi Model wraps and extends Mongoose Model, and will inherit mongoose model methods. Chasi Model also can handle different database connections by specifying the name of the connection to use [./config/database::connections] in the model."
       },
       {
-        "id": "db-model",
-        "label": "Model",
-        "sublabel": "[./src/container/models]",
-        "keywords": ["model", "database model", "methods"],
-        "text": "Chasi Model wraps and extends Mongoose Model, and will inherit mongoose model methods. Chasi Model also can handle different database connections by specifying the name of the connection to use [./config/database::connections] in the model."
-      },
-      {
         "id": "db-model-con",
         "label": "Model Connection",
         "reference": ["db-model"],

@@ -3,30 +3,44 @@ import EventEmitter from "events";
 import Client from "./Client.js";
 import chalk from "chalk";
 import cluster from "cluster";
+import Channel, { ChannelConstructor } from "./Channel.js";
 import { WebSocketServer } from "ws";
 import Base from "../../../../package/Base.js";
 import { Iobject } from "../../../../package/framework/Interfaces.js";
+import Observer from "../../../../package/Observer/index.js";
+
+export type SockServerOptions = {
+  setDefaultEvents?: boolean,
+  container: string
+}
 
 export default class SocketRouter extends EventEmitter {
   public static $pipe: any = null;
+  public static $observer: Observer | null = null;
   public clients = [];
   public events: Iobject = {};
   public evContainer: Function;
   public server: WebSocketServer;
-  public opts: Iobject = {
+  public opts: SockServerOptions = {
     setDefaultEvents: true,
     container: "",
   };
   public _events;
+  public channel: ChannelConstructor = Channel
+
   private logger = {
     full: Logger.writer("FullCustom"),
     trace: Logger.writer("EndTrace"),
   };
 
-  constructor(public path: string = "", public options: Iobject = {}) {
+  constructor(public path: string = "", public options: SockServerOptions) {
     super();
-    this.opts = Object.assign(this.opts, options);
+    this.opts = <SockServerOptions>Object.assign(this.opts, options);
     this.setup();
+  }
+
+  get $pipe() {
+    return SocketRouter.$pipe
   }
 
   /**
@@ -36,16 +50,31 @@ export default class SocketRouter extends EventEmitter {
    * @param client [Client] client instance that holds the socket data
    * @param message [payload] socket params
    */
-  interpolateMessage(client, message) {
-    if (cluster.isWorker) {
+  async interpolateMessage(client, message) {
+    if (!cluster.isWorker && SocketRouter.$pipe) {
       message.path = this.path;
       SocketRouter.$pipe.write({
         action: "websock:event",
         transmit: message,
       });
     } else {
-      this.emit(message.event, message.payload);
+      this.emit(message.event, message.payload, client);
+      // if (SocketRouter?.$pipe) {
+      await this.linkObserverEvent(client, message)
+      // }
     }
+  }
+
+  async linkObserverEvent(client, message) {
+    let event = message.event;
+    let key = "NS["
+    let regx = /\[([^}]+)\]/s
+    // Logger.log(Object.keys(SocketRouter.$observer.$events))
+    Object.keys(SocketRouter.$observer.$events).map(async ev => {
+      if (event.includes(key)) {
+        await SocketRouter.$observer.emit(event, { client, message })
+      }
+    })
   }
 
   /**
@@ -55,11 +84,11 @@ export default class SocketRouter extends EventEmitter {
    * @param client [Client] client instance that holds the socket data
    */
   defaultEvs(client) {
-    client.socket.on("message", (message) => {
+    client.socket.on("message", async (message) => {
       try {
         message = message.toString();
         message = JSON.parse(message);
-        this.interpolateMessage(client, message);
+        await this.interpolateMessage(client, message);
       } catch (e) {
         throw e;
       }
@@ -93,16 +122,21 @@ export default class SocketRouter extends EventEmitter {
    * @param params [any] event parameters
    * @returns [boolean]
    */
-  emit(ev: string, params: any): boolean {
-    super.emit(ev, params);
+  emit(ev: string, params: any, client?: any): boolean {
+    super.emit(ev, params, client);
     return true;
   }
 
   /** [setup()]
    * this method sets up the server
    * and listens to server events
+   * 
+   * WebSocketServer [noServer] is enabled
+   * to avoid conflicts to the running http server
+   * @returns void
    */
   setup() {
+    Channel.$pipe = SocketRouter.$pipe
     this.server = new WebSocketServer({
       noServer: true,
       path: this.path,
@@ -123,9 +157,9 @@ export default class SocketRouter extends EventEmitter {
    * recieves the upgraded request
    * and emits the [WS:WebSocketServer]
    * connection event.
-   * @param sock  [Express:Request]
-   * @param request [Express:Socket]
-   * @param head [Express:Head]
+   * @param sock  [WS:Socket]
+   * @param request [WS:Request]
+   * @param head [WS:Head]
    */
   connect(sock, request, head) {
     this.server.handleUpgrade(request, sock, head, (socket) => {
@@ -139,7 +173,7 @@ export default class SocketRouter extends EventEmitter {
 
   logSocket() {
     this.logger.full.drawAs(
-      ` Socket['${this.path}']::${this.options.container} \n`,
+      ` SocketServer['${this.path}']<${this.options.container}> \n`,
       chalk.bgYellow.black,
       false,
       "services",
@@ -148,5 +182,6 @@ export default class SocketRouter extends EventEmitter {
       this.logger.trace.write(`╟► @${ev} `, "yellow", "services");
       this.logger.full.drawAs(`\n`, chalk.bgGreen.black, false, "services");
     });
+    this.logger.full.drawAs(`\n`, chalk.bgGreen.black, false, "services");
   }
 }

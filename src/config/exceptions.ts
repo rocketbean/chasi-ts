@@ -60,7 +60,8 @@ export default {
     302: "SOS",
     401: "we can't verify your token! ",
     404: "Oops, we can't find what you're looking for.",
-    500: "It seems we have a problem processing your request",
+    500: "It seems we're having a problem processing your request",
+    422: "Request cannot be processed, please check the request body",
     default: "ServerError, please try again later!",
   },
 };

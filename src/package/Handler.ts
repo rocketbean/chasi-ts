@@ -12,11 +12,14 @@ import {
 } from "./framework/Interfaces.js";
 import { EventEmitter } from "events";
 import Consumer from "./framework/Server/Consumer.js";
+import cluster from "cluster";
 import PipeHandler from "./framework/Chasi/PipeHandler.js";
+
 export class Handler extends Base {
-  /***
-   * singleton [Handler];
-   * handles the Lifecycle
+
+  /*** singleton
+   * [Handler];
+   * Chasi App-Lifecycle
    */
   private static _instance: Handler;
 
@@ -118,15 +121,9 @@ export class Handler extends Base {
    * • Caveat ErrorHandling initiated
    * • ServicesModules installation
    * • setup Observers [emitters]
+   * • ServiceProvider boot() event will be executed.
    */
   protected async start(): Promise<void> {
-    // if (!process.stdout.isTTY) {
-    //   let board = (await this.pipe.getAsync({
-    //     action: "getTty",
-    //   })) as Iobject;
-    //   process.stdout.columns = parseInt(board.columns);
-    //   process.stdout.rows = parseInt(board.rows);
-    // }
 
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);
@@ -157,10 +154,15 @@ export class Handler extends Base {
    * • Router initialization
    */
   protected async before(): Promise<void> {
-    await this.$observer.emit("__initialize__", {
-      next: this.$proxy.initialize,
-      app: this.$proxy,
-    });
+    try {
+      await this.$observer.emit("__initialize__", {
+        next: this.$proxy.initialize,
+        app: this.$proxy,
+      });
+    } catch(e) {
+      console.log(e)
+    }
+
 
   }
 
@@ -173,11 +175,13 @@ export class Handler extends Base {
    */
   protected async initialize(): Promise<void> {
     try {
+      
       await this.$observer.emit("__after__", {
         next: this.$proxy.after,
         app: this.$proxy,
       });
-    } catch (e) {}
+    } catch (e) { }
+
   }
 
   /* * * *
@@ -211,7 +215,16 @@ export class Handler extends Base {
     await this.$observer.emit("__ready__", {
       server: this.$app.$server,
     });
-
+    if (this.pipe && cluster.isWorker) {
+      this.pipe.write({
+        action: "server::ready",
+        transmit: {
+          pid: cluster.worker.process.pid,
+          status: this.state,
+          id: cluster.worker.id
+        }
+      })
+    }
     this.loggers.system.write(
       "[SRV_State]::Server onReady state",
       "clear",
@@ -236,12 +249,12 @@ export class Handler extends Base {
    * @return [void]
    */
   protected setup(): void {
+
     this.setLoggers();
     this.$app = new App(this.config.server, this.loggers);
     Consumer._defaultResponses = this.config.exceptions.responses;
-    this.$observer = new Obsesrver(this.config.observer as Iobject);
+    this.$observer = new Obsesrver(this.config.observer);
   }
-
   logthis(message: string, type: string = "system") {
     this.loggers[type].write(message.toUpperCase());
   }
@@ -270,7 +283,7 @@ export class Handler extends Base {
     Handler._instance = new Handler(config, pipe);
     global.$app = Handler._instance;
     await Handler._instance.start();
-    if(__testMode()) console.clear();
+    if (__testMode()) console.clear();
     return Handler._instance;
   }
 }

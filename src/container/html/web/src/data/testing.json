@@ -1,0 +1,76 @@
+{
+  "testing": {
+    
+    "keywords": ["test", "testing", "api testing"],
+    "id": "testing",
+    "icon": "labs",
+    "label": "API Testing",
+    "display": true,
+    "subcats": [
+      {
+        "to": "testing",
+        "label": "TDD"
+      },
+      {
+        "to": "testingShowcase",
+        "label": "setting up your test environment",
+        "group": [
+          "tst-vitest-config",
+          "tst-env"
+        ]
+      },
+      {
+        "to": "testingUsages",
+        "label": "example usage",
+        "group": [
+          "tst-usage"
+        ]
+      }
+    ],
+    "glossary": [
+      {
+        "id": "testing",
+        "label": "TDD on Chasi",
+        "sublabel": "[./test/*.test.ts]",
+        "keywords": ["testing", "tdd", "api testing", "vitest"],
+        "text": "Test-Driven Development practice is fully supported by Chasi, Powered by vitest, developers can check the default vitest configuration in [<root>/vitest.config.ts], you can also check environment variables [<root>/test/.env.test] being passed when working with TDD. By default, when process.env[testMode] is enabled, compiler engines will be disabled as vitest will be working with [./src] directory with Typescript."
+      },
+      {
+        "id": "tst-vitest-config",
+        "label": "vitest.config.ts",
+        "reference": ["testingShowcase"],
+        "type": "https://vitest.dev/config/#env",
+        "keywords": ["vitest config", "config","test config", "environment"],
+        "text": "Vitest can be configured at [<root>/vitest.config.ts], Chasi provides a default config that works with [<root>/test] directory, developers can check other vitest configurations that can be suitable for the needs at :https://vitest.dev/config/#env"
+      },
+      {
+        "id": "tst-env",
+        "label": "test environment",
+        "sublabel": "[./test/.env.test]",
+        "reference": ["testingShowcase"],
+        "type": "<environment variables>",
+        "keywords": ["test env vars", "environment variables"],
+        "text": "A separate Environment for testing. This is to enable developers to run an actual test with real environment, instead of mocking responses, though mocks can still be easily configured/created if needed."
+      },
+      {
+        "id": "tst-usage",
+        "label": "Testing /users/*",
+        "sublabel": "Testing endpoints [/users]",
+        "reference": ["testingUsages"],
+        "type": "<environment variables>",
+        "keywords": ["test usages", "usages", "example"],
+        "text": "Suppose we have a group of endpoints to test into our api, let's say /users endpoint. Implementing the default test configs, a file `user.test.ts` can be created under /test directory. And it may look like this at first"
+      }
+    ],
+    "controls": {
+      "right": {
+        "open": true
+      },
+      "header": {
+        "subheader": {
+          "open": false
+        }
+      }
+    }
+  }
+}

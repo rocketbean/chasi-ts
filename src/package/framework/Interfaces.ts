@@ -6,7 +6,7 @@ export interface AuthDriver {
   property: Iobject;
   authorize: Function;
 }
-export interface ModuleInterface {}
+export interface ModuleInterface { }
 
 export interface Constructuble<T> {
   new <T>(a?: any, B?: any): T;
@@ -24,9 +24,9 @@ export interface genericObject {
   [key: string]: any;
 }
 
-export interface AppException {}
+export interface AppException { }
 
-export interface RoutableInterface {}
+export interface RoutableInterface { }
 
 export interface ProviderInterface {
   name: string;
@@ -44,8 +44,8 @@ export interface BootableInterface {
   boot(a?: any, b?: any): void;
 }
 
-export interface RouteMethodsInterface {}
-export interface ModelInterface {}
+export interface RouteMethodsInterface { }
+export interface ModelInterface { }
 
 export interface ExceptionLoggerInterface {
   write(a?: any, b?: any);
@@ -61,6 +61,7 @@ export type SessionStorageData = {
   exceptions: any;
   reports: any;
   logs: any;
+  workers?: {};
 };
 
 export type SessionStorageClusterData = {

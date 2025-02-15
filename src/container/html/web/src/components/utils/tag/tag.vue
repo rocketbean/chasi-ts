@@ -61,7 +61,7 @@ if (props.reference) {
     display: none;
     position: absolute;
     bottom: 100%;
-    z-index:200 !important; 
+    z-index: 9999 !important; 
     left: 0px;
   }
 
@@ -76,7 +76,7 @@ if (props.reference) {
     margin:10px;
     background: rgb(15, 15, 15);
     border-radius: 10px;
-    z-index:200;
+    z-index:2000;
   }
 
   .hover-content {
@@ -89,7 +89,7 @@ if (props.reference) {
     text-align: start;
     word-wrap: break-word;
     place-items: center;
-    z-index:200 !important; 
+    z-index:2000 !important; 
   }
 
   .in-tag:hover .on-hover,

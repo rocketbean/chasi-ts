@@ -1,9 +1,9 @@
 import { createReadStream, createWriteStream } from "fs";
 import { Writable } from "stream";
-import net, { Socket } from "net";
 import { PassThrough } from "stream";
-import { EventEmitter } from "events";
-import { exit } from "process";
+import { EventEmitter } from "events"
+import cluster from "cluster";
+
 const tunnel = new PassThrough();
 
 class WriteStream extends Writable {
@@ -26,6 +26,7 @@ class WriteStream extends Writable {
     return new Promise(async (res, rej) => {
       let sig = createWriteStream(null, {
         fd: this.fd,
+        highWaterMark: 200,
         autoClose: true,
         emitClose: true,
       });
@@ -41,15 +42,23 @@ export default class PipeHandler extends EventEmitter {
   constructor() {
     super();
     this.writer = new WriteStream({ fd: 3 });
-    this.reader = createReadStream(null, { fd: 4 });
+
+    this.reader = createReadStream(null, {
+      fd: 4,
+      highWaterMark: 200,
+      autoClose: true,
+      emitClose: true
+    });
     this.setReader();
   }
 
   format(byte) {
-    let obj = JSON.parse(byte.toString());
-    if (obj?.action) {
-      this.emit(obj.action, obj.transmit);
-    }
+    try {
+      let obj = JSON.parse(byte.toString());
+      if (obj?.action) {
+        this.emit(obj.action, obj.transmit);
+      }
+    } catch (e) { }
   }
 
   setReader() {
@@ -61,7 +70,18 @@ export default class PipeHandler extends EventEmitter {
   }
 
   async write(data) {
-    return await this.writer.write(JSON.stringify(data) + "\n");
+    try {
+      data.worker = {
+        pid: cluster.worker.process.pid,
+        id: cluster.worker.id,
+      }
+      let chunk = JSON.stringify(data)
+      chunk = "<=====|" + chunk + "|=====>"
+      await this.writer.write(chunk);
+    } catch (e) {
+      Logger.log('pipeErr::Write ', e)
+      Logger.log(data)
+    }
   }
 
   async getAsync(data) {
