@@ -122,7 +122,10 @@ this template requires
 ### Chasi [2.4.1] ReleaseNotes
 ** v2.4.1 >> v2.3.9 **
 
+- test environment has been added (./test/**/*)
+- supertest is added as a dev dependency.
 - added StreamBucket class to handle cluster worker signals to the parent thread.
+- serverPipe have been updated to handle signaling when cluster is enabled.
 - Server storage update [workers will now send signals to the parent thread].
 - removed signal logs handler from the lead worker,  re appointed to the parent thread.
 - Channels have been added to the SocketServer module.
