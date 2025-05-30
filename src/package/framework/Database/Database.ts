@@ -1,21 +1,20 @@
-import {
-  ModuleInterface,
+import DB, {
   DatabaseConfig,
-  DBProperty,
-  Constructuble,
   DatabaseDrivers,
-} from "../Interfaces.js";
+  DBProperty,
+} from "Chasi/Database";
+import { ModuleInterface, Constructuble } from "../Interfaces.js";
 import Models from "./Models.js";
 import chalk from "chalk";
-import Driver, { DBDriverInterface } from "./drivers/drivers.js";
+import Driver from "./drivers/drivers.js";
 import MongoDBDriver from "./drivers/mongodb.js";
-import { exit } from "process";
-
+import PrismaDriver from "./drivers/prisma.js";
 export default class Database implements ModuleInterface {
   $databases: DatabaseDrivers = {};
 
   $drivers: { [key: string]: Constructuble<Driver> } = {
     mongodb: MongoDBDriver as Constructuble<Driver>,
+    prisma: PrismaDriver as Constructuble<Driver>,
   };
 
   static $log: { [key: string]: any } = {
@@ -27,7 +26,7 @@ export default class Database implements ModuleInterface {
     RouterList: Logger.writer("RouterList"),
     loader: Logger.writers["Left"].loading(
       "DB Connection Initializing",
-      "done2",
+      "done2"
     ),
   };
 
@@ -39,62 +38,61 @@ export default class Database implements ModuleInterface {
     this.logLeft.subject = "database";
   }
 
-  async collect(): Promise<void> {
+  async collect<U extends { [key: string]: Record<string, DBProperty<U>> }>(
+    connections: U
+  ): Promise<void> {
+    let keys = <Array<keyof U & string>>Object.keys(connections);
     await Promise.all(
-      Object.keys(this.config.connections).map(async (con: string) => {
-        let connection = this.config.connections[con] as DBProperty;
+      keys.map(async (con: keyof U & string) => {
+        let _c = connections[con];
+        let connection: DBProperty<DB.drivers, typeof _c> =
+          this.config.connections[con];
         connection.hideLogConnectionStrings =
           this.config.hideLogConnectionStrings;
         let driver = this.$drivers[connection.driver];
         this.$databases[con] = new driver(connection, con);
         if (con == this.config.default) this.$databases[con].isDefaultDB = true;
-      }),
+      })
     );
-  }
-
-  /***
-   * fake loading time for [testing purposes]
-   */
-  async sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async connectDbs(): Promise<void> {
     for (let db in this.$databases) {
       let loader = this.logLeft.loading(
         `Initialize connection [${db}]`,
-        "done",
+        "done"
       );
       loader.start();
       try {
         this.$databases[db].connection = await this.$databases[db].connect(
-          loader.stop,
+          loader.stop
         );
       } catch (e) {
         let message = `Error connecting to [${db}], please check connection settings`;
         if (this.config.bootWithDB) {
           message += chalk.red(
-            `\n├─○ config.database[bootWithDB] is enabled, the application will terminate process...`,
+            `\n├─○ config.database[bootWithDB] is enabled, the application will terminate process...`
           );
         }
         loader.stop(
-          `  ╕[${chalk.red("•")}]${db.toUpperCase()}      - ${message} \n`,
+          `  ╕[${chalk.red("•")}]${db.toUpperCase()}      - ${message} \n`
         );
         if (this.config.bootWithDB) throw e;
       }
     }
+
     this.$databases["_"] = this.$databases[this.config.default];
   }
 
   async log(): Promise<void> {
     await Promise.all(
-      Object.keys(this.$databases).map(async (db: string) => {}),
+      Object.keys(this.$databases).map(async (db: string) => {})
     );
   }
 
   static async init(config) {
-    let db = new Database(config as DatabaseConfig);
-    await db.collect();
+    let db = new Database(config);
+    await db.collect(<{ [key: string]: any }>db.config.connections);
     await db.connectDbs();
     await db.log();
     await Models.init(db.$databases, config);

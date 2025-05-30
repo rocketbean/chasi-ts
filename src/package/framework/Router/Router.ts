@@ -2,8 +2,7 @@ import { Iobject } from "../Interfaces.js";
 import Collector from "./Collector.js";
 import Controller from "./Controller.js";
 import Base from "../../Base.js";
-import {RouterConfigInterface} from "./Router.types.js"
-
+import { RouterConfigInterface } from "Chasi/Router";
 export default class Router extends Collector {
   /**
    * static Controllers

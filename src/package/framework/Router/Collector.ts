@@ -2,7 +2,7 @@ import Base from "../../Base.js";
 import Route from "./Route.js";
 import Registry from "./Registry.js";
 import * as methods from "./Methods/methods.js";
-import { RouterConfigInterface, RouteMethodsInterface } from "../Interfaces.js";
+import { RouterConfigInterface } from "Chasi/Router";
 
 export default class RouteCollector extends Base {
   protected $endpoints: string[] = [];

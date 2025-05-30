@@ -1,8 +1,7 @@
 import Group from "./Group.js";
 import Registry from "./Registry.js";
-import * as methods from "./Methods/methods.js";
 import Endpoint from "./Endpoint.js";
-import { RouteGroupProperty } from "../Interfaces.js";
+import { RouteGroupProperty } from "Chasi/Router";
 export default class Route {
   groups: Group[] = [];
   constructor(public $registry: Registry) {

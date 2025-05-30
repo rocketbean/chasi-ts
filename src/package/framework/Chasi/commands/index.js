@@ -17,12 +17,12 @@ program
   .option(
     "-w, --middleware",
     "generates a default copy of a Middleware.",
-    "default",
+    "default"
   )
   .option(
     "-c, --controller",
     "generates a default copy of a Controller",
-    "HomeController",
+    "HomeController"
   )
   .option("-r, --router", "generates a default copy of Router container", "web")
   .action(async (filename, options) => {

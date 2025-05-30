@@ -1,7 +1,8 @@
-import { RouteEndpointProperty } from "../Interfaces.js";
+import { RouteEndpointProperty } from "Chasi/Router";
 import Controller from "./Controller.js";
 import Group from "./Group.js";
 import Exception from "../ErrorHandler/Exception.js";
+
 export default class Endpoint {
   public path: string = "";
   public uPath: string = "";
@@ -52,7 +53,7 @@ export default class Endpoint {
    */
   handleStringController(str: string) {
     let controllerPath = str.split("@");
-    if(controllerPath.length > 1) {
+    if (controllerPath.length > 1) {
       this.controller = controllerPath[0];
       this.method = controllerPath[1];
     } else this.method = controllerPath[0];
@@ -69,11 +70,11 @@ export default class Endpoint {
     if (Array.isArray(exception)) {
       exception.map((middleware: string): void => {
         this.middlewares.filter((mw) => mw != middleware);
-        this.excludeFromMw.push(middleware)
+        this.excludeFromMw.push(middleware);
       });
     } else if (typeof exception === "string") {
       this.middlewares.filter((mw) => mw != exception);
-      this.excludeFromMw.push(exception)
+      this.excludeFromMw.push(exception);
     }
   }
 

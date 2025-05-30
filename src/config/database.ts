@@ -1,27 +1,27 @@
-import { DatabaseConfig } from "../package/framework/Interfaces.js";
+import DB, { DatabaseConfig } from "Chasi/Database";
 
-export default <DatabaseConfig> {
+export default <DatabaseConfig>{
   host: checkout(process.env.database, "local"),
 
-  /** 
-  * throws an error if one of 
-  * the specified DB 
-  * connections failed
-  */
+  /**
+   * throws an error if one of
+   * the specified DB
+   * connections failed
+   */
   bootWithDB: false,
 
-  /** 
-  * hides the 
-  * connection string
-  */
+  /**
+   * hides the
+   * connection string
+   */
   hideLogConnectionStrings: true,
 
-  /** 
-  * this option will be used as
-  * a default DB for models
-  * that did not specify 
-  * a DB connection.
-  */
+  /**
+   * this option will be used as
+   * a default DB for models
+   * that did not specify
+   * a DB connection.
+   */
   default: checkout(process.env.database, "local"),
   /**
    * *------------- [ Database Connections ] ---------------*
@@ -31,7 +31,6 @@ export default <DatabaseConfig> {
    * | is set. [Model] connection can be altered in the     |
    * | model itself.                                        |
    * *------------------------------------------------------*
-   *
    */
 
   connections: {

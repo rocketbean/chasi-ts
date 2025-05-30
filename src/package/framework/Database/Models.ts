@@ -1,19 +1,38 @@
 import Base from "../../Base.js";
-import { DatabaseDrivers, Iobject } from "../Interfaces.js";
-
+import { DatabaseDrivers } from "Chasi/Database";
+import { Iobject } from "../Interfaces.js";
+import mongoose from "mongoose";
+import path from "path";
+// export type collection<T = null> = {
+//   [key: string]: Iobject | mongoose.Model<T>;
+// };
 export const ModelCollection: Iobject = {};
 
 export default class Models extends Base {
   static $databases: DatabaseDrivers;
   static collection: Iobject = ModelCollection;
   static config: any;
+
   static async collect() {
     let dirs = Models.config.modelsDir;
+    //mongodb model collection
     for (let dir in dirs) {
-      (await Models._fsFetchDir(dirs[dir])).map((content: any) => {
-        Models.collection[content.modelName?.toLowerCase()] = content;
+      let base = path.join(___location, dirs[dir]);
+      (await Models._fsFetchDir<any>(dirs[dir])).map((content) => {
+        Models.collection[content?.modelName?.toLowerCase()] = content;
       });
     }
+    //prisma model collection
+    Object.keys(this.$databases).map((db: string) => {
+      let _d = this.$databases[db];
+      let models = _d["models"];
+      Models.collection[db] = {};
+      if (_d.driverName === "prisma") {
+        Object.keys(_d["models"]).map((model) => {
+          Models.collection[db][model] = _d["models"][model];
+        });
+      }
+    });
   }
 
   static async init(dbs: DatabaseDrivers, config: any) {
@@ -23,7 +42,7 @@ export default class Models extends Base {
       await Models.collect();
       return Models;
     } catch (e) {
-      Logger.log(e)
+      Logger.log(e);
     }
   }
 }

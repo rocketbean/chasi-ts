@@ -1,5 +1,4 @@
 import { Iobject } from "../Interfaces.js";
-import Service from "../Services/Service.js";
 
 export default class Controller {
   static $compiler: any;
