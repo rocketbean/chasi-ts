@@ -121,7 +121,7 @@ this template requires
 
 
 ### Chasi [2.4.2] ReleaseNotes
-** v2.4.1 >> v2.3.9 **
+** v2.4.2 >> v2.4.1 **
 
 - chasi-cli has been updated
 - models have been updated
