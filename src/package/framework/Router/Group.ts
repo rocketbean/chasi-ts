@@ -1,4 +1,4 @@
-import { RouteGroupProperty } from "../Interfaces.js";
+import { RouteGroupProperty } from "Chasi/Router";
 import { ObjectId } from "mongodb";
 export default class Group {
   public property: RouteGroupProperty = {
@@ -18,7 +18,7 @@ export default class Group {
      * controller path must be under
      * ./config/container.ts[ControllerDir]
      * path declaration.
-     * 
+     *
      * can be shorthanded if '@' is present
      * before the file declaration
      * e.g. : "posts@PostController"
@@ -37,7 +37,7 @@ export default class Group {
 
     /** RouteGroup after event
      * after() will be emitted before
-     * sending a response object 
+     * sending a response object
      * to the client
      */
     after: async (): Promise<void> => {},

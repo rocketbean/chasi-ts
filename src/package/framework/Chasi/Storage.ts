@@ -29,7 +29,7 @@ export default class SessionStorage {
 
   constructor(public config: Iobject) {
     if (cluster.isPrimary) {
-      if (this.config.trackUsage.enabled) {
+      if (this.config?.trackUsage?.enabled) {
         let cb = this.reportPerf.bind(this);
         setInterval(cb, this.config.trackUsage.interval);
       }

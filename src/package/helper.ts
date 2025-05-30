@@ -52,8 +52,7 @@ declare global {
    */
   var __basepath: string;
 
-
-  var __testMode: Function
+  var __testMode: Function;
 
   /**
    * the Chasi::configuration
@@ -63,7 +62,13 @@ declare global {
 
   var __deepEqual: Function;
 
-  var __deepMerge: Function;
+  var __deepMerge: <
+    T extends { [key: string]: any },
+    U extends { [key: string]: any }
+  >(
+    target: T,
+    ...sources: U[]
+  ) => (T & U) | T;
 
   var _getMethods: Function;
 
@@ -72,7 +77,6 @@ declare global {
   var __getRandomNum: Function;
 
   var $app: any;
-
 }
 
 export default (async () => {
@@ -90,17 +94,17 @@ export default (async () => {
 
   global.___location = path.join(
     path.normalize(fileURLToPath(import.meta.url)),
-    "../../",
+    "../../"
   );
 
   global.__devDirname = path.join(
     path.normalize(fileURLToPath(import.meta.url)),
-    "../../../src",
+    "../../../src"
   );
 
   global.__devFilepath = path.join(
     path.normalize(fileURLToPath(import.meta.url)),
-    "../../",
+    "../../"
   );
 
   global.__filepath = path.join(path.normalize(import.meta.url), "../../");
@@ -110,8 +114,9 @@ export default (async () => {
   };
 
   global.__getRandomStr = (length: number) => {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     const charactersLength = characters.length;
     let counter = 0;
     while (counter < length) {
@@ -119,11 +124,11 @@ export default (async () => {
       counter += 1;
     }
     return result;
-  }
+  };
 
   global.__getRandomNum = (min: number, max: number): number => {
     return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+  };
 
   global.Caveat = new ExceptionHandler();
   await ExceptionHandler.handleProcessError();
@@ -154,11 +159,13 @@ export default (async () => {
     return true;
   };
 
-  global.__deepMerge = function (target, ...sources) {
-    function isObject(item) {
-      return (item && typeof item === 'object' && !Array.isArray(item));
+  global.__deepMerge = function <
+    T extends { [key: string]: any },
+    U extends { [key: string]: any }
+  >(target: T, ...sources: U[]): (T & U) | T {
+    function isObject(item: object) {
+      return item && typeof item === "object" && !Array.isArray(item);
     }
-
     if (!sources.length) return target;
     const source = sources.shift();
 
@@ -173,6 +180,5 @@ export default (async () => {
       }
     }
     return __deepMerge(target, ...sources);
-
-  }
+  };
 })();

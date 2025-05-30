@@ -1,9 +1,10 @@
-import Driver, { DBDriverInterface } from "./drivers.js";
-import { DBProperty, Iobject } from "../../Interfaces.js";
-import mongoose, { mongo } from "mongoose";
+import DB, { DBProperty, DBDriverInterface } from "Chasi/Database";
+import Driver from "./drivers.js";
+import { Iobject } from "../../Interfaces.js";
+import mongoose from "mongoose";
 import chalk from "chalk";
-import { exit } from "process";
 export default class MongoDBDriver extends Driver implements DBDriverInterface {
+  public driverName = <DB.drivers>"mongodb";
   public $property: Iobject = {};
   public protocol = "mongodb://";
   public connection: any;
@@ -18,7 +19,7 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
     chalk.whiteBright,
   ];
 
-  constructor(public config: DBProperty, public name: string) {
+  constructor(public config: DBProperty<"mongodb">, public name: string) {
     super(config);
     this.name = name;
     this.config = config;
@@ -63,12 +64,12 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
             this.isDefaultDB
               ? chalk.greenBright.underline(this.name.toUpperCase())
               : this.name.toUpperCase()
-          } `,
+          } `
         );
         if (this.config.hideLogConnectionStrings) {
           let str = this.hideStrings(this.$property.url);
           this.logger.write(
-            ` - ${this.$property.url.replace(/\/\/(.*?)\//g, str)}\n`,
+            ` - ${this.$property.url.replace(/\/\/(.*?)\//g, str)}\n`
           );
         } else {
           this.logger.write(` - ${this.$property.url}\n`);

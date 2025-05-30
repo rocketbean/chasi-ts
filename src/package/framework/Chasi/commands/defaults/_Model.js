@@ -29,9 +29,16 @@ export default {
     return `import Model from "../../package/statics/Model.js";
 import mongoose from "mongoose";
 
-export type ${model["type"]} = {
+export interface ${model["name"].toUpperCase()}Interface extends Document {
   _: string;
-};
+}
+
+export interface ${model[
+      "name"
+    ].toUpperCase()}Model extends mongoose.Model<${model[
+      "name"
+    ].toUpperCase()}Interface> {}
+
 
 var ${model["schema"]} = new mongoose.Schema<${model["type"]}>({
   _: {
@@ -44,6 +51,7 @@ var ${model["schema"]} = new mongoose.Schema<${model["type"]}>({
 const ${model["name"].toUpperCase()} = Model.connect("${model["name"]}", ${
       model["schema"]
     });
+
 export default ${model["name"].toUpperCase()};
 `;
   },

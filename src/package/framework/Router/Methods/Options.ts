@@ -1,2 +1,2 @@
-import { RouteMethodsInterface } from "../../Interfaces.js";
+import { RouteMethodsInterface } from "Chasi/Router";
 export default class Options implements RouteMethodsInterface {}

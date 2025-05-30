@@ -119,6 +119,18 @@ this template requires
 - nodejs: ^16.0.0
 - mongoDB: ^3.0.0
 
+
+### Chasi [2.4.2] ReleaseNotes
+** v2.4.2 >> v2.4.1 **
+
+- chasi-cli has been updated
+- models have been updated
+- added create event  (-e) command 
+- refreshed packages
+- improve error handling on routes
+- added static observer to controllers
+- prisma support
+
 ### Chasi [2.4.1] ReleaseNotes
 ** v2.4.1 >> v2.3.9 **
 

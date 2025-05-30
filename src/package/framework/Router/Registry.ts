@@ -3,10 +3,8 @@ import Endpoint from "./Endpoint.js";
 import Group from "./Group.js";
 import Router from "./Router.js";
 import Base from "../../Base.js";
-import { RouterConfigInterface } from "../Interfaces.js";
+import { RouterConfigInterface } from "Chasi/Router";
 import Authentication from "../Server/Authentication.js";
-import path from "path";
-import { exit } from "process";
 export default class Registry extends Base {
   controllers: Controller[] = [];
   routes: Endpoint[] = [];

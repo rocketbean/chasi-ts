@@ -51,9 +51,9 @@ export default class Session {
   }
 
   static async validates(config) {
-    if (config.compiler.enabled) {
-      Writer.log = process.stdout.write;
-    }
+    if (!config?.compiler?.enabled) {
+      return;
+    } else Writer.log = process.stdout.write;
     return;
   }
 

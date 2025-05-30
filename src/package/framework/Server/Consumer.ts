@@ -87,7 +87,7 @@ export default class Consumer {
     let autoMs = Consumer._defaultResponses[status]
       ? Consumer._defaultResponses[status]
       : Consumer._defaultResponses["message"];
-    e.message = e.message ? e.message : autoMs;
+    e["message"] = e?.message ? e.message : autoMs;
     if (!(e instanceof exception)) {
       e = new APIException(e, status, ep);
     }

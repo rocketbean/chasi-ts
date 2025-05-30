@@ -16,4 +16,8 @@ export default class Controller extends controller {
   get services() {
     return Controller.$services;
   }
+
+  get $observer() {
+    return $app.$observer;
+  }
 }
