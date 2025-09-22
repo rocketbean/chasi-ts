@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ScriptHost", "ESNext"],
-    "typeRoots": ["node_modules/@types", "node_modules/types"],
+    "typeRoots": ["node_modules/@types", "node_modules"],
     "allowJs": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -19,16 +19,21 @@
     "noEmitOnError": false,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "types": ["node", "vitest/globals"],
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "types": ["node", "vitest/globals"]
   },
   "exclude": [
-    "dist", 
-    "*.config.js", 
-    "chasi.json", 
-    "src/container/html", 
+    "prisma",
+    "dist",
+    "*.config.js",
+    "chasi.json",
+    "src/container/html",
+    "src/container/assets",
     "src/package/framework/Commands",
     "chasi.js",
     "test",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    ".vscode"
   ]
 }
