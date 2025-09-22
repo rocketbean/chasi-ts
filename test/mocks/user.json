@@ -1,10 +1,15 @@
 {
-  "users": [
+  "data": [
     {
-      "name": "test user",
-      "password": "testpass",
+      "name": "test",
+      "email": "test@test.com",
       "alias": "test",
-      "email": "test@test.com"
+      "password": "testpass"
     }
-  ]
+  ],
+  "xero": {
+    "email": "nikko.messina@o3collective.com.au",
+    "alias": "nikko.messina@o3collective.com.au",
+    "password": "testpass"
+  }
 }

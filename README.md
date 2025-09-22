@@ -120,26 +120,25 @@ this template requires
 - mongoDB: ^3.0.0
 
 
-### Chasi [2.4.2] ReleaseNotes
-** v2.4.2 >> v2.4.1 **
+### Chasi [3.0.0] ReleaseNotes
+** v3.0.0 >> v2.4.2 **
 
-- chasi-cli has been updated
-- models have been updated
-- added create event  (-e) command 
-- refreshed packages
-- improve error handling on routes
-- added static observer to controllers
-- prisma support
-
-### Chasi [2.4.1] ReleaseNotes
-** v2.4.1 >> v2.3.9 **
-
-- test environment has been added (./test/**/*)
-- supertest is added as a dev dependency.
-- added StreamBucket class to handle cluster worker signals to the parent thread.
-- serverPipe have been updated to handle signaling when cluster is enabled.
-- Server storage update [workers will now send signals to the parent thread].
-- removed signal logs handler from the lead worker,  re appointed to the parent thread.
-- Channels have been added to the SocketServer module.
-- worker signals for service modules ([action: “service:<modulename>”])
-- global.__basepath (server basepath) is added as a global variable.
+- added support for TypeScript
+- improved Database Drivers
+- added support for multiple databases
+- improved Prisma DB Driver Integration
+- improved Vite Integration
+- [-improved documentation]
+- fixed bugs in the routing system
+- optimized performance for large applications
+- updated dependencies
+- added new middleware features
+- enhanced error handling and logging
+- improved database connection management
+- added support for environment variables
+- improved security features
+- added new utility functions
+- improved testing framework
+- added support for async/await in controllers and services
+- improved code structure and organization
+- added new configuration options

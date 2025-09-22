@@ -116,7 +116,9 @@ export default class Base {
     return await Promise.all(
       fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
         try {
-          let content = (await import(`${path.join(_p, file)}`)).default;
+          let content = (
+            (await import(`${path.join(_p, file)}`)).default
+          );
           return content;
         } catch (e) {
           console.log(e);
@@ -151,6 +153,15 @@ export default class Base {
       })
     );
     return _mods;
+  }
+
+  static async _writeOrUpdateFile(filepath: string, content: string) {
+    try {
+      await fs.promises.writeFile(filepath, content);
+      return true;
+    } catch (e) {
+      Logger.log(e);
+    }
   }
 
   /**

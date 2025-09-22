@@ -3,11 +3,8 @@ import { DatabaseDrivers } from "Chasi/Database";
 import { Iobject } from "../Interfaces.js";
 import mongoose from "mongoose";
 import path from "path";
-// export type collection<T = null> = {
-//   [key: string]: Iobject | mongoose.Model<T>;
-// };
-export const ModelCollection: Iobject = {};
 
+export const ModelCollection: Iobject = {};
 export default class Models extends Base {
   static $databases: DatabaseDrivers;
   static collection: Iobject = ModelCollection;
