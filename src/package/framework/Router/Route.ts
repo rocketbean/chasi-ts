@@ -1,7 +1,7 @@
 import Group from "./Group.js";
 import Registry from "./Registry.js";
 import Endpoint from "./Endpoint.js";
-import { RouteGroupProperty } from "Chasi/Router";
+import { RouteGroupProperty, RouteEndpointPropertyOptions } from "Chasi/Router";
 export default class Route {
   groups: Group[] = [];
   constructor(public $registry: Registry) {
@@ -12,10 +12,14 @@ export default class Route {
    *  Register a [get] Method endpoint;
    * @param endpoint {string} path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options {RouteEndpointPropertyOptions} options
    * @returns [Route] instance to be collected on boot
    */
-  get(endpoint: string, controller: string | Function, options = {}): Endpoint {
+  get(
+    endpoint: string,
+    controller: string | Function,
+    options: RouteEndpointPropertyOptions = {}
+  ): Endpoint {
     let ep = new Endpoint(
       {
         method: "get",
@@ -23,7 +27,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -33,13 +37,13 @@ export default class Route {
    *  Register a [Post] Method endpoint;
    * @param endpoint {string} path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options {RouteEndpointPropertyOptions} options
    * @returns [Route] instance to be collected on boot
    */
   post(
     endpoint: string,
     controller: string | Function,
-    options = {},
+    options: RouteEndpointPropertyOptions = {}
   ): Endpoint {
     let ep = new Endpoint(
       {
@@ -48,7 +52,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -58,13 +62,13 @@ export default class Route {
    *  Register a [options] Method endpoint;
    * @param endpoint {string} | path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options {RouteEndpointPropertyOptions} options
    * @returns [Route] instance to be collected on boot
    */
   options(
     endpoint: string,
     controller: string | Function,
-    options = {},
+    options = {}
   ): Endpoint {
     let ep = new Endpoint(
       {
@@ -73,7 +77,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -83,13 +87,13 @@ export default class Route {
    *  Register a [patch] Method endpoint;
    * @param endpoint {string} | path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options {RouteEndpointPropertyOptions} options
    * @returns [Route] instance to be collected on boot
    */
   patch(
     endpoint: string,
     controller: string | Function,
-    options = {},
+    options: RouteEndpointPropertyOptions = {}
   ): Endpoint {
     let ep = new Endpoint(
       {
@@ -98,7 +102,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -108,10 +112,14 @@ export default class Route {
    *  Register a [put] Method endpoint;
    * @param endpoint {string} | path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options <RouteEndpointPropertyOptions> options
    * @returns [Route] instance to be collected on boot
    */
-  put(endpoint: string, controller: string | Function, options = {}): Endpoint {
+  put(
+    endpoint: string,
+    controller: string | Function,
+    options: RouteEndpointPropertyOptions = {}
+  ): Endpoint {
     let ep = new Endpoint(
       {
         method: "put",
@@ -119,7 +127,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -135,7 +143,7 @@ export default class Route {
   delete(
     endpoint: string,
     controller: string | Function,
-    options = {},
+    options: RouteEndpointPropertyOptions = {}
   ): Endpoint {
     let ep = new Endpoint(
       {
@@ -144,7 +152,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -154,13 +162,13 @@ export default class Route {
    *  Register a [search] Method endpoint;
    * @param endpoint {string} | path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options {RouteEndpointPropertyOptions} options
    * @returns [Route] instance to be collected on boot
    */
   search(
     endpoint: string,
     controller: string | Function,
-    options = {},
+    options: RouteEndpointPropertyOptions = {}
   ): Endpoint {
     let ep = new Endpoint(
       {
@@ -169,7 +177,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     this.$registry.register(ep);
     return ep;
@@ -179,14 +187,14 @@ export default class Route {
    *  Register a [search] Method endpoint;
    * @param endpoint {string} | path url endpoint;
    * @param controller {string} controller and method to call when the endpoint is called;
-   * @param options {object} options
+   * @param options {RouteEndpointPropertyOptions} options
    * @returns [Route] instance to be collected on boot
    */
   dynamic(
     endpoint: string,
     controller: string | Function,
     method: "string",
-    options = {},
+    options: RouteEndpointPropertyOptions = {}
   ): Endpoint {
     let ep = new Endpoint(
       {
@@ -195,7 +203,7 @@ export default class Route {
         endpoint,
         options,
       },
-      [...this.groups],
+      [...this.groups]
     );
     ep.unmatched = true;
     this.$registry.register(ep);
@@ -209,7 +217,7 @@ export default class Route {
   }
 
   stackGroup(stack) {
-    let stk = new Group(stack);
+    let stk = new Group(stack, this);
     this.groups.push(stk);
     return stk;
   }

@@ -12,7 +12,7 @@ import Express, { response } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
-
+import process from "process";
 export default class Consumer {
   $server: any = Express();
   public static servelog: string[] = [];
@@ -52,7 +52,7 @@ export default class Consumer {
             await Promise.all(
               ep.beforeFns.map(async (fn: Function) => {
                 await fn(request, response, data);
-              }),
+              })
             );
             let res = await ep.$method(request, response, data);
             ep.afterFns.map(async (fn: Function) => {
@@ -62,7 +62,7 @@ export default class Consumer {
           } catch (e: any) {
             return await this.handleError(e, ep, response);
           }
-        },
+        }
       );
     }
   }
@@ -72,7 +72,7 @@ export default class Consumer {
       router.property?.mount.map(async (mount: RouterMountable) => {
         if (!mount?.props) mount.props = [];
         await mount.exec?.mount(router, [...mount.props]);
-      }),
+      })
     );
   }
 
@@ -92,8 +92,11 @@ export default class Consumer {
       e = new APIException(e, status, ep);
     }
     let contentType = response.getHeaders()["content-type"];
-    if(contentType?.includes("application/json") && typeof e.message !== 'object') {
-      e.message = {message: e.message}
+    if (
+      contentType?.includes("application/json") &&
+      typeof e.message !== "object"
+    ) {
+      e.message = { message: e.message };
     }
     ep.addExceptions(e);
     response.statusCode = status;
@@ -116,7 +119,7 @@ export default class Consumer {
           } else {
             params[`__${mod.toLowerCase()}`] = null;
           }
-        }),
+        })
       );
     } catch (e) {}
   }
@@ -137,7 +140,7 @@ export default class Consumer {
         if (service.instance?.beforeServerBoot) {
           return await service.instance.beforeServerBoot(this.$server);
         }
-      }),
+      })
     );
   }
 
@@ -154,7 +157,7 @@ export default class Consumer {
         if (service.instance?.beforeRoute) {
           return await service.instance.beforeRoute(this.$server);
         }
-      }),
+      })
     );
   }
 
@@ -172,7 +175,7 @@ export default class Consumer {
   async consumeLayers(
     options: Iobject,
     engine?: Iobject,
-    compiler?: any,
+    compiler?: any
   ): Promise<void> {
     await this.beforeRouteConsume();
 

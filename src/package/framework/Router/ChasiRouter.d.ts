@@ -1,7 +1,7 @@
 declare module "Chasi/Router" {
   import { Iobject } from "../Interfaces.js";
   import Router from "./Router.js";
-
+  import swaggerJsDoc from "swagger-jsdoc";
   export type RouterMethods =
     | "get"
     | "post"
@@ -11,6 +11,24 @@ declare module "Chasi/Router" {
     | "search"
     | "delete";
 
+  export type docParamTypes = "path" | "query" | "body" | "header" | "cookie";
+
+  export type PathItem = {
+    $ref?: string | undefined;
+    summary?: string | undefined;
+    description?: string | undefined;
+    get?: Operation | undefined;
+    put?: Operation | undefined;
+    post?: Operation | undefined;
+    delete?: Operation | undefined;
+    options?: Operation | undefined;
+    head?: Operation | undefined;
+    patch?: Operation | undefined;
+    trace?: Operation | undefined;
+    servers?: readonly swaggerJsDoc.Server[] | undefined;
+    parameters?: Parameter[] | Reference[] | undefined;
+    [key: string]: any;
+  };
   export type RouteExceptions = {
     /** @RouteExceptions.url
      * string path of the targeted endpoint
@@ -30,11 +48,68 @@ declare module "Chasi/Router" {
     mount(router: Router, a: any);
   }
 
+  export type paramType = {
+    /** @paramType.name
+     * name of the parameter
+     */
+    name: string;
+
+    /** @paramType.in
+     * where the parameter is located
+     * e.g. : "path", "query", "body", "header", "cookie"
+     * @see docParamTypes
+     */
+    in: docParamTypes;
+
+    /** @paramType.type
+     * type of the parameter
+     * e.g. : "string", "number", "boolean", etc.
+     */
+    schema: {
+      type: string;
+    };
+
+    /** @paramType.required
+     * if the parameter is required or not
+     */
+    required?: boolean;
+
+    /** @paramType.description
+     * a short description of the parameter
+     */
+    description?: string;
+
+    /** @paramType.allowReserved
+     * if the parameter is allowed to be reserved
+     * e.g. : "true", "false"
+     */
+    allowReserved?: boolean;
+  };
+
+  export type RouteEndpointPropertyOptions = {
+    spec?: PathItem;
+    /** @RouteEndpointPropertyOptions.summary
+     * a short description of the endpoint.
+     */
+    summary?: string;
+    /** @RouteEndpointPropertyOptions.tags
+     * tags can be used to group endpoints
+     * in the documentation.
+     */
+    tags?: string[];
+
+    /** @RouteEndpointPropertyOptions.parameters
+     * parameters can be used to document
+     * the endpoint's parameters.
+     */
+    parameters?: paramType[];
+  };
+
   export type RouteEndpointProperty = {
     method: string;
     controller: string | Function;
     endpoint: string;
-    options: any;
+    options: RouteEndpointPropertyOptions;
   };
 
   export type RouterMountable = {
@@ -43,6 +118,20 @@ declare module "Chasi/Router" {
     exec: RouterMountableInterface;
   };
 
+  export type RouterSpec = {
+    /** @RouterSpec.config
+     * spec config
+     */
+    config: {
+      enabled: boolean;
+      url: string;
+      jsonFile: string;
+    };
+    /** RouterSpec.spec
+     * api specs options
+     */
+    spec: swaggerJsDoc.Options;
+  };
   export type RouterConfigInterface = {
     /** *name*
      * Router's name
@@ -61,6 +150,15 @@ declare module "Chasi/Router" {
      * {String} {Boolean[false]} {null}
      */
     auth: string | boolean | null;
+
+    /** *database
+     * database connection name
+     * that will be used in the router
+     * if not specified, it will use the default
+     * database connection.
+     */
+    database?: string;
+
     /** *prefix
      * prefix[string]
      * will be appended to all the routes
@@ -72,6 +170,8 @@ declare module "Chasi/Router" {
      * a string path to a router container file.
      */
     namespace: string;
+
+    spec: RouterSpec;
 
     /** *middleware
      * middleware/s listed under this property will be implemented,
@@ -158,6 +258,8 @@ declare module "Chasi/Router" {
      * (posts/PostController@index)
      */
     controller?: string;
+
+    spec?: PathItem;
 
     /** RouteGroup prefix
      * value will be prepended to

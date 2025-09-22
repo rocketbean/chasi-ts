@@ -16,7 +16,6 @@ import cluster from "cluster";
 import PipeHandler from "./framework/Chasi/PipeHandler.js";
 
 export class Handler extends Base {
-
   /*** singleton
    * [Handler];
    * Chasi App-Lifecycle
@@ -124,12 +123,11 @@ export class Handler extends Base {
    * • ServiceProvider boot() event will be executed.
    */
   protected async start(): Promise<void> {
-
     await this.$observer.setup();
     await Caveat.init(this.config.exceptions, this.$proxy);
 
     this.$modules.services = await ServicesModule.init(
-      this.config.container.ServiceBootstrap,
+      this.config.container.ServiceBootstrap
     );
 
     this.$services = (await (<ServicesModule>(
@@ -159,11 +157,9 @@ export class Handler extends Base {
         next: this.$proxy.initialize,
         app: this.$proxy,
       });
-    } catch(e) {
-      console.log(e)
+    } catch (e) {
+      console.log(e);
     }
-
-
   }
 
   /* * *
@@ -175,13 +171,11 @@ export class Handler extends Base {
    */
   protected async initialize(): Promise<void> {
     try {
-      
       await this.$observer.emit("__after__", {
         next: this.$proxy.after,
         app: this.$proxy,
       });
-    } catch (e) { }
-
+    } catch (e) {}
   }
 
   /* * * *
@@ -221,14 +215,14 @@ export class Handler extends Base {
         transmit: {
           pid: cluster.worker.process.pid,
           status: this.state,
-          id: cluster.worker.id
-        }
-      })
+          id: cluster.worker.id,
+        },
+      });
     }
     this.loggers.system.write(
       "[SRV_State]::Server onReady state",
       "clear",
-      "boot",
+      "boot"
     );
     this.loggers.system.endGroup("BOOT");
     this.$ev.emit("done");
@@ -249,7 +243,6 @@ export class Handler extends Base {
    * @return [void]
    */
   protected setup(): void {
-
     this.setLoggers();
     this.$app = new App(this.config.server, this.loggers);
     Consumer._defaultResponses = this.config.exceptions.responses;
@@ -257,6 +250,15 @@ export class Handler extends Base {
   }
   logthis(message: string, type: string = "system") {
     this.loggers[type].write(message.toUpperCase());
+  }
+
+  async close() {
+    try {
+      this.$app.server.close();
+      return true;
+    } catch (e) {
+      Logger.log(e);
+    }
   }
 
   /* * *

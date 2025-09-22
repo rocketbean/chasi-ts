@@ -19,12 +19,14 @@ declare module "Chasi/Database" {
     useDynamicPrismaClient: boolean;
     client: string;
     dims?: PrismaClient;
+    globals?: any;
   };
 
   export type MongoDBOptions<U> = {
     connectTimeoutMS: number;
     socketTimeoutMS: number;
     serverSelectionTimeoutMS: number;
+    globals?: any;
   };
 
   export type DBProperty<drivers, U = null> = {

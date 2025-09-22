@@ -41,6 +41,7 @@ export default class JWTDriver implements AuthDriver {
         if (checkException < 0) {
           const _t = request.header("Authorization")?.replace("Bearer ", "");
           const _d = jwt.verify(_t, this.property.key);
+
           const user = await Models.collection[this.property.model].findOne({
             _id: _d._id,
           });
