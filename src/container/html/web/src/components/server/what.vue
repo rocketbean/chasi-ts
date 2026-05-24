@@ -26,12 +26,78 @@
     <!-- @serverConfig -->
     <list :items="data.list" />
 
-    <container/> 
+    <container/>
+
+    <!-- Logger section -->
+    <section class="section">
+      <div class="pan-title">
+        <div class="x-center is-size-3">
+          <span><hook id="loggerSection" /> Logger</span>
+          <span class="tag is-info is-light is-medium">global</span>
+        </div>
+        <small>
+          <span class="subtitle">available globally — no import required</span>
+        </small>
+      </div>
+      <div class="sub-text">
+        A <code>Logger</code> instance is injected globally at startup. All methods
+        accept any number of arguments and automatically pretty-print objects using
+        <code>util.inspect</code>. Output respects the <code>Log_Level</code>
+        environment variable — set it to <code>0</code> to silence all output.
+      </div>
+    </section>
+    <list :items="loggerData.list" />
   </div>
 </template>
 <script setup>
 import {reactive} from "vue";
 import container from "./Container.vue"
+
+const loggerData = reactive({
+  list: [
+    {
+      hook: "logLog",
+      title: "Logger.log()",
+      sub: "[Logger.log]",
+      tag: "(...message: unknown[])",
+      desc: `Plain terminal output — no prefix, no color styling. Identical to <code>console.log</code> in intent.
+            Objects are formatted with <code>util.inspect</code> (depth: null).`,
+      codeContent: {
+        mapping: 'logger/methods',
+        comment: `// Logger usage`,
+        options: {
+          lang: "ts",
+          theme: 'vitesse-dark',
+        }
+      }
+    },
+    {
+      hook: "logInfo",
+      title: "Logger.info()",
+      sub: "[Logger.info]",
+      tag: "(...message: unknown[])",
+      desc: `Informational output prefixed with <strong>ℹ</strong> in <span style="color:#19BEAF">cyan</span>.
+            Use for routine status messages, startup confirmations, or anything useful at a glance.`
+    },
+    {
+      hook: "logWarn",
+      title: "Logger.warn()",
+      sub: "[Logger.warn]",
+      tag: "(...message: unknown[])",
+      desc: `Warning output prefixed with <strong>⚠</strong> in <span style="color:#d4a400">yellow</span>.
+            Use for non-critical issues, deprecation notices, or configuration anomalies.`
+    },
+    {
+      hook: "logError",
+      title: "Logger.error()",
+      sub: "[Logger.error]",
+      tag: "(...message: unknown[])",
+      desc: `Error output prefixed with <strong>✖</strong> in <span style="color:#e04040">red</span>.
+            Use for exceptions, failed operations, or any condition that requires immediate attention.`
+    }
+  ]
+})
+
 const data = reactive({
   list: [
     {

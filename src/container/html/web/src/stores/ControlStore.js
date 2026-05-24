@@ -1,12 +1,16 @@
 import { defineStore } from "pinia";
-import control from "../data/control";
+import { buildData, versions, defaultVersion } from "../data/control";
 import _ from "lodash"
 
 export const useControlStore = defineStore( "ControlStore", {
   state: () => {
+    const _data = buildData(defaultVersion)
     return {
+      _data,
+      activeVersion: defaultVersion,
+      availableVersions: Object.keys(versions).sort((a, b) => b.localeCompare(a, undefined, { numeric: true })),
       left: {
-        navigation: control.collection
+        navigation: _data.collection
       },
       right: {
         controls: {
@@ -68,27 +72,38 @@ export const useControlStore = defineStore( "ControlStore", {
       return this.active.viewport
     },
     dict () {
-      return control.dictionary;
+      return this._data.dictionary;
     },
     collection () {
-      return Object.keys(control.dictionary).map(subject => control.dictionary[subject]);
+      return Object.keys(this._data.dictionary).map(subject => this._data.dictionary[subject]);
     },
     searchRows () {
       return this.search.rows
     },
+    requirements () {
+      const intro = Object.values(this._data.collection).find(s => s.id === 'intro')
+      return intro?.requirements ?? []
+    },
   },
   actions: {
+    switchVersion(version) {
+      if (!versions[version] || version === this.activeVersion) return
+      this.activeVersion = version
+      this._data = buildData(version)
+      this.left.navigation = this._data.collection
+      this.activate(this._data.default)
+    },
     setRows (arr) {
       this.search.rows = arr
     },
     setModal (val) {
-      this.searchModal.open = val 
+      this.searchModal.open = val
     },
     setAboutModal (val) {
-      this.aboutModal.open = val 
+      this.aboutModal.open = val
     },
     toggleModal () {
-      this.searchModal.open = !this.searchModal.open 
+      this.searchModal.open = !this.searchModal.open
     },
     setViewPort(target) {
       this.active.viewport.target = target;
@@ -96,15 +111,15 @@ export const useControlStore = defineStore( "ControlStore", {
     ref (group) {
       return Object.keys(this.dict).map(subject => {
         return this.dict[subject]
-      }).filter(subject => subject.reference.includes(group))
+      }).filter(subject => subject.reference && subject.reference.includes(group))
     },
     activate(id) {
-      let ctx = Object.values(control.collection).find(cont => cont.id === id) ||
-        Object.values(control.collection).find(cont => cont.id === control.default)
-      if(ctx?.controls?.header) this.setHeaderControls(ctx.controls.header)
-      if(ctx?.controls?.right) this.setRightControls(ctx.controls.right)
+      let ctx = Object.values(this._data.collection).find(cont => cont.id === id) ||
+        Object.values(this._data.collection).find(cont => cont.id === this._data.default)
+      if (!ctx) return
+      if(ctx.controls?.header) this.setHeaderControls(ctx.controls.header)
+      if(ctx.controls?.right) this.setRightControls(ctx.controls.right)
       this.active.context = this.mapSubCatGroup(ctx)
-
     },
     mapSubCatGroup (ctx) {
       ctx.subcats = ctx?.subcats?.map(cat => {

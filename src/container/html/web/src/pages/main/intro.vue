@@ -29,9 +29,9 @@
       </p>
       <h4>Requirements</h4>
       <ul class="is-size-6">
-        <li>Node (>=v16.0.0)</li>
-        <li>NPM (>=v8.0.0)</li>
-        <li>Git (>=2.0.0)</li>
+        <li v-for="req in controlStore.requirements" :key="req.id">
+          <hook :id="req.id" /> {{ req.label }} ({{ req.value }})
+        </li>
       </ul>
     </div>
   </div>
@@ -40,21 +40,20 @@
 <script>
 import { defineComponent } from "vue";
 import headerAnimation from "./header-animation.vue";
+import hook from "@/components/utils/hook.vue";
+import { useControlStore } from "@/stores/ControlStore.js";
+
 export default defineComponent({
   name: "intro",
   components: {
-    'header-animation': headerAnimation
+    'header-animation': headerAnimation,
+    hook,
   },
-  data () {
-    return {
-      
-    }
+  setup() {
+    const controlStore = useControlStore();
+    return { controlStore };
   },
-  mounted() {
-  }
-}
-
-)
+})
 </script>
 <style>
 .function-based-values-demo {
