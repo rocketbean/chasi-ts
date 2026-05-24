@@ -27,6 +27,16 @@
           "sc-serviceBootstrap",
           "sc-middlewares"
         ]
+      },
+      {
+        "to": "loggerSection",
+        "label": "Logger",
+        "group": [
+          "logLog",
+          "logInfo",
+          "logWarn",
+          "logError"
+        ]
       }
     ],
     "glossary": [
@@ -120,6 +130,40 @@
         "reference": ["serverContainer", "serverConfig"],
         "keywords": ["serverContainer middlewares", "middlewares","serverconfig"],
         "text": "Middlewares must be registered here before it can be applied to any routing container, group, endpoint, or even in the websockets or channels. It is good to put request validations or verifications in middlewares to centralize gates in the environment."
+      },
+      {
+        "id": "loggerSection",
+        "label": "Logger",
+        "keywords": ["logger", "log", "info", "warn", "error", "debug"],
+        "text": "A global Logger instance is available throughout the application without any import. It provides console-like methods for different log levels, each rendered with a distinct prefix and color in the terminal."
+      },
+      {
+        "id": "logLog",
+        "label": ".log()",
+        "reference": ["loggerSection"],
+        "keywords": ["logger", "log"],
+        "text": "Outputs plain text to the terminal. Accepts multiple arguments; objects are automatically pretty-printed with util.inspect (depth: null, colors: true)."
+      },
+      {
+        "id": "logInfo",
+        "label": ".info()",
+        "reference": ["loggerSection"],
+        "keywords": ["logger", "info"],
+        "text": "Outputs an informational message prefixed with ℹ in cyan. Behaves identically to Logger.log with a distinct color for at-a-glance identification."
+      },
+      {
+        "id": "logWarn",
+        "label": ".warn()",
+        "reference": ["loggerSection"],
+        "keywords": ["logger", "warn", "warning"],
+        "text": "Outputs a warning message prefixed with ⚠ in yellow. Use for non-critical issues, deprecation notices, or anything the developer should be aware of."
+      },
+      {
+        "id": "logError",
+        "label": ".error()",
+        "reference": ["loggerSection"],
+        "keywords": ["logger", "error", "severe"],
+        "text": "Outputs an error message prefixed with ✖ in red. Use for exceptions and critical failures."
       },
       {
         "id": "ev-start",

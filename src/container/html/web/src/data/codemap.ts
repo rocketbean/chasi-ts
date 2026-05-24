@@ -45,6 +45,20 @@ export default <serverConfig> {
       }
     }
   },
+  logger: {
+    methods: `
+// Logger is a global — no import needed anywhere in your app.
+// All methods accept multiple arguments and pretty-print objects.
+
+Logger.log("Server initialized")         // plain, no prefix
+
+Logger.info("Listening on port", 3000)   // ℹ  cyan
+
+Logger.warn("Deprecation: use newMethod()")  // ⚠  yellow
+
+Logger.error("DB connection failed", err)    // ✖  red on black
+`
+  },
   router: {
     routerNamespace: `
 import Route from "../../package/statics/Route.js";

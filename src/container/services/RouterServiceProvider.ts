@@ -42,13 +42,14 @@ export default class RouterServiceProvider
         ControllerDir: ["container/controllers"],
         middleware: [],
         AuthRouteExceptions: [
+          { m: "get", url: "/api/test" },
           { m: "post", url: "/api/users/signin" },
           { m: "post", url: "/api/users/signup" },
           { m: "post", url: "/api/users/forget" },
         ],
         data: (): {} => {
           return {
-            chasiVer: "2.4.1",
+            chasiVer: "3.0.0",
           };
         },
         before: (request: any, response: any, data: any) => {

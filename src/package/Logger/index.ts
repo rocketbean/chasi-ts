@@ -42,6 +42,48 @@ export default class Logger {
     });
   }
 
+  info(...message: unknown[]): void {
+    let wr = this.writer("Left");
+    message.forEach((msg, ind) => {
+      if (typeof msg === "object")
+        msg = inspect(msg, {
+          showHidden: false,
+          depth: null,
+          colors: true,
+        });
+      if (ind > 0) wr.write("\n");
+      wr.write("ℹ " + msg + "\n", "adjusted");
+    });
+  }
+
+  warn(...message: unknown[]): void {
+    let wr = this.writer("Left");
+    message.forEach((msg, ind) => {
+      if (typeof msg === "object")
+        msg = inspect(msg, {
+          showHidden: false,
+          depth: null,
+          colors: true,
+        });
+      if (ind > 0) wr.write("\n");
+      wr.write("⚠ " + msg + "\n", "warning");
+    });
+  }
+
+  error(...message: unknown[]): void {
+    let wr = this.writer("Left");
+    message.forEach((msg, ind) => {
+      if (typeof msg === "object")
+        msg = inspect(msg, {
+          showHidden: false,
+          depth: null,
+          colors: true,
+        });
+      if (ind > 0) wr.write("\n");
+      wr.write("✖ " + msg + "\n", "severe");
+    });
+  }
+
   clusterLogSystem(worker: { pid: number; id: number }, ...message: unknown[]): void {
     let wr = this.writer("Left")
     wr.write(`LOG_PID[${worker.pid}:${worker.id}] >>`, "system")
