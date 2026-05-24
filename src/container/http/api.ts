@@ -11,10 +11,11 @@ export default (route: Route) => {
    * [AuthRouteExceptions] array option.
    *
    */
+  // route.("/test", "v1/UserController@index");
 
   route.group({prefix: "/users"}, () => {
-    route.post("/signin", "UserController@signin");
-    route.post("/signup", "UserController@create");
-    route.post("/forget", "UserController@forget").middleware("testmode")
+    route.post("/signin", "v1/UserController@signin");
+    route.post("/signup", "v1/UserController@create");
+    route.post("/forget", "v1/UserController@forget").middleware("testmode")
   })
 };
