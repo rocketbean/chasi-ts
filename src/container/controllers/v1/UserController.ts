@@ -1,4 +1,4 @@
-import Controller from "../../package/statics/Controller.js";
+import Controller from "../../../package/statics/Controller.js";
 
 export default class UserController extends Controller {
   get user() {
