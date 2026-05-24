@@ -210,14 +210,14 @@ export default class Route {
     return ep;
   }
 
-  group(stack: RouteGroupProperty, fn: Function) {
-    let _g = this.stackGroup(stack);
+  group(stack: RouteGroupProperty, fn: () => void): void {
+    const _g = this.stackGroup(stack);
     fn();
     this.removeGroupStack(_g);
   }
 
-  stackGroup(stack) {
-    let stk = new Group(stack, this);
+  stackGroup(stack: RouteGroupProperty): Group {
+    const stk = new Group(stack, this);
     this.groups.push(stk);
     return stk;
   }

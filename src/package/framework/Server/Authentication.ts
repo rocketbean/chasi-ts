@@ -7,15 +7,14 @@ export default class Authentication {
     this.config = config;
   }
 
-  async createDrivers() {
+  async createDrivers(): Promise<void> {
     await Promise.all(
       Object.keys(this.config.drivers).map(async (d: string) => {
         let driverConfig = this.config.drivers[d];
         if (!driverConfig.handler)
           driverConfig.handler = this.config.defaultJWTDriverPAth;
-        Authentication.$drivers[d] = new (await Base._fetchFile(
-          driverConfig.handler,
-        ))(driverConfig);
+        const DriverClass = await Base._fetchFile(driverConfig.handler) as new (config: Iobject) => AuthDriver;
+        Authentication.$drivers[d] = new DriverClass(driverConfig);
       }),
     );
   }

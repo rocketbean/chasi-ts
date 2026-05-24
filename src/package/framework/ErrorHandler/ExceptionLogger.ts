@@ -1,4 +1,4 @@
-import { ExceptionLoggerInterface } from "../Interfaces.js";
+import { ExceptionLoggerInterface, Iobject } from "../Interfaces.js";
 import DatabaseLogger from "./loggers/Database.js";
 import TerminalLogger from "./loggers/Terminal.js";
 import TextfileLogger from "./loggers/Textfile.js";
@@ -12,7 +12,7 @@ export default class ExceptionLogger {
 
   writer: ExceptionLoggerInterface;
 
-  constructor(public config: any) {
+  constructor(public config: Iobject) {
     this.config = config;
     this.writer = new ExceptionLogger.writers[config.LogType.type]();
   }

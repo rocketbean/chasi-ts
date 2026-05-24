@@ -52,6 +52,8 @@ declare global {
    */
   var __basepath: string;
 
+  var __devFilepath: string;
+
   var __testMode: Function;
 
   /**
@@ -107,7 +109,7 @@ export default (async () => {
     "../../"
   );
 
-  global.__filepath = path.join(path.normalize(import.meta.url), "../../");
+  global.__filepath = path.join(path.normalize(fileURLToPath(import.meta.url)), "../../");
 
   global._getMethods = (obj) => {
     return Object.getOwnPropertyNames(obj).filter((item) => item);

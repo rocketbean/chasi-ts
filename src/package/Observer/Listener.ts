@@ -7,7 +7,7 @@ export default class Listener {
     params: {},
   };
 
-  constructor(public ev: string, public callback: Function, opts: object = {}) {
+  constructor(public ev: string, public callback: (...args: unknown[]) => unknown, opts: Record<string, unknown> = {}) {
     this.options = Object.assign(this.options, opts);
   }
 }

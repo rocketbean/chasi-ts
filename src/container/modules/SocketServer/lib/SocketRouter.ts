@@ -147,7 +147,8 @@ export default class SocketRouter extends EventEmitter {
       .on("error", (err) => Logger.log(err));
 
     Base.fetchSync(this.options.container).then((fn) => {
-      this.evContainer = fn.default;
+      const mod = fn as { default: (router: SocketRouter) => void };
+      this.evContainer = mod.default;
       this.evContainer(this);
     });
     NetServer.register(this.path, this);

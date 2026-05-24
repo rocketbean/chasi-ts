@@ -1,4 +1,5 @@
 import DB, { DBProperty, PrismaOptions } from "Chasi/Database";
+import { Writable } from "../../../Logger/types/Writer.js";
 import Driver from "./drivers.js";
 import chalk from "chalk";
 import Base from "../../../Base.js";
@@ -6,8 +7,8 @@ export default class PrismaDriver<U> extends Driver implements DB.DBDriverInterf
   public driverName = <DB.drivers>"prisma";
   public isDefaultDB: boolean = false;
   public protocol: string = "";
-  public driver: any;
-  public logger;
+  public driver: { _runtimeDataModel?: { models: Record<string, unknown> }; [key: string]: unknown } | null = null;
+  public logger: Writable & { subject?: string };
   public models: Record<string, any> = {};
   public connection: { [key: string]: any } = {};
   constructor(public config: DBProperty<"prisma", U>, public name: string) {
@@ -29,7 +30,8 @@ export default class PrismaDriver<U> extends Driver implements DB.DBDriverInterf
     try {
       let globals = this.config.options?.globals || {};
       let _c = await Base._fetchFile(pathstring + "/index.js", false);
-      this.driver = new _c.PrismaClient({ ...globals });
+      const PrismaClient = (_c as Record<string, unknown>).PrismaClient as new (opts?: Record<string, unknown>) => typeof this.driver;
+      this.driver = new PrismaClient({ ...globals });
     } catch (e) {
       Logger.log(pathstring);
       Logger.log(e);
@@ -60,7 +62,7 @@ export default class PrismaDriver<U> extends Driver implements DB.DBDriverInterf
     return stars.join("");
   }
 
-  async connect(stop: Function) {
+  async connect(stop: (msg: string) => void): Promise<typeof this.driver> {
     await this.getDriver(this.config.options["client"]);
     try {
       stop(

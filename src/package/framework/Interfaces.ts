@@ -42,7 +42,7 @@ export interface BootableInterface {
 export interface ModelInterface {}
 
 export interface ExceptionLoggerInterface {
-  write(a?: any, b?: any);
+  write(a?: unknown, b?: unknown): Promise<void> | void;
 }
 
 export type SessionStorageData = {
@@ -59,11 +59,12 @@ export type SessionStorageData = {
 
 export type SessionStorageClusterData = {
   process: number | string;
-  session_id: number | string;
-  threads: any;
-  pids: any;
+  session_id?: number | string;
+  threads: number;
+  pids: string[];
+  ids?: string[];
   scheduling: number;
-  serverData: Iobject;
+  serverData?: Iobject;
 };
 
 export type ExceptionProperty = {

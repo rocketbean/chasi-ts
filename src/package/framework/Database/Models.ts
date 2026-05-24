@@ -1,5 +1,5 @@
 import Base from "../../Base.js";
-import { DatabaseDrivers } from "Chasi/Database";
+import { DatabaseDrivers, DatabaseConfig } from "Chasi/Database";
 import { Iobject } from "../Interfaces.js";
 import mongoose from "mongoose";
 import path from "path";
@@ -8,7 +8,7 @@ export const ModelCollection: Iobject = {};
 export default class Models extends Base {
   static $databases: DatabaseDrivers;
   static collection: Iobject = ModelCollection;
-  static config: any;
+  static config: Iobject;
 
   static async collect() {
     let dirs = Models.config.modelsDir;
@@ -32,7 +32,7 @@ export default class Models extends Base {
     });
   }
 
-  static async init(dbs: DatabaseDrivers, config: any) {
+  static async init(dbs: DatabaseDrivers, config: Iobject) {
     try {
       Models.$databases = dbs;
       Models.config = config;

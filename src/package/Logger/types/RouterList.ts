@@ -32,21 +32,13 @@ export default class RouterList extends Writer implements Writable {
     return fullMessage;
   }
 
-  /***
-   */
-  setTags(tags) {
-    return Object.keys(tags).map((key: string): { [key: string]: any } => {
-      let style;
-      if (typeof tags[key] == "boolean") {
-        if (tags[key]) style = _style.RouterTags(`[${key}]`);
-        else style = _style.bgBrightNegative(`[${key}]`);
-        let _tk = `[${key}] `;
-        return {
-          key: _tk,
-          style,
-          count: _tk.length,
-        };
-      }
+  setTags(tags: Record<string, boolean>): { key: string; style: string; count: number }[] {
+    return Object.keys(tags).map((key: string) => {
+      let style: string;
+      if (tags[key]) style = _style.RouterTags(`[${key}]`);
+      else style = _style.bgBrightNegative(`[${key}]`);
+      const _tk = `[${key}] `;
+      return { key: _tk, style, count: _tk.length };
     });
   }
 
@@ -57,9 +49,9 @@ export default class RouterList extends Writer implements Writable {
       });
     if (router.property?.mount) {
       router.property?.mount.map((_m) => {
-        let _tk = `[${_m.name}:${_m.props.join("|")}]`;
+        const _tk = `[${_m.name}:${(_m.props ?? []).join("|")}]`;
         _tags.push({
-          key: [`${_m.name}`],
+          key: `[${_m.name}]`,
           style: _style.RouterTags(_tk.toUpperCase()),
           count: _tk.length,
         });

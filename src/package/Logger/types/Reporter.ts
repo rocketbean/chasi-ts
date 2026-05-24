@@ -2,8 +2,8 @@ import { Iobject } from "../../framework/Interfaces.js";
 import chalk from "chalk";
 import Writer, { Writable } from "./Writer.js";
 export default class Reporter extends Writer implements Writable {
-  format(message: string) {
-    let width: number = this.cols;
+  format(message: string): string {
+    return message;
   }
 
   customFormat(message: string, obs: any) {

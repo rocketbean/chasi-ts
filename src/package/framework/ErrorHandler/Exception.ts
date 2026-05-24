@@ -3,7 +3,7 @@ import { ExceptionProperty, ExceptionLoggerInterface } from "../Interfaces.js";
 import ExceptionLogger from "./ExceptionLogger.js";
 
 export default class Exception extends Error {
-  public invoker: any;
+  public invoker: string;
 
   public logger: ExceptionLoggerInterface = new ExceptionLogger.writers[
     "terminal"
@@ -46,14 +46,14 @@ export default class Exception extends Error {
    * by examining Error callstack
    * @returns Invoker as ErrorConstructor
    */
-  setInvoker() {
+  setInvoker(): string {
     let stack = this.stack
       .split("\n")
       .filter(
         (line: string) =>
           !this.commonInvoker.find((common) => line.includes(common)),
       )[0];
-    let checkPath = stack.split("/");
+    let checkPath = stack.split(/[/\\]/);
     if (checkPath.length > 0) {
       let path = checkPath[checkPath.length - 1]
         .replace(/\)|\(|.js/g, "")

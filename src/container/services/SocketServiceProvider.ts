@@ -21,14 +21,14 @@ export default class SocketServiceProvider
     return this.netserver;
   }
 
-  async beforeServerBoot($app: any) {
-    SocketServiceProvider.$observer.when("__ready__", async (prop, params) => {
-      let { server } = params;
+  async beforeServerBoot($app: unknown) {
+    SocketServiceProvider.$observer.when("__ready__", async (_prop: unknown, params: unknown) => {
+      const { server } = params as { server: import("http").Server };
       try {
         server.on("upgrade", (request, socket, head) => {
           this.netserver.setConnectionRoute(request, socket, head);
         });
-      } catch (e) {
+      } catch (e: unknown) {
         Logger.log(e);
       }
     });

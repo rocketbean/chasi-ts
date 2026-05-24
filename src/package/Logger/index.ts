@@ -28,7 +28,7 @@ export default class Logger {
     Logger.board = v;
   }
 
-  log(...message: any) {
+  log(...message: unknown[]): void {
     let wr = this.writer("Left");
     message.forEach((msg, ind) => {
       if (typeof msg === "object")
@@ -42,7 +42,7 @@ export default class Logger {
     });
   }
 
-  clusterLogSystem(worker, ...message) {
+  clusterLogSystem(worker: { pid: number; id: number }, ...message: unknown[]): void {
     let wr = this.writer("Left")
     wr.write(`LOG_PID[${worker.pid}:${worker.id}] >>`, "system")
     message.forEach((msg, ind) => {
@@ -57,7 +57,7 @@ export default class Logger {
     });
   }
 
-  clusterLog(worker, ...message) {
+  clusterLog(worker: { pid: number; id: number }, ...message: unknown[]): void {
     let writer = this.writer("LeftFull")
     let wr = this.writer("Left")
     writer.write(`LOG_PID[${worker.pid}:${worker.id}]`, "system")

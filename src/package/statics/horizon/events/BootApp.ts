@@ -2,32 +2,18 @@ import Event from "./../../../Observer/Event.js";
 import RouterModule from "./../../../framework/Router/RouterModule.js";
 
 export default class BootApp extends Event {
-  /**
-   *
-   * @param {params} recieves the Event parameters
-   * declared when the event is emitted
-   * @param {next} [DO NOT FORGET TO CALL]
-   * fired when validated
-   */
-  async validate(params, next) {
-    params.app.state = 4;
-    let routers = <RouterModule>params.app.$modules.RouterModule;
+  async validate(params: Record<string, unknown>, next: () => void): Promise<void> {
+    const app = params.app as Record<string, unknown>;
+    app.state = 4;
+    const routers = (app.$modules as Record<string, unknown>).RouterModule as RouterModule;
     await routers.consume();
     await routers.logRouter();
     next();
   }
 
-  /**
-   * called when the event  is emitted
-   * all through out the Chasi Instance
-   *
-   * @param {params}
-   * contains the property that have
-   * been passed on emit.
-   */
-  async fire(params) {
-    await params.next();
+  async fire(params: Record<string, unknown>): Promise<void> {
+    await (params.next as Function)();
   }
-  async onemit() {}
-  async emitted() {}
+  async onemit(): Promise<void> {}
+  async emitted(): Promise<void> {}
 }

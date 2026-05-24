@@ -32,7 +32,7 @@ export default class RouterModule implements ModuleInterface {
     );
   }
 
-  static async init(routers: Router[], config: any) {
+  static async init(routers: Router[], config: { ControllerDir: string; middlewares: Record<string, string> }) {
     try {
       Logger.writers["Left"].group("RouteRegistry");
       Router.defaultControllerDir = config.ControllerDir;

@@ -1,19 +1,20 @@
 import Base from "../../Base.js";
 import Route from "./Route.js";
+import Group from "./Group.js";
 import Registry from "./Registry.js";
 import * as methods from "./Methods/methods.js";
 import { RouterConfigInterface } from "Chasi/Router";
 
 export default class RouteCollector extends Base {
   protected $endpoints: string[] = [];
-  protected $groups: [];
-  protected namespace: Function;
+  protected $groups: Group[] = [];
+  protected namespace: (route: Route) => void;
   private methods: string[];
   $route: Route;
   $registry: Registry;
 
-  private methodHandler: {} = {
-    apply: (target, thisArg, ArgList: any) => {
+  private methodHandler: { apply: (target: Function, thisArg: unknown, ArgList: unknown[]) => void } = {
+    apply: (target: Function, thisArg: unknown, ArgList: unknown[]) => {
       this.$registry.register(
         target(...(ArgList as [string, string, object?])),
       );
@@ -34,16 +35,12 @@ export default class RouteCollector extends Base {
    * META Program
    * [reflect|proxy]
    */
-  async collectEndpoints() {
-    this.namespace = await this.fetchFile(this.property.namespace);
+  async collectEndpoints(): Promise<void> {
+    this.namespace = await this.fetchFile(this.property.namespace) as (route: Route) => void;
     Reflect.apply(this.namespace, this, [this.$route]);
   }
 
-  /***
-   * META Program
-   * [reflect|proxy]
-   */
-  async collectEndpointFn(fn: any) {
+  async collectEndpointFn(fn: (route: Route) => void): Promise<void> {
     Reflect.apply(fn, this, [this.$route]);
   }
 

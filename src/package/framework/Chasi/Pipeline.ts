@@ -1,26 +1,26 @@
 import { Duplex } from "stream";
 import cluster from "cluster";
+
 export default class PipeLine extends Duplex {
-  dockType: "main" | "worker"
+  dockType: "main" | "worker";
+
   constructor() {
-    super()
-    this.dockType = cluster.isPrimary ? "main" : "worker"
+    super();
+    this.dockType = cluster.isPrimary ? "main" : "worker";
   }
 
-  _read(chunk): void {
+  _read(_size: number): void {}
 
-  }
-
-  _write(chunk, encoding, callback) {
-    let r = this.push(chunk)
-    if (!r) {
-      console.log("full")
+  _write(chunk: unknown, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    const canContinue = this.push(chunk);
+    if (!canContinue) {
+      this.once("drain", callback);
+    } else {
+      callback();
     }
-    callback()
   }
 
   _final(callback: (error?: Error) => void): void {
-    callback()
+    callback();
   }
-
 }

@@ -1,3 +1,5 @@
+import { Worker as ClusterWorker } from "cluster";
+
 export type task = {
   id: string,
   value: string,
@@ -31,8 +33,7 @@ export default class StreamBucket {
   })
 
   public stack: task[] = []
-  public data;
-
+  public data: unknown;
 
   public prop = {
     delim: {
@@ -40,12 +41,15 @@ export default class StreamBucket {
       end: "|=====>"
     }
   }
-  constructor(private worker, private cb: Function) { }
+  constructor(
+    private worker: ClusterWorker,
+    private cb: (worker: ClusterWorker, chunk: string) => Promise<unknown>
+  ) { }
 
-  get bucket() { return this.bucketProxy }
-  set bucket(v) { this.bucketProxy = v }
-  get readystate() { return this._readystate }
-  async mapBucketString(str) {
+  get bucket(): typeof this.bucketProxy { return this.bucketProxy; }
+  set bucket(v: typeof this.bucketProxy) { this.bucketProxy = v; }
+  get readystate(): boolean { return this._readystate; }
+  async mapBucketString(str: string): Promise<void> {
     this._readystate = false;
     this.splitWithIndex(str).map(res => {
       let nstr = str.slice(res.startIndex, res.endIndex)
@@ -98,7 +102,7 @@ export default class StreamBucket {
     this.bucket.value += streamdata;
   }
 
-  splitWithIndex(str) {
+  splitWithIndex(str: string): { startIndex: number; endIndex: number; raw: string; value: string }[] {
     let regx = /\<=====\|([^)]+?)\|=====\>/gm;
     let res = [...str.matchAll(regx)];
     return res.map(r => {

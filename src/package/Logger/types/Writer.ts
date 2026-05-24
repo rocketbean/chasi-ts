@@ -40,31 +40,30 @@ export default abstract class Writer {
    * command line loading
    *
    */
-  loading(message: string = "", finalMessage = "") {
+  loading(message: string = "", finalMessage: string = ""): { start: () => void; stop: (m?: string, subj?: string) => void } {
     this.spacer = " ";
-    let timer;
-    let _wr = process.stdout;
-    let start = () => {
-      var P = ["\\", "|", "/", "-", "*"];
-      var x = 0;
+    let timer: NodeJS.Timeout;
+    const _wr = process.stdout;
+    const start = (): void => {
+      const P = ["\\", "|", "/", "-", "*"];
+      let x = 0;
       timer = setInterval(() => {
         x++;
         trs(chalk.bold.yellow(message + " ") + chalk.bold.yellow(P[x]));
         x %= P.length - 1;
       }, 50);
     };
-    let stop = ((_m?: "", _subj?: "") => {
+    const stop = ((m?: string, subj?: string): void => {
       readline.cursorTo(_wr, 0);
       readline.clearLine(_wr, 0);
       if (finalMessage.length > 0) {
-        let _s = _subj !== "" ? _subj : this.subject;
-        this.write("\r" + chalk.bold.yellow(_m), "clear", "database");
+        this.write("\r" + chalk.bold.yellow(m), "clear", "database");
       }
       clearInterval(timer);
     }).bind(this);
 
-    let trs = ((m: string) => {
-      let indention = this.fill(process.stdout.columns - this.cols);
+    const trs = ((m: string): void => {
+      const indention = this.fill(process.stdout.columns - this.cols);
       _wr.write(`\r ${indention} ${m}`);
     }).bind(this);
     return { start, stop };
@@ -119,10 +118,10 @@ export default abstract class Writer {
 
 export interface Writable {
   write(a?: string | object, b?: string, c?: string): void;
-  format(a?: string, b?: string): void;
+  format(a?: string, b?: string): string | void;
   group(a: string): void;
   endGroup(a: string): void;
   endGroups(): void;
   style(a: string): Writable;
-  loading(a: string, b?: any): any;
+  loading(a: string, b?: string): { start: () => void; stop: (m?: string, subj?: string) => void };
 }

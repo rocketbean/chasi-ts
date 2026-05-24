@@ -50,22 +50,14 @@ export default class Observer extends Base {
       Object.keys(this.config.events).map(async (ev) => {
         await this.register(
           ev,
-          new (await this.fetchFile(this.config.events[ev]))(),
+          new (await this.fetchFile(this.config.events[ev]) as new () => EventInterface)(),
         );
       }),
     );
   }
 
-  /**
-   * validating before and after
-   * emit handlers from the instance
-   * adding the default.
-   * @param key {string} instance key
-   * @param instance {EventInterface} Event instance
-   * @returns Observer.watch
-   */
   async register(key: string, instance: EventInterface): Promise<events> {
-    let onEmit: { [key: string]: any } = {};
+    const onEmit: { beforeEmit?: Function; afterEmit?: Function } = {};
     if (typeof instance["beforeEmit"] !== "function")
       onEmit["beforeEmit"] = this.config.beforeEmit;
     if (typeof instance["afterEmit"] !== "function")
@@ -79,16 +71,9 @@ export default class Observer extends Base {
     return await this.watch(key, instance);
   }
 
-  /**
-   * Initial registration to EventEmitter/Listener
-   * <emitter>
-   * @param key {string} instance key
-   * @param instance {EventInterface} Event instance
-   * @returns Observer.$events
-   */
   async watch(key: string, instance: EventInterface): Promise<events> {
     this.$events[key] = instance;
-    this.emitter.on(key, async (property: any = {}) => {
+    this.emitter.on(key, async (property: Record<string, unknown> = {}) => {
       Reflect.set(instance, "options", property);
       try {
         await instance.validate(property, async (): Promise<void> => {
@@ -97,18 +82,18 @@ export default class Observer extends Base {
           await instance.fireListeners();
           await instance.emitted();
         });
-      } catch (e) { }
+      } catch (e: unknown) { /* event errors are surfaced via exception system */ }
     });
     return this.$events;
   }
 
-  when(key: string, fn: Function, opts: object = {}): void {
-    let ev = this.$events[key];
-    let lis = new Listener(key, fn, opts);
+  when(key: string, fn: (...args: unknown[]) => unknown, opts: Record<string, unknown> = {}): void {
+    const ev = this.$events[key];
+    const lis = new Listener(key, fn, opts);
     ev.listeners.push(lis);
   }
 
-  async emit(event: string, params?: any): Promise<void> {
+  async emit(event: string, params?: Record<string, unknown>): Promise<void> {
     await this.emitter.emit(event, params);
   }
 }
