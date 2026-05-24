@@ -116,8 +116,9 @@ export const useControlStore = defineStore( "ControlStore", {
     activate(id) {
       let ctx = Object.values(this._data.collection).find(cont => cont.id === id) ||
         Object.values(this._data.collection).find(cont => cont.id === this._data.default)
-      if(ctx?.controls?.header) this.setHeaderControls(ctx.controls.header)
-      if(ctx?.controls?.right) this.setRightControls(ctx.controls.right)
+      if (!ctx) return
+      if(ctx.controls?.header) this.setHeaderControls(ctx.controls.header)
+      if(ctx.controls?.right) this.setRightControls(ctx.controls.right)
       this.active.context = this.mapSubCatGroup(ctx)
     },
     mapSubCatGroup (ctx) {
