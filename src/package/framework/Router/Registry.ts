@@ -37,7 +37,7 @@ export default class Registry extends Base {
     let controllers = await this.NamespacedfetchFilesFromDir(dir);
     await Promise.all(
       Object.keys(controllers).map(async (key) => {
-        let controller = new controllers[key]();
+        let controller = new (controllers[key] as new () => Controller)();
         if (controller instanceof Controller) {
           await Router.registerController(key, controller);
         }
@@ -132,7 +132,7 @@ export default class Registry extends Base {
    * Bind Middlewares from
    * Route Container layer
    */
-  async bindMiddlewares(ep) {
+  async bindMiddlewares(ep: Endpoint): Promise<void> {
     if ("middleware" in this.property) {
       if (typeof this.property.middleware === "string") {
         this.property.middleware = [this.property.middleware];

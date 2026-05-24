@@ -90,7 +90,7 @@ export default class Database implements ModuleInterface {
     );
   }
 
-  static async init(config) {
+  static async init(config: DatabaseConfig) {
     let db = new Database(config);
     await db.collect(<{ [key: string]: any }>db.config.connections);
     await db.connectDbs();

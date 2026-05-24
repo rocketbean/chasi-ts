@@ -15,7 +15,7 @@ export interface EventInterface {
 export default class Event {
   public props: { [key: string]: any } = {};
   logger: Writer = Logger.writer("StartTrace");
-  public options: any;
+  public options: Record<string, unknown>;
   public listeners: Listener[] = [];
 
   async emitted(): Promise<void> {

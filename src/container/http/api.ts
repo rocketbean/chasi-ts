@@ -12,6 +12,9 @@ export default (route: Route) => {
    *
    */
 
+  route.get("/test", (request: Request, response: Response) => {
+    return "Test";
+  });
   route.group({prefix: "/users"}, () => {
     route.post("/signin", "UserController@signin");
     route.post("/signup", "UserController@create");

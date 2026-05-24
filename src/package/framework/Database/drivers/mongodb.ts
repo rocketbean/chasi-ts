@@ -1,4 +1,5 @@
 import DB, { DBProperty, DBDriverInterface } from "Chasi/Database";
+import { Writable } from "../../../Logger/types/Writer.js";
 import Driver from "./drivers.js";
 import { Iobject } from "../../Interfaces.js";
 import mongoose from "mongoose";
@@ -7,10 +8,10 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
   public driverName = <DB.drivers>"mongodb";
   public $property: Iobject = {};
   public protocol = "mongodb://";
-  public connection: any;
+  public connection: mongoose.Connection | null = null;
   public hasOptions = false;
   public isDefaultDB = false;
-  public logger;
+  public logger: Writable & { subject?: string };
 
   public states: any[] = [
     chalk.redBright,
@@ -52,7 +53,7 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
     return stars.join("");
   }
 
-  async connect(stop: Function) {
+  async connect(stop: (msg: string) => void): Promise<mongoose.Connection> {
     let params: [string, object?] = [this.$property.url];
     if (this.hasOptions) params.push(this.$property.options);
     return await mongoose

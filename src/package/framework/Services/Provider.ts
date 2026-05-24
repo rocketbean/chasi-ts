@@ -1,9 +1,12 @@
 import { Handler } from "../../Handler.js";
 import { ModelCollection } from "../Database/Models.js";
+import Observer from "../../Observer/index.js";
+import PipeHandler from "../Chasi/PipeHandler.js";
+import { Iobject } from "../Interfaces.js";
 export default class Provider {
-  protected static $observer;
-  protected static $pipe = null;
-  protected static config;
+  protected static $observer: Observer;
+  protected static $pipe: PipeHandler | null = null;
+  protected static config: Iobject;
   protected static models = ModelCollection;
   static init() {
     let { $observer, _config } = Handler.Instance;

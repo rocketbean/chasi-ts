@@ -15,3 +15,5 @@ dist/*
 .gitmodules
 rest.http
 notes
+CLAUDE.md
+./claude

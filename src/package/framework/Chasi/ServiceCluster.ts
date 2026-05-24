@@ -1,13 +1,13 @@
 import { Iobject, serviceClusterConfig } from "../Interfaces.js";
 import Session from "./Session.js";
-import cluster from "cluster";
+import cluster, { Worker as ClusterWorker } from "cluster";
 import Storage from "./Storage.js";
 import Pipeline from "./Pipeline.js"
 import StreamBucket from "./StreamBucket.js";
 export type ServicePipeProp = {
-  service: string
-  action: string
-  transmit: any
+  service: string;
+  action: string;
+  transmit: unknown;
 }
 
 export default class ServiceCluster {
@@ -15,10 +15,10 @@ export default class ServiceCluster {
 
   public config: serviceClusterConfig;
   public storage: Storage;
-  public pids: any[] = [];
-  public ids: any[] = [];
-  public workers: any[] = [];
-  private forkOpts: Iobject = {
+  public pids: string[] = [];
+  public ids: string[] = [];
+  public workers: ClusterWorker[] = [];
+  private forkOpts: { env: NodeJS.ProcessEnv; FORCE_COLOR: number } = {
     env: { ...process.env },
     FORCE_COLOR: 3,
   };
@@ -42,8 +42,8 @@ export default class ServiceCluster {
     };
   }
 
-  getMethods = (obj) =>
-    Object.getOwnPropertyNames(obj).filter((item) => typeof obj[item]);
+  getMethods = (obj: object): string[] =>
+    Object.getOwnPropertyNames(obj).filter((item) => typeof (obj as Record<string, unknown>)[item] === "function");
 
   /**
    * returns process
@@ -74,8 +74,8 @@ export default class ServiceCluster {
    * after specifying the lead
    * thread.
    */
-  setPrimeSession(process: string | number, pids?: string[]) {
-    let threads = Object.keys(cluster.workers).length;
+  setPrimeSession(process: string | number, pids?: string[]): void {
+    const threads = Object.keys(cluster.workers ?? {}).length;
   }
 
   /**
@@ -102,74 +102,63 @@ export default class ServiceCluster {
     }
   }
 
-  async broadcast(message) {
-    await Promise.all(this.workers.map(async (worker) => {
-      await worker.process.stdio[4].write(message);
+  async broadcast(message: string): Promise<void> {
+    await Promise.all(this.workers.map(async (worker: ClusterWorker) => {
+      await (worker.process.stdio[4] as NodeJS.WritableStream).write(message);
     }));
   }
 
-  async setMessagingProto(worker) {
-    let pl = new Pipeline()
-    let data = ""
-    let streamBucket: StreamBucket = new StreamBucket(worker, this.consumeStream.bind(this))
-    pl.on("data", (chunk) => {
-      streamBucket.appendStreamData(chunk.toString())
-    })
-
-    worker.process.stdio[3].pipe(pl)
+  async setMessagingProto(worker: ClusterWorker): Promise<void> {
+    const pl = new Pipeline();
+    const streamBucket: StreamBucket = new StreamBucket(worker, this.consumeStream.bind(this));
+    pl.on("data", (chunk: Buffer) => {
+      streamBucket.appendStreamData(chunk.toString());
+    });
+    (worker.process.stdio[3] as NodeJS.ReadableStream).pipe(pl);
   }
 
-  async consumeStream(worker, chunk: string) {
+  async consumeStream(worker: ClusterWorker, chunk: string): Promise<string | void> {
     try {
-      let _prop = JSON.parse(chunk);
-      if (_prop.action.includes("getTty")) {
-        let { columns, rows } = process.stdout;
-        worker.process.stdio[4].write(
-          JSON.stringify({
-            action: _prop.action,
-            transmit: { columns, rows },
-          }),
+      const _prop: Record<string, unknown> = JSON.parse(chunk);
+      const action = _prop.action as string;
+
+      if (action.includes("getTty")) {
+        const { columns, rows } = process.stdout;
+        (worker.process.stdio[4] as NodeJS.WritableStream).write(
+          JSON.stringify({ action, transmit: { columns, rows } }),
         );
       }
 
       if (cluster.isPrimary) {
-        if (_prop.action.includes("getClusterData")) {
-          this.storage.setClusterData(this.ClusterData)
+        if (action.includes("getClusterData")) {
+          this.storage.setClusterData(this.ClusterData);
         }
-
-        if (_prop.action.includes("logData")) {
-          Logger.clusterLog(_prop.worker, _prop.transmit.message);
+        if (action.includes("logData")) {
+          const transmit = _prop.transmit as Record<string, unknown>;
+          Logger.clusterLog(_prop.worker as { pid: number; id: number }, transmit.message);
         }
-
-        if (_prop.action.includes("server::ready")) {
-          Logger.clusterLogSystem(_prop.worker, `[Server {${_prop.worker.pid}} onReady state]`);
+        if (action.includes("server::ready")) {
+          Logger.clusterLogSystem(_prop.worker as { pid: number; id: number }, `[Server {${(_prop.worker as Record<string, unknown>).pid}} onReady state]`);
         }
       }
 
-      if (_prop.action.includes("service:")) {
-        await this.handleServiceActions(worker, _prop);
+      if (action.includes("service:")) {
+        await this.handleServiceActions(worker, _prop as unknown as ServicePipeProp);
       }
-
-      if (_prop.action.includes("websock")) {
+      if (action.includes("websock")) {
         await this.handleSocketActions(worker, _prop);
       }
-
-      if (_prop.action.includes("clearAll")) {
+      if (action.includes("clearAll")) {
         console.clear();
       }
 
       return chunk;
-    } catch (e) {
-      Logger.log("SERVCLUSTERR::", e)
+    } catch (e: unknown) {
+      Logger.log("SERVCLUSTERR::", e);
     }
   }
 
-  /**
-   * 
-   * @param worker Worker
-   * @param _prop any
-   */
-  async handleServiceActions(worker: Worker, _prop: ServicePipeProp) {
+  async handleServiceActions(worker: ClusterWorker, _prop: ServicePipeProp): Promise<void> {
     setTimeout(async () => {
       await this.broadcast(
         JSON.stringify({
@@ -178,25 +167,15 @@ export default class ServiceCluster {
           transmit: _prop,
         }),
       );
-    }, 20)
-
+    }, 20);
   }
 
-  async handleSocketActions(worker, _prop) {
-    if (_prop.action.includes("event")) {
-      await this.broadcast(
-        JSON.stringify({
-          action: "socket:fire",
-          transmit: _prop,
-        }),
-      );
+  async handleSocketActions(worker: ClusterWorker, _prop: Record<string, unknown>): Promise<void> {
+    const action = _prop.action as string;
+    if (action.includes("event")) {
+      await this.broadcast(JSON.stringify({ action: "socket:fire", transmit: _prop }));
     } else {
-      await this.broadcast(
-        JSON.stringify({
-          action: _prop.action,
-          transmit: _prop,
-        }),
-      );
+      await this.broadcast(JSON.stringify({ action, transmit: _prop }));
     }
   }
 
@@ -205,36 +184,33 @@ export default class ServiceCluster {
    * invokes after configuring
    * cluster settings
    */
-  async createCluster() {
-    return new Promise((res, rej): void => {
+  async createCluster(): Promise<number> {
+    return new Promise<number>((res, rej) => {
       try {
         this.setupPrimaryThread();
-        for (let worker = 0; worker < this.config.workers; worker++) {
+        for (let i = 0; i < this.config.workers; i++) {
           process.env["lead"] = "0";
-          if (worker === 0) process.env["lead"] = "1";
-          let w = cluster.fork(this.forkOpts);
+          if (i === 0) process.env["lead"] = "1";
+          cluster.fork(this.forkOpts);
         }
 
-        cluster.on("fork", (worker: Iobject) => {
-          worker.process.stderr.pipe(process.stderr);
+        cluster.on("fork", (worker: ClusterWorker) => {
+          (worker.process.stderr as NodeJS.ReadableStream).pipe(process.stderr);
           this.setMessagingProto(worker);
           this.workers.push(worker);
           this.pids.push(`${worker.process.pid}`);
           this.ids.push(`${worker.id}`);
         });
-        cluster.on("exit", (worker, code, sig) => {
+        cluster.on("exit", () => {
           cluster.fork(this.forkOpts);
         });
-
-        cluster.on("message", (worker, m) => {
-          // Logger.log("message from worker", m)
-        });
+        cluster.on("message", (_worker: ClusterWorker, _m: unknown) => {});
         res(1);
-      } catch (e) {
-        console.log(e)
-        process.exit(1)
+      } catch (e: unknown) {
+        console.log(e);
+        rej(e);
+        process.exit(1);
       }
-
     });
   }
 }

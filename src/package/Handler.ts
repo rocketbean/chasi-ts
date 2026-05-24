@@ -1,5 +1,5 @@
 import App from "./framework/Server/App.js";
-import Obsesrver from "./Observer/index.js";
+import Observer from "./Observer/index.js";
 import horizon from "./statics/horizon/config.js";
 import Service from "./framework/Services/Service.js";
 import Controller from "./framework/Router/Controller.js";
@@ -28,7 +28,7 @@ export class Handler extends Base {
    * [MetaProperty]
    * Proxy of instance
    */
-  $proxy = new Proxy(this, ProxyHandler);
+  $proxy = new Proxy(this, ProxyHandler as unknown as ProxyHandler<Handler>);
 
   /**
    * Chasi generates a unique
@@ -55,7 +55,7 @@ export class Handler extends Base {
   /* * *
    * [$observer] EventHandler
    */
-  $observer: Obsesrver;
+  $observer: Observer;
 
   /* * *
    * [$modules]
@@ -77,7 +77,7 @@ export class Handler extends Base {
    * [3] after initialization
    * [4] Handler on readystate
    */
-  private _state: 0;
+  private _state: number = 0;
 
   $services: { [key: string]: Service };
   private LockedServices: string[] = ["routers"];
@@ -157,7 +157,7 @@ export class Handler extends Base {
         next: this.$proxy.initialize,
         app: this.$proxy,
       });
-    } catch (e) {
+    } catch (e: unknown) {
       console.log(e);
     }
   }
@@ -175,7 +175,9 @@ export class Handler extends Base {
         next: this.$proxy.after,
         app: this.$proxy,
       });
-    } catch (e) {}
+    } catch (e: unknown) {
+      Logger.log(e);
+    }
   }
 
   /* * * *
@@ -185,8 +187,8 @@ export class Handler extends Base {
    * ♦ setup services
    */
   protected async after(): Promise<void> {
-    let services = {};
-    Object.keys(this.$services).filter((service: string) => {
+    const services: Record<string, Service> = {};
+    Object.keys(this.$services).forEach((service: string) => {
       if (!this.LockedServices.includes(service)) {
         services[service] = this.$services[service];
       }
@@ -207,7 +209,7 @@ export class Handler extends Base {
     this.loggers.system.group("BOOT");
     await this.$app.bootup();
     await this.$observer.emit("__ready__", {
-      server: this.$app.$server,
+      server: this.$app.$httpServer,
     });
     if (this.pipe && cluster.isWorker) {
       this.pipe.write({
@@ -246,17 +248,17 @@ export class Handler extends Base {
     this.setLoggers();
     this.$app = new App(this.config.server, this.loggers);
     Consumer._defaultResponses = this.config.exceptions.responses;
-    this.$observer = new Obsesrver(this.config.observer);
+    this.$observer = new Observer(this.config.observer);
   }
   logthis(message: string, type: string = "system") {
     this.loggers[type].write(message.toUpperCase());
   }
 
-  async close() {
+  async close(): Promise<boolean | void> {
     try {
-      this.$app.server.close();
+      this.$app.$httpServer.close();
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       Logger.log(e);
     }
   }

@@ -9,8 +9,8 @@ var writeFile = async (_p) => {
   });
 };
 
-export default async (path) => {
-  let _p = _path.join(___location + path);
+export default async (path: string): Promise<void> => {
+  let _p = _path.join(___location, path);
   fs.access(_p, constants.R_OK, async (err) => {
     if (err) {
       if (err.errno == -4058) await writeFile(_p);

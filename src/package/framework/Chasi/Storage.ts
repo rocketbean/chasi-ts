@@ -23,7 +23,7 @@ export default class SessionStorage {
 
   public strData: string = "";
   public clusterData: Iobject = {};
-  public enabled;
+  public enabled: boolean;
   public pipe: PipeHandler;
   public ReportLog: any = Logger.writers["Reporter"];
 
@@ -36,14 +36,14 @@ export default class SessionStorage {
     }
   }
 
-  async setPipe(pipe) {
+  async setPipe(pipe: PipeHandler): Promise<void> {
     this.pipe = pipe;
     if (cluster.isWorker) {
       await this.pipe.write({ action: "getClusterData" });
     }
   }
 
-  setClusterData(d) {
+  setClusterData(d: SessionStorageClusterData): void {
     if (cluster.isPrimary) {
       this.clusterData = d;
       this.appendClusterData();
@@ -75,8 +75,8 @@ export default class SessionStorage {
     };
   }
 
-  getWorkerData() {
-    return
+  getWorkerData(): void {
+    return;
   }
 
   appendClusterData() {

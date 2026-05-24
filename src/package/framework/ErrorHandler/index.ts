@@ -2,7 +2,7 @@ import Base from "../../Base.js";
 import chalk from "chalk";
 import Exception from "./Exception.js";
 import APIException from "./exceptions/APIException.js";
-import ChasiException from "./exceptions/APIException.js";
+import ChasiException from "./exceptions/ChasiException.js";
 import ExceptionLogger from "./ExceptionLogger.js";
 import Observer from "../../Observer/index.js";
 import { genericImport, ExceptionProperty, Iobject } from "../Interfaces.js";
@@ -50,22 +50,11 @@ export default class ErrorHandler extends Base {
     );
   }
 
-  /**
-   * adding events that will
-   * fire when Exception
-   * occured
-   */
-  fireOnCommit($ev: any) {
+  fireOnCommit($ev: Exception): void {
     ErrorHandler.errors.push($ev);
   }
 
-  /**
-   * collecting exceptions from Registry
-   * and fetching [Exception]class files
-   * for registration at
-   * ErrorHandler[exceptions]
-   */
-  async registerExceptions() {
+  async registerExceptions(): Promise<void> {
     await Promise.all(
       Object.keys(this.config.registry).map(async (key: string) => {
         ErrorHandler.exceptions[key] = await this.fetchFile(
@@ -75,13 +64,8 @@ export default class ErrorHandler extends Base {
     );
   }
 
-  /**
-   * setting default app
-   * behavior on handling
-   * errors
-   */
-  static async handleProcessError() {
-    process.on("exit", (code) => {
+  static async handleProcessError(): Promise<void> {
+    process.on("exit", (code: number) => {
       console.error(
         chalk.yellow(
           `\n----♦ process exited with code [${code}], waiting for re establishing instance`,
@@ -89,28 +73,23 @@ export default class ErrorHandler extends Base {
       );
     });
 
-    process.on("uncaughtException", function (err, origin) {
+    process.on("uncaughtException", (err: Error) => {
       console.error(err);
     });
 
-    process.on("unhandledRejection", function (reason, promise) {
+    process.on("unhandledRejection", (reason: unknown) => {
       console.error(reason);
     });
   }
 
-  /**
-   * initializes the ErrorHandler class
-   * @param config Objects from config/exceptions file
-   * @param $app Proxy handler
-   */
-  async init(config: Iobject, $app: Handler) {
+  async init(config: Iobject, $app: Handler): Promise<void> {
     this.config = config;
     this.$app = $app;
     await this.registerExceptions();
     this.logger = new ExceptionLogger(config);
     this.$observer = $app.$observer;
     Exception.init(this.$observer);
-    this.config.events.forEach((ev) => {
+    this.config.events.forEach((ev: string) => {
       this.$observer.emitter.on(ev, this.fireOnCommit.bind(this));
     });
   }

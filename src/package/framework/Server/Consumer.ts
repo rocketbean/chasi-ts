@@ -8,13 +8,14 @@ import {
 } from "../Interfaces.js";
 import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
-import Express, { response } from "express";
+import Endpoint from "../Router/Endpoint.js";
+import Express, { Application, Request, Response, NextFunction } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
 import process from "process";
 export default class Consumer {
-  $server: any = Express();
+  $server: Application = Express();
   public static servelog: string[] = [];
   /* * * *
    * Router Consumer
@@ -36,14 +37,14 @@ export default class Consumer {
    */
   async consume(router: Router): Promise<void> {
     for (let r in router.$registry.routes) {
-      let ep = router.$registry.routes[r];
+      const ep = router.$registry.routes[r];
       this.$server[ep.property.method](
         ep.path,
         ep.useAuth,
         ...ep.$middlewares,
-        async (request, response) => {
+        async (request: Request, response: Response) => {
           try {
-            let data: Function = () => {};
+            let data: () => Iobject = () => ({});
             if (ep.isDynamic) await this.bindModel(request.params);
             if (router.property?.data) {
               if (ep?.$controller) ep.$controller.$data = router.property.data;
@@ -54,12 +55,12 @@ export default class Consumer {
                 await fn(request, response, data);
               })
             );
-            let res = await ep.$method(request, response, data);
-            ep.afterFns.map(async (fn: Function) => {
+            const res: unknown = await ep.$method(request, response, data);
+            await Promise.all(ep.afterFns.map(async (fn: Function) => {
               await fn(request, response, res, data);
-            });
+            }));
             response.send(res);
-          } catch (e: any) {
+          } catch (e: unknown) {
             return await this.handleError(e, ep, response);
           }
         }
@@ -82,25 +83,28 @@ export default class Consumer {
    * and executes a log, before sending
    * a client response.
    */
-  async handleError(e, ep, response): Promise<void> {
-    let status = e.status ? e.status : 500;
-    let autoMs = Consumer._defaultResponses[status]
+  async handleError(e: unknown, ep: Iobject, response: Response): Promise<void> {
+    const errObj = e as Iobject;
+    const status: number = errObj?.status ?? 500;
+    const autoMs: string = Consumer._defaultResponses[status]
       ? Consumer._defaultResponses[status]
       : Consumer._defaultResponses["message"];
-    e["message"] = e?.message ? e.message : autoMs;
+    errObj["message"] = errObj?.message ? errObj.message : autoMs;
+    let finalErr: exception | Iobject = errObj;
     if (!(e instanceof exception)) {
-      e = new APIException(e, status, ep);
+      finalErr = new APIException(errObj, status, ep as unknown as Endpoint);
     }
-    let contentType = response.getHeaders()["content-type"];
+    const contentType = response.getHeaders()["content-type"];
     if (
-      contentType?.includes("application/json") &&
-      typeof e.message !== "object"
+      typeof contentType === "string" &&
+      contentType.includes("application/json") &&
+      typeof (finalErr as Iobject).message !== "object"
     ) {
-      e.message = { message: e.message };
+      (finalErr as Iobject).message = { message: (finalErr as Iobject).message };
     }
-    ep.addExceptions(e);
+    ep.addExceptions(finalErr as exception);
     response.statusCode = status;
-    response.send(e.message);
+    response.send((finalErr as Iobject).message);
   }
 
   /** * [bindModel()]
@@ -108,20 +112,20 @@ export default class Consumer {
    * it attaches the model[collection] to the
    * request via (findById)
    */
-  async bindModel(params: Iobject): Promise<void> {
+  async bindModel(params: Record<string, string>): Promise<void> {
     try {
       await Promise.all(
         Object.keys(params).map(async (mod) => {
           if (mod.toLowerCase() in Models.collection) {
-            params[`__${mod.toLowerCase()}`] = await Models.collection[
+            (params as Record<string, unknown>)[`__${mod.toLowerCase()}`] = await Models.collection[
               mod.toLowerCase()
             ].findById(params[mod]);
           } else {
-            params[`__${mod.toLowerCase()}`] = null;
+            (params as Record<string, unknown>)[`__${mod.toLowerCase()}`] = null;
           }
         })
       );
-    } catch (e) {}
+    } catch (e: unknown) { /* model not found — leave param unbound */ }
   }
 
   /** *
@@ -190,7 +194,7 @@ export default class Consumer {
       if (router.property?.mount) await this.mounts(router);
     }
 
-    this.$server.use((req, res, next) => {
+    this.$server.use((req: Request, res: Response, next: NextFunction) => {
       res.status(404).send(Consumer._defaultResponses["404"]);
     });
   }

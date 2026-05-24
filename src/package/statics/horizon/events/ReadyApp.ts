@@ -1,25 +1,12 @@
 import { appendFile } from "fs";
 import Event from "./../../../Observer/Event.js";
 
-export default class Exception extends Event {
-  /**
-   * @param {params} recieves the Event parameters
-   *  declared when the event is emitted
-   * @param {next} [DO NOT FORGET TO CALL]
-   *  - fired when validated
-   */
-  async validate(params: any, next: Function) {
+export default class ReadyApp extends Event {
+  async validate(params: Record<string, unknown>, next: () => void): Promise<void> {
     next();
   }
 
-  /**
-   * called when the event  is emitted
-   * all through out the Chasi Instance
-   * @param {params}
-   * contains the property that have
-   * been passed on emit.
-   */
-  async fire(params: any) {}
-  async onemit() {}
-  async emitted() {}
+  async fire(params: Record<string, unknown>): Promise<void> {}
+  async onemit(): Promise<void> {}
+  async emitted(): Promise<void> {}
 }

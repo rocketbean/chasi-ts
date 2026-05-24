@@ -9,10 +9,10 @@ import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
 
 export default class App extends Consumer {
-  server: any;
+  $httpServer: http.Server | https.Server;
   env: string;
-  mode: { [key: string]: any };
-  protocol: any;
+  mode: { protocol: "http" | "https"; key?: string; cert?: string };
+  protocol: typeof http | typeof https;
   private auth: Authentication;
   private _basepath: string;
   constructor(
@@ -44,33 +44,31 @@ export default class App extends Consumer {
    * actual booting of Http/Https Server
    * fetching certificate and key file
    */
-  async install() {
-    let serverConfig: { cert?: any; key?: any } = {};
+  async install(): Promise<void> {
+    const serverConfig: { cert?: Buffer | string; key?: Buffer | string } = {};
     if (this.mode.key != null && this.mode.cert != null) {
-      serverConfig = {
-        key: Base._fsFetchFile(this.mode.key),
-        cert: Base._fsFetchFile(this.mode.cert),
-      };
+      serverConfig.key = Base._fsFetchFile(this.mode.key);
+      serverConfig.cert = Base._fsFetchFile(this.mode.cert);
     }
     this.$server.use(cors(this.config.cors));
-    this.$server = this.protocol.createServer(serverConfig, this.$server);
+    this.$httpServer = (this.protocol as typeof http).createServer(serverConfig as http.ServerOptions, this.$server as unknown as http.RequestListener);
     return;
   }
 
   /**
    * Initializes the Authentication layer
    */
-  async setAuthLayer(authConfig: Iobject) {
+  async setAuthLayer(authConfig: Iobject): Promise<void> {
     this.auth = new Authentication(authConfig);
     await this.auth.init();
   }
 
   async bootup(): Promise<void> {
-    global.__basepath = `${this.mode.protocol}://localhost:${this.config.port}`
-    return await new Promise(async (res, rej) => {
-      await this.install();
-      this.$server.on("error", (err) => rej(err));
-      this.$server.listen(this.config.port, async () => {
+    global.__basepath = `${this.mode.protocol}://localhost:${this.config.port}`;
+    await this.install();
+    return new Promise<void>((res, rej) => {
+      this.$httpServer.on("error", (err: Error) => rej(err));
+      this.$httpServer.listen(this.config.port, async () => {
         this.loggers.full.write("SERVING IN: ", "cool", "boot");
         App.servelog.forEach((str) => {
           let protocol = this.mode.protocol;
