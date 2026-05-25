@@ -80,17 +80,73 @@ export default <DatabaseConfig>{
      * Local development database (no auth, generous timeouts).
      * Default connection when `process.env.database` is not set.
      */
-    local: {
-      driver: "mongodb",
-      url: process.env.dbConStringLocal,
-      db: process.env.databaseName,
-      options: {
-        /** Longer timeouts for local Docker/VM setups that may be slow to start. */
-        connectTimeoutMS: 4000,
-        socketTimeoutMS: 4000,
-        serverSelectionTimeoutMS: 5000,
-      },
-    },
+    // local: {
+    //   driver: "mongodb",
+    //   url: process.env.dbConStringLocal,
+    //   db: process.env.databaseName,
+    //   options: {
+    //     /** Longer timeouts for local Docker/VM setups that may be slow to start. */
+    //     connectTimeoutMS: 4000,
+    //     socketTimeoutMS: 4000,
+    //     serverSelectionTimeoutMS: 5000,
+    //   },
+    // },
+
+    // ─── Drizzle ORM connections ──────────────────────────────────────────────
+    //
+    // Install the underlying client package for your target database, then
+    // uncomment and fill in the connection below.
+    //
+    // Supported adapters and their peer packages:
+    //   "node-postgres"   → npm i pg @types/pg
+    //   "postgres-js"     → npm i postgres
+    //   "mysql2"          → npm i mysql2
+    //   "better-sqlite3"  → npm i better-sqlite3 @types/better-sqlite3
+    //   "libsql"          → npm i @libsql/client
+    //
+    // ─── PostgreSQL (node-postgres) ───────────────────────────────────────────
+    // pg: {
+    //   driver: "drizzle",
+    //   url: process.env.PG_URL,           // e.g. "postgresql://user:pass@localhost:5432/mydb"
+    //   options: {
+    //     adapter: "node-postgres",
+    //     schema: "./container/drizzle/schema",  // path to your schema file (relative to src/)
+    //     globals: { logger: false },            // extra drizzle() options (optional)
+    //   },
+    // },
+    //
+    // ─── MySQL (mysql2) ───────────────────────────────────────────────────────
+    // mysql: {
+    //   driver: "drizzle",
+    //   url: process.env.MYSQL_URL,        // e.g. "mysql://user:pass@localhost:3306/mydb"
+    //   options: {
+    //     adapter: "mysql2",
+    //     schema: "./container/drizzle/schema",
+    //     // mysql2 requires a pre-built connection — pass it via globals.client:
+    //     // globals: { client: await mysql.createConnection({ uri: process.env.MYSQL_URL }) },
+    //   },
+    // },
+    //
+    // ─── SQLite (better-sqlite3) ──────────────────────────────────────────────
+    // sqlite: {
+    //   driver: "drizzle",
+    //   url: "./data/app.db",              // file path or ":memory:"
+    //   options: {
+    //     adapter: "better-sqlite3",
+    //     schema: "./container/drizzle/schema",
+    //   },
+    // },
+    //
+    // ─── Turso / libSQL ───────────────────────────────────────────────────────
+    // turso: {
+    //   driver: "drizzle",
+    //   url: process.env.TURSO_URL,        // e.g. "libsql://your-db.turso.io"
+    //   options: {
+    //     adapter: "libsql",
+    //     schema: "./container/drizzle/schema",
+    //     globals: { authToken: process.env.TURSO_AUTH_TOKEN },
+    //   },
+    // },
   },
 
   /**

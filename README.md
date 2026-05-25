@@ -274,7 +274,7 @@ Each router is configured via `RouterConfigInterface`:
 
 ## Database
 
-Chasi supports **MongoDB** and **Prisma** out of the box. All connections are declared in `src/config/database.ts` and connected automatically at boot.
+Chasi supports **MongoDB**, **Prisma**, and **Drizzle ORM**. All connections are declared in `src/config/database.ts` and connected automatically at boot.
 
 ```ts
 connections: {
@@ -288,6 +288,216 @@ connections: {
 ```
 
 Use `$getConnection("connectionName")` inside a controller to switch connections at runtime; falls back to the `default` connection if the name doesn't exist.
+
+---
+
+## Drizzle ORM
+
+Chasi has a first-class Drizzle driver that supports PostgreSQL, MySQL, SQLite, and Turso. Drizzle connections live alongside MongoDB/Prisma connections in the same `src/config/database.ts` file.
+
+### 1. Install the peer package for your database
+
+| Database | Adapter string | Package to install |
+|----------|---------------|--------------------|
+| PostgreSQL | `"node-postgres"` | `npm i pg @types/pg` |
+| PostgreSQL (postgres.js) | `"postgres-js"` | `npm i postgres` |
+| MySQL | `"mysql2"` | `npm i mysql2` |
+| SQLite | `"better-sqlite3"` | `npm i better-sqlite3 @types/better-sqlite3` |
+| Turso / libSQL | `"libsql"` | `npm i @libsql/client` |
+
+`drizzle-orm` itself is already included in the project dependencies.
+
+### 2. Define a schema
+
+Create a schema file at `src/container/drizzle/schema.ts`. Export each table as a named export — do **not** use a default export.
+
+```ts
+// src/container/drizzle/schema.ts
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").unique().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  authorId: serial("author_id").references(() => users.id),
+});
+```
+
+Use the matching import path for your database dialect:
+
+| Database | Import path |
+|----------|------------|
+| PostgreSQL | `drizzle-orm/pg-core` |
+| MySQL | `drizzle-orm/mysql-core` |
+| SQLite | `drizzle-orm/sqlite-core` |
+
+### 3. Register the connection in `src/config/database.ts`
+
+```ts
+connections: {
+  // existing MongoDB connections...
+  local: { driver: "mongodb", ... },
+
+  // Drizzle PostgreSQL connection
+  pg: {
+    driver: "drizzle",
+    url: process.env.PG_URL,  // "postgresql://user:pass@localhost:5432/mydb"
+    options: {
+      adapter: "node-postgres",
+      schema: "./container/drizzle/schema",  // path relative to src/
+    },
+  },
+}
+```
+
+Add the connection URL to your `.env`:
+```env
+PG_URL=postgresql://user:pass@localhost:5432/mydb
+```
+
+### 4. Add the migration setup (optional but recommended)
+
+Create a `drizzle.config.ts` in the project root to use Drizzle Kit for migrations:
+
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/container/drizzle/schema.ts",
+  out: "./drizzle/migrations",
+  dbCredentials: {
+    url: process.env.PG_URL!,
+  },
+});
+```
+
+Install Drizzle Kit and add a migration script:
+```bash
+npm i -D drizzle-kit
+```
+
+```json
+// package.json scripts
+"db:generate": "drizzle-kit generate",
+"db:migrate":  "drizzle-kit migrate",
+"db:studio":   "drizzle-kit studio"
+```
+
+### 5. Query from a controller
+
+Once the connection is registered, two access patterns are available:
+
+**Via `this.models`** (recommended inside controllers):
+```ts
+import Controller from "../../package/statics/Controller.js";
+import { eq } from "drizzle-orm";
+
+export default class UserController extends Controller {
+
+  // Convenience getter — this.models.pg._db is the live Drizzle client
+  get db() {
+    return this.models.pg._db;
+  }
+
+  // this.models.pg.users is the table definition from the schema file
+  get users() {
+    return this.models.pg.users;
+  }
+
+  async list(request, response) {
+    return await this.db.select().from(this.users);
+  }
+
+  async index(request, response) {
+    const [user] = await this.db
+      .select()
+      .from(this.users)
+      .where(eq(this.users.id, Number(request.params.id)));
+    return user;
+  }
+
+  async create(request, response) {
+    const [created] = await this.db
+      .insert(this.users)
+      .values(request.body)
+      .returning();
+    return created;
+  }
+
+  async update(request, response) {
+    const [updated] = await this.db
+      .update(this.users)
+      .set(request.body)
+      .where(eq(this.users.id, Number(request.params.id)))
+      .returning();
+    return updated;
+  }
+
+  async delete(request, response) {
+    await this.db
+      .delete(this.users)
+      .where(eq(this.users.id, Number(request.params.id)));
+    return { deleted: true };
+  }
+}
+```
+
+**Via `Model.drizzle()`** (useful outside a controller, e.g. in a service or event):
+```ts
+import Model from "../../package/statics/Model.js";
+import { users } from "../drizzle/schema.js";
+
+const db = Model.drizzle("pg");
+const allUsers = await db.select().from(users);
+```
+
+### MySQL and postgres-js (client-based adapters)
+
+These adapters require a pre-built client passed through `globals.client` because they do not accept a bare connection string:
+
+```ts
+// src/config/database.ts
+import mysql from "mysql2/promise";
+
+const mysqlConnection = await mysql.createConnection({
+  uri: process.env.MYSQL_URL,
+});
+
+connections: {
+  mysql: {
+    driver: "drizzle",
+    url: process.env.MYSQL_URL,
+    options: {
+      adapter: "mysql2",
+      schema: "./container/drizzle/schema",
+      globals: { client: mysqlConnection },
+    },
+  },
+}
+```
+
+### SQLite example
+
+```ts
+connections: {
+  sqlite: {
+    driver: "drizzle",
+    url: "./data/app.db",   // file path, or ":memory:" for in-memory
+    options: {
+      adapter: "better-sqlite3",
+      schema: "./container/drizzle/schema",
+    },
+  },
+}
+```
 
 ---
 
@@ -354,7 +564,18 @@ Switch between `"dev"` (Vite HMR) and `"prod"` (static build) by changing the `e
 
 ## Release Notes
 
+### v3.6.0
+- Added **Drizzle ORM** database driver — supports PostgreSQL (`node-postgres`, `postgres-js`), MySQL (`mysql2`), SQLite (`better-sqlite3`), and Turso (`libsql`) alongside existing MongoDB/Prisma connections
+- Added `Model.drizzle(connection)` static accessor for retrieving the live Drizzle query client outside of controllers
+- Added `DrizzleOptions` and `DrizzleAdapter` types to `DatabaseConfig` — full TypeScript coverage for Drizzle connection config
+- All `src/config/` files now have TypeScript types with full JSDoc on every property (`src/config/types.ts` centralizes `AuthenticationConfig`, `ContainerConfig`, `ExceptionsConfig`)
+- Version-aware requirements in documentation — `intro.vue` reads node/npm/git versions from the active version JSON instead of hardcoded values
+- Requirements now indexed in global search — searchable by keyword (`node`, `npm`, `git`, `requirements`, `version`)
+- Drizzle ORM entries added to the database section of the built-in docs (searchable adapter, schema, globals, querying, and `Model.drizzle` glossary items)
+- Documentation frontend updated to v3.6.0 as default version
+
 ### v3.5.0
+- Added **Drizzle ORM** database driver — supports PostgreSQL, MySQL, SQLite, and Turso alongside existing MongoDB/Prisma connections
 - Added global `Logger` with `.log()`, `.info()`, `.warn()`, `.error()` methods (available without import)
 - Added version switcher to built-in documentation UI
 - Improved Observer event system (`beforeEmit` / `afterEmit` global hooks)

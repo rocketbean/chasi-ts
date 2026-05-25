@@ -1,4 +1,4 @@
-<template >
+<template>
   <div>
     <section class="section">
       <div class="pan-title">
@@ -13,27 +13,28 @@
         </small>
       </div>
       <span class="sub-text">
-
-        Chasi Database Handler automatically connects on the declared named connection in 
-        <tag v-bind="{ name: 'DatabaseConfig.connections', style: 'is-primary', reference: 'dc-connections' } " />, the handler also supports multi-tenancy which should be declared in the connections config first, and models will be switched vie the connect() method. the Hanlder is currently focused on MongoDB, however there future plans to adopt ORM to support multiple types of databases.
-
+        Chasi Database Handler automatically connects on the declared named connection in
+        <tag v-bind="{ name: 'DatabaseConfig.connections', style: 'is-primary', reference: 'dc-connections' }" />.
+        Supports <strong>MongoDB</strong>, <strong>Prisma</strong>, and <strong>Drizzle ORM</strong> —
+        all connections live in a single config file and connect automatically at boot.
       </span>
     </section>
 
     <db-config/>
     <db-model/>
+    <db-drizzle/>
 
   </div>
 </template>
+
 <script setup>
 import { useControlStore } from "@/stores/ControlStore"
 import DbConfig from "./config.vue"
 import DbModel from "./model.vue"
-let ctx = useControlStore();
+import DbDrizzle from "./drizzle.vue"
+
+const ctx = useControlStore();
 const db = ctx.dict["database"]
-const config = ctx.dict["DatabaseConfig"]
-
-
 </script>
 
 <style scoped></style>

@@ -9,12 +9,15 @@ import chalk from "chalk";
 import Driver from "./drivers/drivers.js";
 import MongoDBDriver from "./drivers/mongodb.js";
 import PrismaDriver from "./drivers/prisma.js";
+import DrizzleDriver from "./drivers/drizzle.js";
+
 export default class Database implements ModuleInterface {
   $databases: DatabaseDrivers = {};
 
   $drivers: { [key: string]: Constructuble<Driver> } = {
     mongodb: MongoDBDriver as Constructuble<Driver>,
     prisma: PrismaDriver as Constructuble<Driver>,
+    drizzle: DrizzleDriver as Constructuble<Driver>,
   };
 
   static $log: { [key: string]: any } = {

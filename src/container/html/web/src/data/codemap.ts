@@ -255,6 +255,124 @@ connections: {
   },
 },
 `
+    },
+    drizzle: {
+      connection: `
+// src/config/database.ts
+connections: {
+  // PostgreSQL  →  npm i pg @types/pg
+  pg: {
+    driver: "drizzle",
+    url: process.env.PG_URL,   // "postgresql://user:pass@host:5432/db"
+    options: {
+      adapter: "node-postgres",
+      schema: "./container/drizzle/schema",
+    },
+  },
+
+  // SQLite  →  npm i better-sqlite3 @types/better-sqlite3
+  sqlite: {
+    driver: "drizzle",
+    url: "./data/app.db",      // file path, or ":memory:"
+    options: {
+      adapter: "better-sqlite3",
+      schema: "./container/drizzle/schema",
+    },
+  },
+
+  // MySQL  →  npm i mysql2  (client-based: pass via globals.client)
+  mysql: {
+    driver: "drizzle",
+    url: process.env.MYSQL_URL,
+    options: {
+      adapter: "mysql2",
+      schema: "./container/drizzle/schema",
+      globals: { client: mysqlConnection },
+    },
+  },
+}`,
+      schema: `
+// src/container/drizzle/schema.ts
+// Use named exports only — no default export.
+
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+// MySQL:  import { mysqlTable, int, varchar } from "drizzle-orm/mysql-core";
+// SQLite: import { sqliteTable, integer, text }  from "drizzle-orm/sqlite-core";
+
+export const users = pgTable("users", {
+  id:        serial("id").primaryKey(),
+  name:      text("name").notNull(),
+  email:     text("email").unique().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const posts = pgTable("posts", {
+  id:       serial("id").primaryKey(),
+  title:    text("title").notNull(),
+  authorId: serial("author_id").references(() => users.id),
+});`,
+      query: `
+import Controller from "../../package/statics/Controller.js";
+import { eq } from "drizzle-orm";
+
+export default class UserController extends Controller {
+
+  // Drizzle query client for the "pg" connection
+  get db() { return this.models.pg._db; }
+
+  // Table definition loaded from the schema file
+  get users() { return this.models.pg.users; }
+
+  async list(request, response) {
+    return await this.db.select().from(this.users);
+  }
+
+  async index(request, response) {
+    const [user] = await this.db
+      .select()
+      .from(this.users)
+      .where(eq(this.users.id, Number(request.params.id)));
+    return user;
+  }
+
+  async create(request, response) {
+    const [created] = await this.db
+      .insert(this.users)
+      .values(request.body)
+      .returning();
+    return created;
+  }
+
+  async update(request, response) {
+    const [updated] = await this.db
+      .update(this.users)
+      .set(request.body)
+      .where(eq(this.users.id, Number(request.params.id)))
+      .returning();
+    return updated;
+  }
+
+  async delete(request, response) {
+    await this.db
+      .delete(this.users)
+      .where(eq(this.users.id, Number(request.params.id)));
+    return { deleted: true };
+  }
+}`,
+      modelMethod: `
+// Use Model.drizzle() anywhere outside a controller —
+// service providers, event handlers, scripts, etc.
+
+import Model from "../../package/statics/Model.js";
+import { users } from "../drizzle/schema.js";
+import { eq } from "drizzle-orm";
+
+// Returns the live Drizzle query client for "pg"
+const db = Model.drizzle("pg");
+
+const allUsers  = await db.select().from(users);
+const oneUser   = await db.select().from(users).where(eq(users.id, 1));
+const [created] = await db.insert(users).values({ name: "Alice", email: "alice@example.com" }).returning();`
     }
   },
   testing:{
