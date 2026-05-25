@@ -1,4 +1,4 @@
-# chasi-ts &nbsp;`v3.5.0`
+# chasi-ts &nbsp;`v3.6.0`
 
 A TypeScript MVC framework for Node.js, built on Express. Chasi autoloads controllers, models, routes, and services at startup, wiring them together through a structured lifecycle — so you focus on your application logic, not the boilerplate.
 
