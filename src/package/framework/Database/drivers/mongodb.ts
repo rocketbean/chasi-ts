@@ -30,7 +30,7 @@ export default class MongoDBDriver extends Driver implements DBDriverInterface {
   }
 
   setup() {
-    this.$property.url = this.config.url + this.config.db;
+    this.$property.url = this.config.url + (this.config.db ?? "");
     if (this.config.params) this.$property.url += this.config.params;
     if (this.config.options) {
       this.hasOptions = true;

@@ -5,17 +5,19 @@
     <!-- version switcher -->
     <div class="version-bar">
       <span class="version-label">version</span>
-      <div class="version-buttons">
-        <button
+      <select
+        class="version-select"
+        :value="controlStore.activeVersion"
+        @change="controlStore.switchVersion($event.target.value)"
+      >
+        <option
           v-for="v in controlStore.availableVersions"
           :key="v"
-          class="version-btn"
-          :class="{ active: controlStore.activeVersion === v }"
-          @click="controlStore.switchVersion(v)"
+          :value="v"
         >
           v{{ v }}
-        </button>
-      </div>
+        </option>
+      </select>
     </div>
 
     <a class="panel-block is-active" :class="controlStore.active.context.id == option.id ? 'gradient-background' : ''"
@@ -60,31 +62,20 @@ const controlStore = useControlStore()
   white-space: nowrap;
 }
 
-.version-buttons {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.version-btn {
+.version-select {
+  flex: 1;
   font-size: 11px;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: transparent;
-  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: all 0.15s ease;
+  appearance: auto;
+  outline: none;
 }
 
-.version-btn:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.version-btn.active {
-  background: rgba(72, 66, 118, 0.7);
+.version-select:focus {
   border-color: rgba(150, 140, 220, 0.6);
-  color: #fff;
 }
 </style>

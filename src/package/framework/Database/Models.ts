@@ -19,14 +19,20 @@ export default class Models extends Base {
         Models.collection[content?.modelName?.toLowerCase()] = content;
       });
     }
-    //prisma model collection
     Object.keys(this.$databases).map((db: string) => {
       let _d = this.$databases[db];
-      let models = _d["models"];
       Models.collection[db] = {};
+
       if (_d.driverName === "prisma") {
         Object.keys(_d["models"]).map((model) => {
           Models.collection[db][model] = _d["models"][model];
+        });
+      }
+
+      if (_d.driverName === "drizzle") {
+        // _db holds the live Drizzle query client; remaining keys are table definitions
+        Object.keys(_d["models"]).map((key) => {
+          Models.collection[db][key] = _d["models"][key];
         });
       }
     });
