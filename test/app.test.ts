@@ -1,14 +1,17 @@
 import { beforeAll, describe } from "vitest";
 import { app } from "./setup.ts";
-
+import routesTest from "./tests/routes.test.ts";
 console.clear();
 describe("App Test running", async () => {
   let $app = new app({
-    basePath: "/baseurl",
+    basePath: "/api",
+    signinUrl: "/api/users/signin",
   });
   beforeAll(async () => {
     // configure app before tests
     // await $app.configure();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
   });
 
   /**
@@ -19,5 +22,11 @@ describe("App Test running", async () => {
    * E.G.
    * await User($app);
    * await someTest($app);
+   * 
    */
+
+  await routesTest($app);
+
+  // process.exit(0);
+
 });

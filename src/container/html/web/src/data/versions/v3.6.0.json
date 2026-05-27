@@ -571,6 +571,131 @@
       }
     },
     {
+      "keywords": ["observer", "event", "events", "emitter", "event-handler"],
+      "id": "observer",
+      "icon": "local_activity",
+      "label": "Observer",
+      "display": true,
+      "subcats": [
+        { "to": "observer", "label": "Observer" },
+        { "to": "obs-execution", "label": "How events run" },
+        {
+          "to": "observerConfig",
+          "label": "Configuration",
+          "group": ["obs-events", "obs-beforeEmit", "obs-afterEmit", "obs-ObserverConfig"]
+        },
+        {
+          "to": "observerEvents",
+          "label": "Events",
+          "group": ["obs-event-class", "obs-emit", "obs-when", "obs-lifecycle"]
+        }
+      ],
+      "glossary": [
+        {
+          "id": "observer",
+          "label": "Observer",
+          "sublabel": "[./src/package/Observer/index.ts]",
+          "keywords": ["observer", "event bus", "async emitter", "$observer"],
+          "text": "Chasi's built-in async event system. A single Observer instance is created at boot from src/config/observer.ts and exposed as $observer on the Handler and on every Controller (this.$observer). Custom events must be registered in observer.ts before emit() can use them. Event execution runs on the async emitter, isolated from the HTTP request — omit await on emit() in controllers to return a response while the event pipeline still runs."
+        },
+        {
+          "id": "obs-execution",
+          "label": "How events run",
+          "reference": ["observer"],
+          "keywords": ["execution", "async", "fire and forget", "detached", "background", "await"],
+          "text": "Custom events must be listed in src/config/observer.ts events before emit(alias) works. When dispatched, the pipeline (validate → onemit → fire → fireListeners → emitted) runs on AsyncEventEmitter, separate from Express request/response timing. In controllers, this.$observer.emit(...) without await lets res.json() return immediately while the event continues. Use await only when the client must wait. Errors in a detached event do not change an HTTP status already sent."
+        },
+        {
+          "id": "observerConfig",
+          "label": "Observer configuration",
+          "sublabel": "[./src/config/observer.ts]",
+          "reference": ["observer"],
+          "keywords": ["observer config", "ObserverConfig", "observer.ts"],
+          "text": "Typed as ObserverConfig. Maps custom event aliases to class paths under src/, and optionally defines global beforeEmit and afterEmit hooks that wrap every event's fire() unless an event class overrides onemit or emitted."
+        },
+        {
+          "id": "obs-events",
+          "label": "events",
+          "reference": ["observerConfig"],
+          "type": "events",
+          "keywords": ["events registry", "ObserverConfig events", "register event"],
+          "text": "Required registry for custom events. Every alias you pass to emit() must appear here with a class path relative to src/ (no extension). Unlisted aliases are not loaded at boot and will not run. Registered during Observer.setup() on startup — restart after adding new events.",
+          "coderef": { "ref": "observer/config/events" }
+        },
+        {
+          "id": "obs-beforeEmit",
+          "label": "beforeEmit",
+          "reference": ["observerConfig"],
+          "type": "(params) => Promise<void>",
+          "keywords": ["beforeEmit", "global hook", "pre-event"],
+          "text": "Global hook invoked in onemit() immediately before an event's fire() runs. `this` is the Event instance; `params` is the payload from emit(). Skipped for events that define their own onemit/beforeEmit.",
+          "coderef": { "ref": "observer/config/beforeEmit" }
+        },
+        {
+          "id": "obs-afterEmit",
+          "label": "afterEmit",
+          "reference": ["observerConfig"],
+          "type": "(params) => Promise<void>",
+          "keywords": ["afterEmit", "global hook", "post-event"],
+          "text": "Global hook invoked in emitted() after fire() and when() listeners complete. Use for audit logging or metrics. Skipped when the event class defines its own emitted/afterEmit.",
+          "coderef": { "ref": "observer/config/afterEmit" }
+        },
+        {
+          "id": "obs-ObserverConfig",
+          "label": "ObserverConfig",
+          "reference": ["observerConfig"],
+          "type": "ObserverConfig",
+          "keywords": ["ObserverConfig", "observer types", "events type"],
+          "text": "Type exported from package/Observer/index.ts: { events: events; beforeEmit: Function; afterEmit: Function }. The nested events type is Record<string, string> — event alias → src-relative class path."
+        },
+        {
+          "id": "observerEvents",
+          "label": "Events",
+          "sublabel": "[./src/container/events/]",
+          "keywords": ["events", "Event class", "EventInterface", "custom events"],
+          "text": "Custom events are classes extending package/Observer/Event.ts and implementing EventInterface. Each implements validate(params, next) and fire(params). Framework lifecycle events (__before__, __ready__, etc.) live under package/statics/horizon/events/ and are registered internally — not in observer.ts events map."
+        },
+        {
+          "id": "obs-event-class",
+          "label": "Event class",
+          "reference": ["observerEvents"],
+          "type": "EventInterface",
+          "keywords": ["Event", "EventInterface", "Authorize", "container/events"],
+          "text": "Extend Event and implement validate (must call next()) and fire. Listeners from when() run in fireListeners after fire(). Example: src/container/events/Authorize.ts mapped as authorized in observer config.",
+          "coderef": { "ref": "observer/events/eventClass" }
+        },
+        {
+          "id": "obs-emit",
+          "label": "$observer.emit()",
+          "reference": ["observerEvents"],
+          "type": "(event: string, params?: Record<string, unknown>) => Promise<void>",
+          "keywords": ["emit", "dispatch event", "fire event"],
+          "text": "Dispatch a registered event by alias (must exist in observer.ts events). Fire-and-forget in controllers: this.$observer.emit('authorized', payload) without await — response can return while fire() still runs. Block until done: await this.$observer.emit(...). Also on Handler.Instance.$observer and Provider.$observer.",
+          "coderef": { "ref": "observer/events/emit" }
+        },
+        {
+          "id": "obs-when",
+          "label": "$observer.when()",
+          "reference": ["observerEvents"],
+          "type": "(key, fn, opts?) => void",
+          "keywords": ["when", "listener", "subscribe"],
+          "text": "Attach a listener to a registered event. Callback signature: (listenerParams, emitParams). Used to hook lifecycle events such as __ready__ from service providers.",
+          "coderef": { "ref": "observer/events/when" }
+        },
+        {
+          "id": "obs-lifecycle",
+          "label": "Lifecycle events",
+          "reference": ["observerEvents"],
+          "keywords": ["__before__", "__initialize__", "__after__", "__boot__", "__ready__", "__exception__", "lifecycle"],
+          "text": "Built-in framework events orchestrate boot: __before__ (DB + auth + routers), __initialize__ / __after__ (router layers), __boot__ (service providers), __ready__ (HTTP server listening), __exception__ (global error handler). Emitted by Handler during the initializing → initialized state machine."
+        }
+      ],
+      "controls": {
+        "right": { "open": true },
+        "header": { "subheader": { "open": false } }
+      }
+    },
+    {
       "keywords": ["general"],
       "id": "general",
       "label": "general",

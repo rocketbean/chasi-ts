@@ -11,6 +11,13 @@ export default class UserController extends Controller {
    * */
   async create(request, response) {
     // maybe add some validations here ?
+    let {email} = request.body;
+    if (await this.user.findOne({email})) {
+      throw {
+        status: 400,
+        message: "Email already exists"
+      }
+    }
     return await this.user.create({...request.body})
   }
 

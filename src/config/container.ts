@@ -36,6 +36,7 @@ export default <ContainerConfig>{
     compiler: "container/services/CompilerEngineServiceProvider",
     routers: "container/services/RouterServiceProvider",
     sockets: "container/services/SocketServiceProvider",
+    apispec: "container/services/ApiSpecServiceProvider"
   },
 
   /**
