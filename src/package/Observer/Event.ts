@@ -1,11 +1,21 @@
 import Writer from "./../Logger/types/Writer.js";
 import Listener from "./Listener.js";
 
+/**
+ * Contract for Observer event classes (custom and framework lifecycle events).
+ *
+ * Execution order on `emit()`: `validate` → `onemit` (global `beforeEmit`) →
+ * `fire` → `fireListeners` (`when()` callbacks) → `emitted` (global `afterEmit`).
+ */
 export interface EventInterface {
+  /** Injected global/per-event hooks (`beforeEmit`, `afterEmit`) */
   props: { [key: string]: any };
   logger: Writer;
+  /** Listeners registered via `$observer.when()` */
   listeners: Listener[];
+  /** Gate execution; must call `next()` to proceed to `fire()` */
   validate(a: any, b: Function);
+  /** Main event handler — receives the emit payload */
   fire(a: any): void;
   fireListeners();
   emitted(): void;

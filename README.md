@@ -291,6 +291,93 @@ Use `$getConnection("connectionName")` inside a controller to switch connections
 
 ---
 
+## Observer & Events
+
+Chasi includes an async **Observer** event bus. A single instance is created at boot from `src/config/observer.ts` and exposed as `$observer` on the app `Handler` and on every controller via `this.$observer`.
+
+### What the Observer does
+
+- Loads and registers **custom Event classes** listed in config (`Observer.setup()` at startup)
+- Dispatches events through an `AsyncEventEmitter` with a fixed pipeline: `validate` → `onemit` → `fire` → `fireListeners` → `emitted`
+- Orchestrates **framework lifecycle** during boot (`__before__`, `__initialize__`, `__after__`, `__boot__`, `__ready__`, `__exception__`) — these Horizon events live under `src/package/statics/horizon/events/` and are not listed in `observer.ts`
+
+### Registering custom events (required)
+
+A custom event **must** be declared in `src/config/observer.ts` under `events` before you can use it. At boot, `Observer.setup()` reads that map, loads each class from `src/container/events/` (or your path), and registers the alias on the emitter. If an alias is missing from config, `emit("thatAlias")` will not run your handler.
+
+```ts
+events: {
+  authorized: "container/events/Authorize", // required — alias → path relative to src/
+},
+```
+
+### How events run (isolated from the request)
+
+Event work runs on the async emitter, **not on the Express request/response stack**. In a controller:
+
+- **Fire-and-forget** (typical for side effects): `this.$observer.emit("authorized", { ... })` **without** `await` — the handler can call `res.json()` and the client gets a response while the event pipeline still runs.
+- **Wait for completion**: `await this.$observer.emit(...)` — use when the response must not be sent until the event finishes.
+
+Once detached (no `await`), a failure inside `fire()` does not change an HTTP status code that was already sent; handle errors inside the event or use `await` when the client must wait.
+
+### Configuration (`src/config/observer.ts`)
+
+Typed as `ObserverConfig` from `src/package/Observer/index.ts`:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `events` | `events` (`Record<string, string>`) | Maps event alias → class path relative to `src/` (no extension) |
+| `beforeEmit` | `Function` | Global hook before `fire()`; `this` is the Event instance |
+| `afterEmit` | `Function` | Global hook after `fire()` and listeners; skipped if the event overrides `emitted` |
+
+```ts
+// src/config/observer.ts
+export default <ObserverConfig>{
+  events: {
+    authorized: "container/events/Authorize",
+  },
+  beforeEmit: async function (params) { /* runs before every event's fire() */ },
+  afterEmit: async function (params) { /* runs after fire() + listeners */ },
+};
+```
+
+### Custom Event classes
+
+Create a class under `src/container/events/` that extends `Event` and implements `EventInterface`:
+
+```ts
+import Event, { EventInterface } from "../../package/Observer/Event.js";
+
+export default class Authorize extends Event implements EventInterface {
+  async validate(params, next) {
+    next(); // required — or throw to abort
+  }
+  async fire(params) {
+    // side effects: audit, notify, etc.
+  }
+}
+```
+
+### Emitting and listening
+
+```ts
+// In a controller — response can return before the event finishes (no await)
+this.$observer.emit("authorized", { userId: req.user.id });
+return this.res.json({ ok: true });
+
+// Or block until the event completes
+await this.$observer.emit("authorized", { userId: req.user.id });
+
+// In a service provider — subscribe to lifecycle or custom events
+Provider.$observer.when("__ready__", async (_prop, params) => {
+  Logger.info("Server ready", params.server?.address());
+});
+```
+
+> Full interactive docs for Observer and Events are in the built-in documentation UI (sidebar **Observer**) when you run `npm run dev` and open `http://localhost:3010`.
+
+---
+
 ## Drizzle ORM
 
 Chasi has a first-class Drizzle driver that supports PostgreSQL, MySQL, SQLite, and Turso. Drizzle connections live alongside MongoDB/Prisma connections in the same `src/config/database.ts` file.
@@ -573,6 +660,7 @@ Switch between `"dev"` (Vite HMR) and `"prod"` (static build) by changing the `e
 - Requirements now indexed in global search — searchable by keyword (`node`, `npm`, `git`, `requirements`, `version`)
 - Drizzle ORM entries added to the database section of the built-in docs (searchable adapter, schema, globals, querying, and `Model.drizzle` glossary items)
 - Documentation frontend updated to v3.6.0 as default version
+- Added **Observer** documentation page (Observer vs Events, `ObserverConfig` / `events` types, config file reference)
 
 ### v3.5.0
 - Added **Drizzle ORM** database driver — supports PostgreSQL, MySQL, SQLite, and Turso alongside existing MongoDB/Prisma connections

@@ -1,42 +1,72 @@
-import { Writable } from "../package/Logger/types/Writer.js";
 import { ObserverConfig } from "../package/Observer/index.js";
 
-let logger: Writable = Logger.writer();
-
+/**
+ * Observer configuration (`src/config/observer.ts`).
+ *
+ * Loaded by `Handler` and passed to `new Observer(config)`. Controls which
+ * application Event classes are registered and optional global hooks around
+ * every event's `fire()` pipeline.
+ *
+ * @see `ObserverConfig` — `{ events, beforeEmit, afterEmit }` in `package/Observer/index.ts`
+ * @see `events` — `Record<string, string>` alias → path relative to `src/`
+ * @see `EventInterface` — contract for classes under `container/events/`
+ *
+ * **Registration** — Custom events are only available after you add them here.
+ * `emit("myEvent")` has no handler until the alias is listed and the app has restarted.
+ *
+ * **Execution** — Events run on the async emitter, isolated from the HTTP request.
+ * In controllers, calling `emit()` without `await` lets the response return while
+ * `validate` → `fire` → listeners still run in the background.
+ */
 export default <ObserverConfig>{
   /**
-   * Named event registry.
-   * Maps an event alias to the path of its Event class file
-   * (relative to `src/`, resolved at boot time).
+   * Named event registry (`events` type: `Record<string, string>`).
    *
-   * Once registered, fire an event anywhere inside a controller with:
-   *   `this.$observer.emit("authorized", { ...payload })`
+   * **Required for custom events.** Only aliases listed here are loaded at boot and
+   * can be passed to `$observer.emit()`. Add the class under `container/events/`,
+   * map the alias to its path, then restart (or rely on dev reload).
    *
-   * Each event class must implement the `EventInterface` (see `package/Observer/Event.ts`).
-   * Add new events here to have them auto-registered during startup.
+   * Maps an event **alias** (first argument to `$observer.emit`) to the path of
+   * its Event class file, relative to `src/` and without a file extension.
+   * Resolved at boot in `Observer.setup()` via dynamic import.
+   *
+   * @example
+   * ```ts
+   * events: {
+   *   authorized: "container/events/Authorize",
+   * }
+   * // later in a controller:
+   * await this.$observer.emit("authorized", { userId: "..." });
+   * ```
+   *
+   * Each class must extend `Event` and implement `EventInterface`
+   * (`package/Observer/Event.ts`).
    */
   events: {
     authorized: "container/events/Authorize",
   },
 
   /**
-   * Global hook called just before every event's `fire()` method executes.
-   * Applies to all registered events unless the event class overrides `onemit()`.
-   * Use this to inject cross-cutting logic (logging, tracing, validation setup)
-   * without touching individual event files.
+   * Global `beforeEmit` hook — runs in `Event.onemit()` before `fire()`.
    *
-   * `this` inside the function refers to the Event instance.
-   * `params` is the payload passed to `$observer.emit(...)`.
+   * Applies to every registered event whose class does **not** define its own
+   * `onemit()` / `beforeEmit`. Use for cross-cutting setup: tracing, shared
+   * validation context, or structured logging.
+   *
+   * - `this` — the `Event` instance
+   * - `params` — payload passed to `$observer.emit(alias, params)`
    */
   beforeEmit: async function (params) {},
 
   /**
-   * Global hook called just after every event's `fire()` method completes.
-   * Applies to all registered events unless the event class overrides `emitted()`.
-   * Use this for post-event cleanup, audit logging, or metric recording.
+   * Global `afterEmit` hook — runs in `Event.emitted()` after `fire()` and
+   * `when()` listeners complete.
    *
-   * `this` inside the function refers to the Event instance.
-   * `params` is the same payload that was passed to `$observer.emit(...)`.
+   * Applies unless the event class overrides `emitted()` / `afterEmit`.
+   * Use for audit logs, metrics, or cleanup.
+   *
+   * - `this` — the `Event` instance
+   * - `params` — same payload from `emit()`
    */
   afterEmit: async function (params) {},
 };

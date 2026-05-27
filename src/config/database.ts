@@ -31,7 +31,7 @@ export default <DatabaseConfig>{
   default: checkout(process.env.database, "local"),
 
   /**
-   * Named database connection definitions.
+   * Named database connection definitions. 
    * All entries are connected automatically during the boot sequence.
    * Reference a specific connection inside a model or via
    * `$getConnection("ConnectionName")` in a controller — if the name doesn't

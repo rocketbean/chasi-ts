@@ -4,12 +4,23 @@ import Writer from "../Logger/types/Writer.js";
 import { EventInterface } from "./Event.js";
 import Listener from "./Listener.js";
 
+/**
+ * Shape of `src/config/observer.ts`.
+ *
+ * @property events - Registry of custom application events (see `events` type)
+ * @property beforeEmit - Global hook before each event's `fire()` (unless overridden)
+ * @property afterEmit - Global hook after each event completes (unless overridden)
+ */
 export type ObserverConfig = {
   events: events,
   beforeEmit: Function,
   afterEmit: Function
 }
 
+/**
+ * Event alias → class path relative to `src/` (no extension).
+ * @example `{ authorized: "container/events/Authorize" }`
+ */
 export type events = {
   [key: string]: string
 }
@@ -93,6 +104,14 @@ export default class Observer extends Base {
     ev.listeners.push(lis);
   }
 
+  /**
+   * Dispatch an event by alias. Custom aliases must be registered in `src/config/observer.ts`
+   * (`events` map) and loaded via `setup()` before emit has any effect.
+   *
+   * The handler pipeline runs on the async emitter, decoupled from Express request timing.
+   * Callers that do not `await` this promise (typical in controllers) may already have sent
+   * the HTTP response while `validate` → `fire` → listeners still execute.
+   */
   async emit(event: string, params?: Record<string, unknown>): Promise<void> {
     await this.emitter.emit(event, params);
   }

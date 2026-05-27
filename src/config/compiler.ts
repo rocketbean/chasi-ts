@@ -30,7 +30,7 @@ const config: CompilerEngineConfig = {
    * Set to `false` to disable all Vite compilation (e.g. API-only servers
    * that serve no frontend assets).
    */
-  enabled: true,
+  enabled: false,
 
   /**
    * List of Vite engine instances to manage.

@@ -6,7 +6,7 @@ import { resolve, dirname } from "node:path";
 export default defineConfig({
   resolve: {},
   test: {
-    exclude: ["dist", "node_modules", "src"],
+    exclude: ["dist", "node_modules", "src", "test/tests"],
     includeSource: ["src/types"],
     globals: true,
     environment: "node",

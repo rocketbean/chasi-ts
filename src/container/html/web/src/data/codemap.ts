@@ -519,6 +519,7 @@ describe("[POST /signin]", async () => {
         expect(res.body).toHaveProperty("token")
       })
     })`,
+    },
     onSuccessTest: `$ npm run test
 RERUN  test/user.test.ts x2
 
@@ -538,6 +539,65 @@ Test Files  1 passed (1)
 
 PASS  Waiting for file changes...
       press h to show help, press q to quit`
+  },
+  observer: {
+    config: {
+      events: `
+export default <ObserverConfig>{
+  events: {
+    // alias → path relative to src/ (no extension)
+    authorized: "container/events/Authorize",
+  },
+  beforeEmit: async function (params) {},
+  afterEmit: async function (params) {},
+}`,
+      beforeEmit: `
+// Global hook — runs before every event's fire() (via onemit)
+// this = Event instance, params = emit payload
+beforeEmit: async function (params) {
+  Logger.info("Event starting", params);
+}`,
+      afterEmit: `
+// Global hook — runs after fire() and listeners complete (via emitted)
+afterEmit: async function (params) {
+  Logger.info("Event finished", params);
+}`,
+    },
+    events: {
+      emit: `
+// Inside any controller — "authorized" must be in src/config/observer.ts events map
+
+async index() {
+  // Fire-and-forget: response returns while the event still runs
+  this.$observer.emit("authorized", {
+    userId: this.req.user?.id,
+    action: "login",
+  });
+  return this.res.json({ ok: true });
+
+  // Or await when the client must wait for the event to finish:
+  // await this.$observer.emit("authorized", { userId: this.req.user?.id });
+}`,
+      eventClass: `
+import Event, { EventInterface } from "../../package/Observer/Event.js";
+
+export default class Authorize extends Event implements EventInterface {
+  async validate(params, next) {
+    if (!params?.userId) throw new Error("userId required");
+    next();
+  }
+
+  async fire(params) {
+    // side effects: audit log, notify, etc.
+    Logger.info("User authorized", params.userId);
+  }
+}`,
+      when: `
+// In a service provider boot() — listen for server ready
+Provider.$observer.when("__ready__", async (_prop, params) => {
+  const server = params.server;
+  Logger.info("HTTP server listening", server?.address());
+});`,
     }
   }
 }
