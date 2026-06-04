@@ -29,7 +29,7 @@ npm init @rocketbean/chasi-ts
 
 **via chasi-cli**
 ```bash
-npm i -g @rocketbean/chasis
+npm i -g @rocketbean/create-chasi-ts
 chasi init
 ```
 
