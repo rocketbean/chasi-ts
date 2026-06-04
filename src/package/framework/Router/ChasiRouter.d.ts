@@ -2,6 +2,43 @@ declare module "Chasi/Router" {
   import { Iobject } from "../Interfaces.js";
   import Router from "./Router.js";
   import swaggerJsDoc from "swagger-jsdoc";
+
+  // ─── SDK middleware types ─────────────────────────────────────────────────
+
+  /**
+   * Callback passed to every sdk handler.
+   * Call it to advance to the next handler in the chain (or to signal
+   * successful validation back to sdkBuilder).
+   */
+  export type SdkNextFn = () => void | Promise<void>;
+
+  /**
+   * A validation handler registered via `endpoint.sdk()`.
+   * Receives the payload (or build context during sdkBuilder compilation) as
+   * the first argument, and `next` as the second.
+   *
+   * Call `next()` when validation passes; throw or return without calling
+   * `next()` to halt the chain.
+   *
+   * The same handler runs in two contexts:
+   *  • Build time — sdkBuilder calls it with a `SdkBuildContext` object so
+   *    you can validate route configuration during compilation.
+   *  • Client side — the serialised handler is embedded in the generated SDK
+   *    bundle and called with the actual request payload before `_request()`.
+   *
+   * @example
+   * route.post("/items", "ItemController@create").sdk(async (params, next) => {
+   *   if (!params?.name) throw { status: 422, message: "name is required" };
+   *   await next();
+   * });
+   */
+  export type SdkMiddlewareFn = (
+    params: unknown,
+    next: SdkNextFn
+  ) => void | Promise<void>;
+
+  // ─── Router types ─────────────────────────────────────────────────────────
+
   export type RouterMethods =
     | "get"
     | "post"
@@ -235,6 +272,14 @@ declare module "Chasi/Router" {
      * [1] to enable router logs
      */
     displayLog?: 0 | 1;
+
+    /**
+     * sdk() handlers applied to every route in this router.
+     * Handlers are prepended before group and route-level sdk() handlers and
+     * are serialised into the generated SDK bundle by sdkBuilder.
+     * Accepts a single handler or an array.
+     */
+    sdk?: SdkMiddlewareFn | SdkMiddlewareFn[];
   };
 
   export type RouteGroupProperty = {
@@ -243,6 +288,14 @@ declare module "Chasi/Router" {
      * will be implemented across the group endpoints
      */
     middleware?: string[];
+
+    /**
+     * sdk() handlers applied to every route inside this group.
+     * Handlers are prepended before route-level sdk() handlers and are
+     * serialised into the generated SDK bundle by sdkBuilder.
+     * Accepts a single handler or an array.
+     */
+    sdk?: SdkMiddlewareFn | SdkMiddlewareFn[];
 
     /** RouteGroup controller
      * controller path must be under

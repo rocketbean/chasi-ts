@@ -1,4 +1,4 @@
-import { PathItem, RouteEndpointProperty } from "Chasi/Router";
+import { PathItem, RouteEndpointProperty, SdkMiddlewareFn, SdkNextFn } from "Chasi/Router";
 import Controller from "./Controller.js";
 import Group from "./Group.js";
 import Exception from "../ErrorHandler/Exception.js";
@@ -13,6 +13,7 @@ export default class Endpoint {
   public middlewares: string[] = [];
   public excludeFromMw: string[] = [];
   public $middlewares: Function[] = [];
+  public $sdkHandlers: SdkMiddlewareFn[] = [];
   public beforeFns: Function[] = [];
   public afterFns: Function[] = [];
   public useAuth: Function;
@@ -157,6 +158,11 @@ export default class Endpoint {
     this.middlewares.unshift(fn);
   }
 
+  /** Prepends sdk handlers — used by Registry to propagate router/group-level sdk. */
+  pushSdkHandlers(handlers: SdkMiddlewareFn[]): void {
+    this.$sdkHandlers.unshift(...handlers);
+  }
+
   pushBefore(fn: Function) {
     this.beforeFns.push(fn);
   }
@@ -167,5 +173,47 @@ export default class Endpoint {
 
   addExceptions(exception: Exception) {
     this.exceptions.push(exception);
+  }
+
+  /**
+   * Registers an SDK validation handler on this endpoint.
+   * Handlers are executed in registration order by `runSdk()`.
+   * Returns `this` so the call can be chained on route declarations:
+   *
+   *   route.post("/items", "ItemController@create").sdk(async (params, next) => {
+   *     if (!params?.name) throw { status: 422, message: "name is required" };
+   *     await next();
+   *   });
+   *
+   * sdkBuilder serialises these handlers into the generated SDK bundle so
+   * they run client-side before every HTTP request. They also execute during
+   * the build phase with a SdkBuildContext as `params`.
+   */
+  sdk(fn: SdkMiddlewareFn | SdkMiddlewareFn[]): this {
+    const handlers = Array.isArray(fn) ? fn : [fn];
+    this.$sdkHandlers.push(...handlers);
+    return this;
+  }
+
+  /**
+   * Executes all registered sdk handlers in sequence.
+   * `params` is passed as the first argument to every handler;
+   * `next` advances the chain. A handler that does not call `next()`
+   * halts execution.
+   *
+   * @param params  Payload or build context forwarded to each handler.
+   */
+  async runSdk(params?: unknown): Promise<void> {
+    if (!this.$sdkHandlers.length) return;
+
+    let index = 0;
+
+    const next: SdkNextFn = async (): Promise<void> => {
+      if (index >= this.$sdkHandlers.length) return;
+      const handler = this.$sdkHandlers[index++];
+      await handler(params, next);
+    };
+
+    await next();
   }
 }

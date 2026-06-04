@@ -118,4 +118,11 @@ export type RouterConfigInterface = {
    * [1] to enable router logs
    */
   displayLog?: 0 | 1;
+
+  /**
+   * sdk() handlers applied to every route in this router.
+   * Propagated to all endpoints during expansion and serialised by sdkBuilder.
+   * Accepts a single handler or an array.
+   */
+  sdk?: Function | Function[];
 };

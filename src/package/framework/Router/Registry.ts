@@ -126,6 +126,12 @@ export default class Registry extends Base {
     this.constructRouterEp(ep);
     if ("before" in this.property) ep.pushBefore(this.property.before);
     if ("after" in this.property) ep.pushAfter(this.property.after);
+    if (this.property.sdk) {
+      const handlers = Array.isArray(this.property.sdk)
+        ? this.property.sdk
+        : [this.property.sdk];
+      ep.pushSdkHandlers(handlers as any[]);
+    }
   }
 
   /***
@@ -169,9 +175,18 @@ export default class Registry extends Base {
           this.constructControllerPath(ep, group);
           this.constructBeforeFn(ep, group);
           this.constructAfterFn(ep, group);
+          this.constructSdkHandlers(ep, group);
         }),
       );
     }
+  }
+
+  constructSdkHandlers(ep: Endpoint, group: Group) {
+    if (!group.property.sdk) return;
+    const handlers = Array.isArray(group.property.sdk)
+      ? group.property.sdk
+      : [group.property.sdk];
+    ep.pushSdkHandlers(handlers as any[]);
   }
 
   /***

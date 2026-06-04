@@ -25,6 +25,12 @@
       <div v-else-if="ctx.id === 'observer'" class = "bottom-padding">
         <observer />
       </div>
+      <div v-else-if="ctx.id === 'apispec'" class="bottom-padding">
+        <apispec />
+      </div>
+      <div v-else-if="ctx.id === 'sdkbuilder'" class="bottom-padding">
+        <sdkbuilder />
+      </div>
       <div v-else style="width:100%; height: 100%; ">
         <catcher/>
       </div>
@@ -43,6 +49,8 @@ import database from "./database.vue";
 import catcher from "./catcher.vue";
 import testing from "./testing.vue";
 import observer from "./observer.vue";
+import apispec from "./apispec.vue";
+import sdkbuilder from "./sdkbuilder.vue";
 import { computed, onMounted } from "vue";
 
 const controlStore = useControlStore()

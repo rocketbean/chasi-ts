@@ -39,7 +39,7 @@ export default class PrismaDriver<U> extends Driver implements DB.DBDriverInterf
   }
 
   setModels() {
-    let _m = this.driver?._runtimeDataModel?.models;
+    let _m = this.driver?._runtimeDataModel?.models ?? {};
     Object.keys(_m).map((m: string) => {
       let _model = this.driver[m];
       this.models[m.toLowerCase()] = _model;
@@ -64,6 +64,8 @@ export default class PrismaDriver<U> extends Driver implements DB.DBDriverInterf
 
   async connect(stop: (msg: string) => void): Promise<typeof this.driver> {
     await this.getDriver(this.config.options["client"]);
+    this.setModels();
+    this.connection = this.driver;
     try {
       stop(
         `  ╡[${this.states[1]("•")}]${

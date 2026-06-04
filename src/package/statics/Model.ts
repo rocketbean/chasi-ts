@@ -53,4 +53,25 @@ export default class Model extends Models {
     }
     return driver.connection;
   }
+
+  /**
+   * Returns the live Prisma client for a named connection.
+   *
+   *   const db = Model.prisma("mysql");
+   *   const rows = await db.user.findMany();
+   *
+   * @param connection Connection key from config/database.ts (default: "_")
+   */
+  static prisma(connection: string = "_"): any {
+    const driver = Model.$databases[connection];
+    if (!driver) {
+      throw new Error(`[Prisma] No connection found for "${connection}".`);
+    }
+    if (driver.driverName !== "prisma") {
+      throw new Error(
+        `[Prisma] Connection "${connection}" uses driver "${driver.driverName}", not "prisma".`
+      );
+    }
+    return driver.connection;
+  }
 }

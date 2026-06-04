@@ -25,13 +25,17 @@
   },
   "exclude": [
     "prisma",
+    "drizzle",
+    "drizzle.config.ts",
     "dist",
     "*.config.js",
     "chasi.json",
     "src/container/html",
-    "src/container/assets",
+    "prisma/client",
     "src/package/framework/Commands",
     "chasi.js",
+    "**/*.sdk.js",
+    "**/*.spec.json",
     "test",
     "vitest.config.ts",
     ".vscode"

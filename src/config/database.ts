@@ -28,7 +28,7 @@ export default <DatabaseConfig>{
    * Sourced from `process.env.database`; falls back to `"local"`.
    * You can override this per-model inside the model's class definition.
    */
-  default: checkout(process.env.database, "local"),
+  default: checkout(process.env.database, "dev"),
 
   /**
    * Named database connection definitions. 
@@ -37,7 +37,7 @@ export default <DatabaseConfig>{
    * `$getConnection("ConnectionName")` in a controller — if the name doesn't
    * exist, Chasi falls back to the `default` connection silently.
    *
-   * Supported drivers: `"mongodb"` | `"prisma"`
+   * Supported drivers: `"mongodb"` | `"prisma"` | `"drizzle"`
    */
   connections: {
     /**
@@ -104,16 +104,7 @@ export default <DatabaseConfig>{
     //   "better-sqlite3"  → npm i better-sqlite3 @types/better-sqlite3
     //   "libsql"          → npm i @libsql/client
     //
-    // ─── PostgreSQL (node-postgres) ───────────────────────────────────────────
-    // pg: {
-    //   driver: "drizzle",
-    //   url: process.env.PG_URL,           // e.g. "postgresql://user:pass@localhost:5432/mydb"
-    //   options: {
-    //     adapter: "node-postgres",
-    //     schema: "./container/drizzle/schema",  // path to your schema file (relative to src/)
-    //     globals: { logger: false },            // extra drizzle() options (optional)
-    //   },
-    // },
+    /** PostgreSQL via Drizzle ORM (node-postgres). */
     //
     // ─── MySQL (mysql2) ───────────────────────────────────────────────────────
     // mysql: {
