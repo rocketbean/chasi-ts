@@ -1,4 +1,6 @@
 import Controller from "../../../package/statics/Controller.js";
+import Model from "../../../package/statics/Model.js";
+import bc from "bcryptjs";
 
 export default class UserController extends Controller {
   get user() {
@@ -82,5 +84,4 @@ export default class UserController extends Controller {
   async forget (request, response) {
     return await this.user.collection.drop();
   }
-
 }

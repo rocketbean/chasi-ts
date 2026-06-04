@@ -9,6 +9,7 @@ declare module "Chasi/Database" {
     isDefaultDB: boolean;
     driverName: drivers;
     driver?: any;
+    name?: string;
     connect(a?: any): void;
   }
 
@@ -18,7 +19,10 @@ declare module "Chasi/Database" {
 
   export type PrismaOptions<U> = {
     useDynamicPrismaClient: boolean;
+    /** Path to the generated Prisma client (relative to src/). */
     client: string;
+    /** Path to schema.prisma (relative to project root). */
+    schema?: string;
     dims?: PrismaClient;
     globals?: any;
   };

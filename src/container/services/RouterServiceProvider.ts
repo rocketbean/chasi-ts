@@ -45,6 +45,7 @@ export default class RouterServiceProvider
           { m: "post", url: "/api/users/signin" },
           { m: "post", url: "/api/users/signup" },
           { m: "post", url: "/api/users/forget" },
+          { m: "post", url: "/api/users/pg-signup" },
         ],
         data: (): {} => {
           return {

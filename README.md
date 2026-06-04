@@ -1,4 +1,4 @@
-# chasi-ts &nbsp;`v3.6.0`
+# chasi-ts &nbsp;`v4.0.0`
 
 A TypeScript MVC framework for Node.js, built on Express. Chasi autoloads controllers, models, routes, and services at startup, wiring them together through a structured lifecycle — so you focus on your application logic, not the boilerplate.
 
@@ -179,7 +179,9 @@ src/server.ts
 | `src/config/` | App-level config: server, database, auth, compiler, exceptions |
 | `src/container/controllers/` | Route handlers — extend base `Controller` |
 | `src/container/models/` | Mongoose schemas — extend base `Model` |
-| `src/container/services/` | Service providers (Router, Socket, Compiler) |
+| `src/container/services/` | Service providers (Router, Socket, Compiler, ApiSpec, SdkBuilder) |
+| `src/container/modules/ApiSpecs/` | OpenAPI spec generation module |
+| `src/container/modules/SdkBuilder/` | JavaScript SDK bundle generation module |
 | `src/container/middlewares/` | Custom middleware |
 | `src/container/http/` | Route definitions (`api.ts`, `chasi.ts`) |
 | `src/package/framework/` | Core framework internals |
@@ -209,6 +211,8 @@ All config files live in `src/config/` and are fully TypeScript-typed. Key files
 | `compiler.ts` | `CompilerEngineConfig` | Vite SSR engine configuration |
 | `exceptions.ts` | `ExceptionsConfig` | Error log destination, exception registry, default HTTP responses |
 | `observer.ts` | `ObserverConfig` | Event registry, global `beforeEmit`/`afterEmit` hooks |
+| `apispec.ts` | `ApiSpecConfig` | OpenAPI spec output, schema filters, security, components |
+| `sdkbuilder.ts` | `SdkBuilderConfig` | SDK output path, host, HTTP client, route filters, formatter |
 
 ### Environment modes
 
@@ -649,7 +653,218 @@ Switch between `"dev"` (Vite HMR) and `"prod"` (static build) by changing the `e
 
 ---
 
+## API Spec
+
+The `ApiSpec` module auto-generates an **OpenAPI 3.x** JSON spec file on every server boot. It collects model schemas from all active database connections and route definitions from registered routers.
+
+### Enable
+
+`ApiSpecServiceProvider` is already registered in `ServiceBootstrap`. Configure it in `src/config/apispec.ts`:
+
+```ts
+import type { ApiSpecConfig } from "../container/modules/ApiSpecs/ApiSpec.types.js";
+
+export default <ApiSpecConfig>{
+  enabled: true,
+  output: { filename: "api.spec.json", pretty: true },
+  definition: {
+    openapi: "3.0.0",
+    info: { title: "My API", version: "1.0.0" },
+    servers: [{ url: "http://localhost:3010" }],
+  },
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+  schemas: {
+    keyFormat: "prefixed",              // test:user, pg:properties, mysql:User
+    drivers: { exclude: ["test"] },     // skip the test DB entirely
+    models: { pg: { exclude: ["users", "userApps"] } },
+  },
+};
+```
+
+### Annotate routes
+
+Add a `spec` option to any route. Only annotated routes appear in the output:
+
+```ts
+route.post("/signup", "v1/UserController@create", {
+  spec: {
+    summary: "Register a new user",
+    security: [],   // public route — no JWT
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["name", "email", "password"],
+            properties: {
+              name:     { type: "string" },
+              email:    { type: "string", format: "email" },
+              password: { type: "string", format: "password", minLength: 6 },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: "Created user", content: { "application/json": { schema: { $ref: "#/components/schemas/test:user" } } } },
+      400: { description: "Email already exists" },
+    },
+  },
+});
+```
+
+Tags are auto-derived from the enclosing `route.group` prefix (e.g. `/users` → `"Users"`). Auth is auto-resolved from `AuthRouteExceptions` — public routes get `security: []` automatically.
+
+### Schema key formats
+
+| Setting | Example key | `$ref` |
+|---|---|---|
+| `keyFormat: "plain"` | `user` | `#/components/schemas/user` |
+| `keyFormat: "prefixed"` | `test:user` | `#/components/schemas/test:user` |
+
+---
+
+## SDK Builder
+
+The `SdkBuilder` module generates a **JavaScript SDK bundle** from your registered routes, ready to be consumed by a frontend or mobile app with no extra tooling.
+
+### Enable
+
+`SdkBuilderServiceProvider` is already registered in `ServiceBootstrap`. Configure it in `src/config/sdkbuilder.ts`:
+
+```ts
+import type { SdkBuilderConfig } from "../container/modules/SdkBuilder/SdkBuilder.types.js";
+import { terserFormatter } from "../container/modules/SdkBuilder/formatters/terser.js";
+
+export default <SdkBuilderConfig>{
+  enabled: true,
+  host: `http://localhost:${checkout(process.env.ServerPort, "3010")}`,
+  output: {
+    filename: "sdk/chasi.sdk.js",
+    formatter: terserFormatter,   // minify + mangle via terser (default)
+  },
+  httpClient: "fetch",            // "fetch" (default) or "axios"
+  routers: ["api"],               // which routers to include
+  exclude: [
+    { m: "post", url: "/api/users/forget" },
+  ],
+};
+```
+
+### Add validation with `.sdk()`
+
+Register validation handlers on a route, group, or router. They run in two phases:
+
+1. **Build time** — called during `SdkBuilder.compile()` with a `SdkBuildContext` to validate route configuration
+2. **Client side** — serialised as inline functions in the generated bundle and executed before every HTTP request
+
+```ts
+// Route-level
+route.post("/signin", "v1/UserController@signin", { spec: { ... } })
+  .sdk((params, next) => {
+    if (!params?.email) throw new Error("email is required");
+    next();
+  });
+
+// Array of handlers
+route.post("/signup", "v1/UserController@create", { spec: { ... } })
+  .sdk([validateEmail, validatePassword]);
+
+// Group-level — applied to all routes in the group
+route.group({ prefix: "/users", sdk: [validateScope] }, () => {
+  route.post("/signin", ...);
+  route.post("/signup", ...);
+});
+
+// Router-level — applied to every route in the router
+new Router({ name: "api", sdk: [validateApiVersion], ... })
+```
+
+Execution order per route: **router sdk → group sdk → route sdk → HTTP request**.
+
+> sdk() handlers are cleared from endpoints after compilation — they never run during normal server operation.
+
+### Generated bundle
+
+The output is an ES module grouped by route namespace:
+
+```js
+// sdk/chasi.sdk.js (generated)
+export const users = {
+  /** POST /api/users/signin · public · sdk() validated */
+  signin: async (payload = {}) => {
+    _validate(payload, ["email", "pass"]);
+    await _runSdk(payload, [(params, next) => {
+      if (!params?.email) throw new Error("email is required");
+      next();
+    }]);
+    return _request("post", "/api/users/signin", payload);
+  },
+  /** POST /api/users/signup · public */
+  signup: async (payload = {}) => { ... },
+};
+export default { users };
+```
+
+### Consuming the SDK
+
+```js
+import { users } from "./sdk/chasi.sdk.js";
+
+// Public route
+const { user, token } = await users.signin({ email: "a@b.com", pass: "secret" });
+
+// Protected route — pass the JWT
+const profile = await users.index({}, token);
+
+// Validation fires before the request
+try {
+  await users.signup({ name: "Alice" }); // throws: Missing required field "email"
+} catch (err) {
+  console.error(err.message);
+}
+```
+
+### Custom formatter
+
+Swap `terserFormatter` for any `(code: string) => string | Promise<string>` function:
+
+```ts
+// uglify-js@3
+import UglifyJS from "uglify-js";
+formatter: (code) => UglifyJS.minify(code).code
+
+// prettier (for readable, formatted output)
+import prettier from "prettier";
+formatter: (code) => prettier.format(code, { parser: "babel" })
+
+// no formatting — omit the property
+```
+
+---
+
 ## Release Notes
+
+### v4.0.0
+- Added **ApiSpec** module — generates an OpenAPI 3.x JSON spec file on every boot from registered routes and auto-collected model schemas (MongoDB, Prisma, Drizzle)
+- Added `src/config/apispec.ts` — fully typed `ApiSpecConfig` with output path, schema filters (`drivers`, `models`, `keyFormat`), shared components, and global security
+- Schema keys support two formats: `"plain"` (`user`) or `"prefixed"` (`test:user`) controlled by `schemas.keyFormat`; every schema includes an `x-driver` extension field
+- Route-level OpenAPI spec declared inline as a `spec` option on route definitions — tags auto-derived from group prefix, auth auto-resolved from `AuthRouteExceptions`
+- Added **SdkBuilder** module — generates a JavaScript ES module SDK bundle from registered routes, consumed directly by frontend or mobile apps
+- Added `src/config/sdkbuilder.ts` — fully typed `SdkBuilderConfig` with host, output path, HTTP client (`fetch` / `axios`), router and route exclude filters
+- Added `.sdk()` method on `Endpoint` — accepts a single `SdkMiddlewareFn` or an array; handlers run at build time (route validation) and are serialised into the generated bundle as client-side validators
+- Added `sdk` property to `RouteGroupProperty` and `RouterConfigInterface` — group/router-level sdk handlers propagate to all child endpoints in order (router → group → route)
+- sdk() handlers are cleared from all endpoints after compilation — they never run during server operation
+- Added `SdkBuilderFormatter` type — formatter function `(code: string) => string | Promise<string>` applied to the bundle before writing; built-in `terserFormatter` (terser minify + mangle) is the default
+- Added `terser` to dependencies for the built-in SDK formatter
+- Added `ApiSpec` and `SDK Builder` pages to the built-in documentation UI (v4.0.0 default version)
+- Updated `tsconfig.json` to exclude `**/*.sdk.js` and `**/*.spec.json` generated output files from TypeScript compilation
 
 ### v3.6.0
 - Added **Drizzle ORM** database driver — supports PostgreSQL (`node-postgres`, `postgres-js`), MySQL (`mysql2`), SQLite (`better-sqlite3`), and Turso (`libsql`) alongside existing MongoDB/Prisma connections

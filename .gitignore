@@ -15,5 +15,6 @@ dist/*
 .gitmodules
 rest.http
 notes
-CLAUDE.md
-./claude
+src/container/prisma/client
+sdk/*
+api.spec.json
