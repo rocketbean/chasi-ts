@@ -34,7 +34,7 @@
   "email": "buzzrocketbeab@gmail.com",
   "license": "ISC",
   "devDependencies": {
-    "@rocketbean/create-chasi-ts": "^1.0.7",
+    "@rocketbean/create-chasi-ts": "^1.0.8",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@types/chalk": "^2.2.0",
     "@types/express": "^4.17.13",
