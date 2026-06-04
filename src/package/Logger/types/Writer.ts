@@ -81,7 +81,7 @@ export default abstract class Writer {
         colors: true,
       });
     }
-    if(Number(process.env["Log_Level"]) > 0 ) Writer.log(message, subject);
+    if(Number(checkout( process.env["Log_Level"], 2)) > 0 ) Writer.log(message, subject);
   }
 
   drawAs(
@@ -93,7 +93,7 @@ export default abstract class Writer {
     let parsedStr: any = message;
     if (!subject) subject = this.subject;
     if (formatStr) parsedStr = this.format(message);
-    if(Number(process.env["Log_Level"]) > 0 ) Writer.log(draw(parsedStr), subject);
+    if(Number(checkout( process.env["Log_Level"], 2)) > 0 ) Writer.log(draw(parsedStr), subject);
   }
 
   group(label: string = " ") {
