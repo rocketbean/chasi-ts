@@ -104,6 +104,7 @@ export default class SchemaCollection {
   }
 
   collectMongoSchemas(db: MongoDBDriver, filter?: ApiSpecSchemaFilter): void {
+    if (!db.connection?.models) return;
     const instance = db.connection.models;
     const dbName = db.name;
     Object.keys(instance).forEach((model: string) => {
