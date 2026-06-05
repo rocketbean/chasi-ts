@@ -1,4 +1,4 @@
-# chasi-ts &nbsp;`v4.0.0`
+# chasi-ts &nbsp;`v4.x.x`
 
 A TypeScript MVC framework for Node.js, built on Express. Chasi autoloads controllers, models, routes, and services at startup, wiring them together through a structured lifecycle — so you focus on your application logic, not the boilerplate.
 
@@ -92,13 +92,13 @@ TypeScript compiles to `dist/` (CommonJS, ESNext target). The `postbuild` step a
 Install the Chasi CLI globally or use it via `npx`:
 
 ```bash
-npm i -g @rocketbean/chasis
+npm i -g @rocketbean/create-chasi-ts
 # or use npx chasis <command>
 ```
 
 ### Create a Controller
 ```bash
-chasis create -c UserController
+chasis create -c User
 # → src/container/controllers/UserController.ts
 ```
 
