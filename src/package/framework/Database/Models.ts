@@ -58,7 +58,7 @@ export default class Models extends Base {
       Models.collection[db] = {};
 
       if (_d.driverName === "mongodb") {
-        Models.collection[_d.name] = _d.connection.models
+        Models.collection[_d.name] = _d.connection?.models
       }
 
       if (_d.driverName === "prisma") {
