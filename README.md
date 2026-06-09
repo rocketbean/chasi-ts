@@ -3,7 +3,7 @@
 A TypeScript MVC framework for Node.js, built on Express. Chasi autoloads controllers, models, routes, and services at startup, wiring them together through a structured lifecycle — so you focus on your application logic, not the boilerplate.
 
 - **npm** — https://www.npmjs.com/package/@rocketbean/chasi-ts
-- **CLI** — https://www.npmjs.com/package/@rocketbean/chasis
+- **CLI** — https://www.npmjs.com/package/@rocketbean/create-chasi-ts
 - **GitHub** — https://github.com/rocketbean/chasi-ts
 
 > **Docs** — full interactive documentation is served locally. Start the server and open `http://localhost:3010` in your browser.
@@ -93,12 +93,12 @@ Install the Chasi CLI globally or use it via `npx`:
 
 ```bash
 npm i -g @rocketbean/create-chasi-ts
-# or use npx chasis <command>
+# or use npx chasi <command>
 ```
 
 ### Create a Controller
 ```bash
-chasis create -c User
+chasi create -c User
 # → src/container/controllers/UserController.ts
 ```
 
@@ -115,7 +115,7 @@ route.group({ prefix: "user", controller: "@UserController" }, () => {
 
 ### Create a Model
 ```bash
-chasis create -m User
+chasi create -m User
 # → src/container/models/User.ts
 ```
 
@@ -128,7 +128,7 @@ get user() {
 
 ### Create a Service Provider
 ```bash
-chasis create -p MyServiceProvider
+chasi create -p MyServiceProvider
 # → src/container/services/MyServiceProvider.ts
 ```
 
@@ -141,7 +141,7 @@ ServiceBootstrap: {
 
 ### Create a Middleware
 ```bash
-chasis create -w AuthMiddleware
+chasi create -w AuthMiddleware
 # → src/container/middlewares/AuthMiddleware.ts
 ```
 
