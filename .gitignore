@@ -18,3 +18,14 @@ notes
 src/container/prisma/client
 sdk/*
 api.spec.json
+
+.claude/
+docker/
+drizzle/
+prisma/
+sdk/
+
+api.sdk.json
+api.spec.json
+CLAUDE.node_modules
+drizzle.config.*

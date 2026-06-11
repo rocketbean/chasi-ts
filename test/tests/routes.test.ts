@@ -1,14 +1,17 @@
-import { describe, expect, test, beforeAll } from "vitest";
+import { describe, expect, test, beforeAll, afterAll } from "vitest";
 import { app } from "../setup.ts";
 import App from "../helper.ts";
+import instance from "../../src/server.ts";
 console.clear();
-
-const $app = new app({ basePath: "/api/users", signinUrl: "/signin" });
 
 export default async ($app: App) => {
 describe("Route capabilities", async () => {
   beforeAll(async () => {
-    await $app.send({ url: "/forget", method: "post" });
+    await $app.send({ url: "/users/forget", method: "post" });
+  });
+
+  afterAll(async () => {
+    await instance.close();
   });
 
   describe("Route resolution", () => {

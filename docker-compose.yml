@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: chasi-pg
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: chasi
+      POSTGRES_PASSWORD: chasi
+      POSTGRES_DB: chasi
+    command:
+      - postgres
+      - -c
+      - listen_addresses=*
+      - -c
+      - hba_file=/etc/postgresql/pg_hba.conf
+    volumes:
+      - chasi_pg_data:/var/lib/postgresql/data
+      - ./docker/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+
+  mysql:
+    image: mysql:8.4
+    container_name: chasi-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: chasi
+      MYSQL_USER: chasi
+      MYSQL_PASSWORD: chasi
+    command:
+      - --bind-address=0.0.0.0
+    volumes:
+      - chasi_mysql_data:/var/lib/mysql
+
+volumes:
+  chasi_pg_data:
+  chasi_mysql_data:

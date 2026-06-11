@@ -1,0 +1,57 @@
+// Mirrors src/container/drizzle/schema.ts (users, user_apps, properties, units)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("MYSQL_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String    @db.VarChar(255)
+  password  String?   @db.VarChar(255)
+  alias     String    @unique @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  apps      UserApp[]
+
+  @@map("users")
+}
+
+model UserApp {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  appId  String @map("app_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, appId], map: "user_apps_user_app_unique")
+  @@map("user_apps")
+}
+
+model Property {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(255)
+  code      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  units     Unit[]
+
+  @@map("properties")
+}
+
+model Unit {
+  id         String   @id @default(uuid())
+  name       String   @db.VarChar(255)
+  code       String   @db.VarChar(255)
+  propertyId String   @map("property_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("units")
+}
