@@ -48,7 +48,7 @@ export default class NetServer {
           payload.transmit.props,
           false)
       } else if (payload.event == "send") {
-        let ch = NetServer.$routers[payload.transmit.props.path].channel.get(payload.channel)
+        let ch = NetServer.$routers[payload.transmit.props.path].channel.get(payload.transmit.channel)
         ch.send(
           payload.transmit.payload,
           payload.transmit.props,
