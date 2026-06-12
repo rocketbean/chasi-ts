@@ -28,7 +28,8 @@ export default (server: SocketRouter) => {
 
   // ── Channel: leave ────────────────────────────────────────────────────
   server.on("channel:leave", (payload, client) => {
-    const { name } = payload;
+    const name = payload?.name;
+    if (!name) return client.sendEvent("error", { message: "channel name required" });
     const ch = Channel.get(name);
     if (ch) ch.unsubscribe(client);
     client.sendEvent("channel:left", { name });
