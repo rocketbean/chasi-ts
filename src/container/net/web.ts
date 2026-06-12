@@ -37,7 +37,9 @@ export default (server: SocketRouter) => {
 
   // ── Channel: send to a specific channel ───────────────────────────────
   server.on("channel:send", (payload, client) => {
-    const { name, data } = payload;
+    const name = payload?.name;
+    const data = payload?.data;
+    if (!name) return client.sendEvent("error", { message: "channel name required" });
     const ch = Channel.get(name);
     if (!ch) return client.sendEvent("error", { message: `channel "${name}" not found` });
     ch.send(data, { path: server.path });
