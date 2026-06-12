@@ -6,7 +6,6 @@ import type { SdkMiddlewareFn } from "Chasi/Router";
  * add any extra request-level auth logic here.
  */
 export default async (request, response, next) => {
-  Logger.log("fired:: Auth mw", process.pid);
   next();
 };
 

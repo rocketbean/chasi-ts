@@ -21,6 +21,13 @@ export default class devBundler extends Bundler implements BundlerInterface {
       if (req.originalUrl.includes(this.base)) {
         try {
           const url = req.originalUrl.replace(this.base, "/");
+          const urlPath = url.split("?")[0];
+          if (!this.isValidRoute(urlPath)) {
+            return res
+              .status(404)
+              .set({ "Content-Type": "text/html" })
+              .end(this.notFoundResponse());
+          }
           let html = await this.render(url);
           res.status(200).set({ "Content-Type": "text/html" }).end(html);
         } catch (e) {

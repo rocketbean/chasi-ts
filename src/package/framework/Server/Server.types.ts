@@ -92,13 +92,19 @@ export type serverModeConfig = {
   }
 }
 
+export type PortRange = { start: number; end: number };
+
 export type serverConfig = {
 
   /** *port
-  * port number to be used
-  * by the server
+  * port (or ports) the server may listen on.
+  * - number:               single port  e.g. 3010
+  * - number[]:             explicit list e.g. [3010, 3011, 3012]
+  * - { start, end }:       inclusive range e.g. { start: 3010, end: 3020 }
+  * When the chosen port is in use the runtime tries the next candidate
+  * in order until one succeeds.
   */
-  port: number;
+  port: number | number[] | PortRange;
 
   /** environment
   * environment setup

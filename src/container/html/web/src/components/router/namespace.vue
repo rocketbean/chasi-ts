@@ -119,6 +119,19 @@ const rgpList = reactive({
       sub: "[RouteGroupProperty.after]",
       tag: "<Function<void>",
       desc: `after() will be emitted before sending a response object to the client`
+    },
+    {
+      hook: "rgp-sdk",
+      title: "sdk",
+      sub: "[RouteGroupProperty.sdk]",
+      tag: "<SdkMiddlewareFn | SdkMiddlewareFn[]>",
+      desc: `SDK validation handlers applied to every route inside this group.
+        Accepts a single handler or an array. Prepended before route-level
+        <a class="tag is-dark">.sdk()</a> handlers and serialised by
+        <a class="tag is-dark">SdkBuilder</a> into the generated client bundle.
+        Execution order: <strong>router sdk → group sdk → route sdk</strong>.
+        Handlers are cleared from all endpoints before the server begins
+        handling live requests.`
     }
 ]});
 

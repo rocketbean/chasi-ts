@@ -47,6 +47,45 @@
       </div>
     </section>
     <list :items="loggerData.list" />
+
+    <!-- Terminal Dashboard section -->
+    <section class="section">
+      <div class="pan-title">
+        <div class="x-center is-size-3">
+          <span><hook id="terminalDashboard" /> Terminal Dashboard</span>
+          <span class="tag is-info is-light is-medium">Storage</span>
+        </div>
+        <small>
+          <span class="subtitle">live terminal UI rendered by the primary process</span>
+        </small>
+      </div>
+      <div class="sub-text">
+        Chasi renders a live dashboard directly in the terminal. It tracks database connections,
+        registered routes, booted services, worker status, exceptions, and performance — all in
+        a single persistent display that redraws on new log entries and on terminal resize.
+      </div>
+    </section>
+    <list :items="dashboardData.list" />
+
+    <!-- Service Clustering section -->
+    <section class="section">
+      <div class="pan-title">
+        <div class="x-center is-size-3">
+          <span><hook id="clusterSection" /> Service Clustering</span>
+          <span class="tag is-primary is-light is-medium">ServiceCluster</span>
+        </div>
+        <small>
+          <span class="subtitle">[src/config/server.ts → serviceCluster]</span>
+        </small>
+      </div>
+      <div class="sub-text">
+        Enable Node.js multi-process clustering via <code>serviceCluster</code> in
+        <code>src/config/server.ts</code>. The primary process manages worker lifecycle,
+        pipes structured log data from the lead worker to the dashboard, and handles
+        graceful shutdown on <code>SIGTERM</code> / <code>SIGINT</code>.
+      </div>
+    </section>
+    <list :items="clusterData.list" />
   </div>
 </template>
 <script setup>
@@ -104,9 +143,31 @@ const data = reactive({
       hook: "scport",
       title: "port",
       sub: "[serverConfig.port]",
-      tag: "<number>",
-      desc: `This value will be passed to chasi's core upon booting, 
-          and will serve as local serving port.`
+      tag: "<number | number[] | { start, end }>",
+      desc: `Accepts a single port number, an explicit list, or a start/end range object.
+        When the chosen port is already in use the runtime automatically tries the next
+        candidate in order until one succeeds, then updates
+        <code>process.env.ServerPort</code> and <code>global.__basepath</code> to the
+        resolved value. The <code>ServerPort</code> env var supports the same three
+        notations as a string.`
+    },
+    {
+      hook: "scport-range",
+      title: "port — range",
+      sub: "[serverConfig.port]",
+      tag: "{ start: number, end: number }",
+      desc: `Declare a range as <code>{ start: 3010, end: 3020 }</code> in config,
+        or as the string <code>"3010-3020"</code> in the <code>ServerPort</code> env var.
+        The runtime tries each port in order from <code>start</code> to <code>end</code>.`
+    },
+    {
+      hook: "scport-list",
+      title: "port — list",
+      sub: "[serverConfig.port]",
+      tag: "number[]",
+      desc: `Declare an explicit list as <code>[3010, 3011, 3012]</code> in config,
+        or as the comma-separated string <code>"3010,3011,3012"</code> in the
+        <code>ServerPort</code> env var. Ports are tried in declaration order.`
     },
     {
       hook: "scenvi",
@@ -193,6 +254,120 @@ const data = reactive({
   ]
 })
 
+const dashboardData = reactive({
+  list: [
+    {
+      hook: "td-sections",
+      title: "Dashboard sections",
+      sub: "[Storage]",
+      tag: "THREADS · PERFORMANCE · DATABASE · ROUTE REGISTRY · SERVICES · BOOT · EXCEPTIONS · LOGS · WORKERS",
+      desc: `Each section only renders when it contains at least one entry. Sections render
+        in a fixed order. The <strong>EXCEPTIONS</strong> section surfaces unhandled errors
+        from all workers; all other structured sections forward only from the lead worker
+        to keep the display clean.`
+    },
+    {
+      hook: "td-redraw",
+      title: "Debounced redraw",
+      sub: "[Storage._redraw()]",
+      tag: "~50 ms debounce",
+      desc: `Rapid log writes during boot are collapsed into a single repaint ~50 ms after
+        the last write. The visible screen is erased with <code>\\x1b[2J\\x1b[H</code>
+        (erase + cursor home) so the scrollback buffer is never cleared — previous
+        terminal output remains accessible by scrolling up.`
+    },
+    {
+      hook: "td-resize",
+      title: "Resize handling",
+      sub: "[process.stdout resize]",
+      tag: "TERM_COLS",
+      desc: `The dashboard listens to <code>process.stdout</code> resize events and
+        immediately redraws with the new terminal width. In cluster mode, worker processes
+        inherit the primary's terminal width via <code>TERM_COLS</code> injected into
+        <code>process.env</code> at fork time — log formatters use this so all entries
+        align correctly even though workers have no TTY.`
+    }
+  ]
+})
+
+const clusterData = reactive({
+  list: [
+    {
+      hook: "cls-lead",
+      title: "Lead worker",
+      sub: "[process.env.lead]",
+      tag: "first forked worker",
+      desc: `The first forked worker is designated the lead. Only the lead forwards
+        structured log sections (DATABASE, BOOT, SERVICES, ROUTE REGISTRY) to the
+        primary's dashboard. All workers forward unhandled exceptions. This prevents
+        N×M duplicate entries when running multiple workers.`
+    },
+    {
+      hook: "cls-termcols",
+      title: "Terminal width",
+      sub: "[TERM_COLS]",
+      tag: "process.env.TERM_COLS",
+      desc: `Worker processes have no TTY — <code>process.stdout.columns</code> is
+        <code>undefined</code>. The primary injects <code>TERM_COLS</code> into
+        <code>process.env</code> before forking so all workers inherit the correct
+        terminal width. Log formatters (<code>Full</code>, <code>LeftFull</code>,
+        <code>EndTraceFull</code>) use this value to produce correctly-padded output.`
+    },
+    {
+      hook: "cls-restart",
+      title: "Worker restart",
+      sub: "[cluster.on('exit')]",
+      tag: "leadWorkerId tracking",
+      desc: `When a worker crashes and is re-forked, the replacement inherits the same
+        lead or non-lead role as the process it replaces. The primary tracks
+        <code>leadWorkerId</code> and sets <code>process.env.lead</code> correctly
+        before each re-fork — previously all restarted workers became non-lead,
+        silently stopping structured log forwarding.`
+    },
+    {
+      hook: "cls-shutdown",
+      title: "Graceful shutdown",
+      sub: "[SIGTERM / SIGINT]",
+      tag: "5s drain window",
+      desc: `On <code>SIGTERM</code> or <code>SIGINT</code> the primary calls
+        <code>worker.disconnect()</code> on each worker, allowing up to 5 seconds for
+        in-flight requests to complete before <code>process.exit(0)</code>. Send
+        <code>SIGTERM</code> to the primary PID to trigger a clean shutdown:
+        <code>kill -TERM &lt;pid&gt;</code>.`
+    },
+    {
+      hook: "cls-destroy",
+      title: "Storage.destroy()",
+      sub: "[SessionStorage]",
+      tag: "cleanup",
+      desc: `Call <code>storage.destroy()</code> to remove the terminal resize listener
+        and clear the performance-tracking interval. Prevents listener and timer
+        accumulation when the primary process reinitialises (e.g. hot reload).`
+    },
+    {
+      hook: "cls-compiler",
+      title: "Compiler + Cluster",
+      sub: "[compiler + serviceCluster]",
+      tag: "cluster.isWorker guard",
+      desc: `The <code>compiler</code> module and <code>serviceCluster</code> can be
+        enabled simultaneously. Workers automatically skip the Vite engine setup via a
+        <code>cluster.isWorker</code> guard — only the primary process initialises the
+        compiler. Set the compiler <code>environment</code> to <code>"prod"</code> for
+        cluster deployments; Vite's HMR dev server is not designed for multi-process use.`
+    },
+    {
+      hook: "cls-errors",
+      title: "Cluster error surfacing",
+      sub: "[consumeStream / handleSocketActions]",
+      tag: "exceptions section",
+      desc: `Unhandled errors inside the primary's pipe message handlers
+        (<code>consumeStream</code>, <code>handleServiceActions</code>,
+        <code>handleSocketActions</code>) are written to the
+        <strong>EXCEPTIONS</strong> section of the terminal dashboard instead of being
+        silently dropped.`
+    }
+  ]
+})
 </script>
 
 <style scoped></style>

@@ -54,7 +54,7 @@ export type SessionStorageData = {
   exceptions: any;
   reports: any;
   logs: any;
-  workers?: {};
+  workers?: string[];
 };
 
 export type SessionStorageClusterData = {

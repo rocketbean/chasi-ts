@@ -66,12 +66,15 @@ export default class Channel {
   }
 
   send(payload, props: ChannelConfig, emitter = true) {
-    if (this.$pipe) {
+    if (emitter && this.$pipe) {
       this.$pipe?.write({
         action: "websock:channel",
         event: "send",
         transmit: { channel: this.name, payload, props }
       })
+      // pipe broadcasts to all workers — don't also call _send or clients on
+      // this worker receive the message twice
+      return;
     }
     this._send(payload, props)
   }

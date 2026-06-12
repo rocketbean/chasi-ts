@@ -68,9 +68,11 @@ export default class NetServer {
    */
   setConnectionRoute(request, socket, head): void {
     const { pathname } = parse(request.url);
-    Object.keys(NetServer.$routers).map((serv) => {
-      if (pathname == serv) {
-        NetServer.$routers[serv].connect(socket, request, head);
+    Object.keys(NetServer.$routers).forEach((serv) => {
+      if (pathname === serv) {
+        NetServer.$routers[serv].connect(socket, request, head).catch((e) => {
+          Logger.log("NetServer:connect error", e);
+        });
       }
     });
   }

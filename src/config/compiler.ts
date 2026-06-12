@@ -46,86 +46,26 @@ const config: CompilerEngineConfig = {
    */
   engines: [
     {
-      /**
-       * Unique name for this engine instance.
-       * Must match the `name` passed to `router.mount()` in the
-       * `RouterServiceProvider` so Chasi knows which engine to attach
-       * to which router.
-       */
       name: "web",
-
-      /**
-       * Build mode for this engine.
-       * `"dev"`  — starts Vite's dev server with HMR (not cluster-safe).
-       * `"prod"` — runs a full Vite build and serves static output.
-       * Should match the top-level `environment` variable above.
-       */
       environment,
-
-      /**
-       * Absolute path to the Vite project root (the directory containing
-       * `vite.config.js` / `ssr.config.js`).
-       * In dev mode this points into `/src`; in prod into `/dist`.
-       */
       root: join(dirpath, "container/html/web"),
-
-      /**
-       * Entry point for the SSR server bundle.
-       * Vite compiles this file as the Node.js renderer that turns
-       * Vue/React components into HTML strings for each request.
-       */
       ssrServerModule: "entry-server.js",
-
-      /**
-       * Vite build options for the SSR server bundle.
-       * `outDir` is relative to `root`. `ssr` points to the server entry file.
-       * See: https://vitejs.dev/config/build-options
-       */
       serverBuild: {
         outDir: "./.out/server",
-        /** Clear the output directory before each build to avoid stale assets. */
         emptyOutDir: true,
         ssr: "./entry-server.js",
       },
-
-      /**
-       * Vite build options for the client-side bundle.
-       * `manifest: true` generates a `manifest.json` used to inject hashed
-       * asset URLs into SSR-rendered HTML. `ssrManifest` enables preload hints.
-       */
       clientBuild: {
         outDir: "./.out/client",
         emptyOutDir: true,
-        /** Required for SSR asset injection — do not disable. */
         manifest: true,
         ssrManifest: true,
       },
-
-      /**
-       * Absolute path to the Vite config file for this engine.
-       * Supports a separate SSR-specific config (`ssr.config.js`) instead of
-       * the default `vite.config.js`, letting you keep SSR options isolated.
-       */
       configPath: resolve(join(dirpath, "container/html/web/ssr.config.js")),
-
-      /**
-       * The router prefix this engine is attached to.
-       * Must match the `prefix` of the router declared in `RouterServiceProvider`.
-       * Use `"/"` when the router has no prefix.
-       * Chasi also uses this path as the base URL for serving compiled static files.
-       */
       mountedTo: "/",
-
-      /**
-       * Called during `server.hooks.beforeApp` before Express starts accepting requests.
-       * In `"prod"` mode: distributes the compiled bundle and runs `prodSetup` to
-       * wire static file serving and the SSR renderer into Express.
-       * Runs once on the primary process — not per worker — to avoid redundant builds
-       * when `serviceCluster` is enabled.
-       */
       hook: async (getConfig: Function, ctx: builderConfig): Promise<void> => {
         //@ts-ignore
-        if (environment === "prod") await Builder.distribute(ctx.root); // execs only on TS
+        if (environment === "prod") await Builder.distribute(ctx.root);
         await Builder.prodSetup(getConfig, ctx);
       },
     },

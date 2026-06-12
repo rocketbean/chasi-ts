@@ -11,7 +11,6 @@ export type HttpMethods =
   | "get"
   | "put"
   | "patch"
-  | "update"
   | "delete";
 
 export type submitOptions = {
@@ -51,7 +50,7 @@ export default class Helper {
     return Helper.AppInstance;
   }
 
-  async authenticate(data: { email: string; password: string }) {
+  async authenticate(data: { email: string; pass: string }) {
     let { basePath, signinUrl } = this.opts;
     let res = await this.send({
       url: signinUrl,

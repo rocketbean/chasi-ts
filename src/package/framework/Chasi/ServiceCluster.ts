@@ -18,9 +18,11 @@ export default class ServiceCluster {
   public pids: string[] = [];
   public ids: string[] = [];
   public workers: ClusterWorker[] = [];
-  private forkOpts: { env: NodeJS.ProcessEnv; FORCE_COLOR: number } = {
-    env: { ...process.env },
-    FORCE_COLOR: 3,
+  private leadWorkerId: number | null = null;
+  // cluster.fork(env) expects a flat key/value object — nesting an "env" key
+  // inside it would stringify to "[object Object]" in the worker's process.env.
+  private forkOpts: Record<string, string> = {
+    FORCE_COLOR: "3",
   };
 
   constructor(public $session: Session) {
@@ -135,10 +137,18 @@ export default class ServiceCluster {
         }
         if (action.includes("logData")) {
           const transmit = _prop.transmit as Record<string, unknown>;
-          Logger.clusterLog(_prop.worker as { pid: number; id: number }, transmit.message);
+          const worker  = _prop.worker as { pid: number; id: number };
+          const target  = (transmit.target as string) || "logs";
+          const msg     = String(transmit.message);
+          // Structured sections (boot, database, routeRegistry, services…) already
+          // carry visual formatting baked in — prepending a raw text prefix breaks
+          // their padding. Only tag exceptions so the originating worker is clear.
+          const entry = target === "exceptions" ? `[w${worker.id}:${worker.pid}] ${msg}` : msg;
+          this.storage.write(entry, target);
         }
         if (action.includes("server::ready")) {
-          Logger.clusterLogSystem(_prop.worker as { pid: number; id: number }, `[Server {${(_prop.worker as Record<string, unknown>).pid}} onReady state]`);
+          const worker = _prop.worker as Record<string, unknown>;
+          this.storage.write(`Worker ${worker.id}  pid ${worker.pid}  ready\n`, "workers");
         }
       }
 
@@ -154,28 +164,45 @@ export default class ServiceCluster {
 
       return chunk;
     } catch (e: unknown) {
-      Logger.log("SERVCLUSTERR::", e);
+      this.storage.write(`[consumeStream] ${String(e)}`, "exceptions");
     }
   }
 
   async handleServiceActions(worker: ClusterWorker, _prop: ServicePipeProp): Promise<void> {
     setTimeout(async () => {
-      await this.broadcast(
-        JSON.stringify({
-          service: _prop.service,
-          action: `service:${_prop.service}`,
-          transmit: _prop,
-        }),
-      );
+      try {
+        await this.broadcast(
+          JSON.stringify({
+            service: _prop.service,
+            action: `service:${_prop.service}`,
+            transmit: _prop,
+          }),
+        );
+      } catch (e: unknown) {
+        this.storage.write(`[handleServiceActions] ${String(e)}`, "exceptions");
+      }
     }, 20);
   }
 
   async handleSocketActions(worker: ClusterWorker, _prop: Record<string, unknown>): Promise<void> {
-    const action = _prop.action as string;
-    if (action.includes("event")) {
-      await this.broadcast(JSON.stringify({ action: "socket:fire", transmit: _prop }));
-    } else {
-      await this.broadcast(JSON.stringify({ action, transmit: _prop }));
+    try {
+      const action = _prop.action as string;
+      if (action.includes("event")) {
+        // Exclude the originating worker — it already fired the event locally.
+        // Broadcasting back to it would cause every event handler to run twice.
+        const others = this.workers.filter((w) => w.id !== worker.id);
+        await Promise.all(
+          others.map((w) =>
+            (w.process.stdio[4] as NodeJS.WritableStream).write(
+              JSON.stringify({ action: "socket:fire", transmit: _prop })
+            )
+          )
+        );
+      } else {
+        await this.broadcast(JSON.stringify({ action, transmit: _prop }));
+      }
+    } catch (e: unknown) {
+      this.storage.write(`[handleSocketActions] ${String(e)}`, "exceptions");
     }
   }
 
@@ -188,6 +215,9 @@ export default class ServiceCluster {
     return new Promise<number>((res, rej) => {
       try {
         this.setupPrimaryThread();
+        // Set TERM_COLS on the primary's process.env so every forked worker
+        // inherits the correct terminal width (workers have no TTY themselves).
+        process.env.TERM_COLS = String(process.stdout.columns || 100);
         for (let i = 0; i < this.config.workers; i++) {
           process.env["lead"] = "0";
           if (i === 0) process.env["lead"] = "1";
@@ -200,10 +230,25 @@ export default class ServiceCluster {
           this.workers.push(worker);
           this.pids.push(`${worker.process.pid}`);
           this.ids.push(`${worker.id}`);
+          // First worker forked becomes the lead.
+          if (this.leadWorkerId === null) this.leadWorkerId = worker.id;
         });
-        cluster.on("exit", () => {
-          cluster.fork(this.forkOpts);
+        cluster.on("exit", (deadWorker: ClusterWorker) => {
+          this.workers = this.workers.filter((w) => w.id !== deadWorker.id);
+          // Restore the correct lead flag before re-forking so the replacement
+          // worker inherits the same role as the one that crashed.
+          process.env["lead"] = deadWorker.id === this.leadWorkerId ? "1" : "0";
+          const newWorker = cluster.fork(this.forkOpts);
+          if (deadWorker.id === this.leadWorkerId) this.leadWorkerId = newWorker.id;
         });
+
+        const shutdown = () => {
+          for (const worker of this.workers) worker.disconnect();
+          this.storage.destroy();
+          setTimeout(() => process.exit(0), 5000).unref();
+        };
+        process.once("SIGTERM", shutdown);
+        process.once("SIGINT", shutdown);
         cluster.on("message", (_worker: ClusterWorker, _m: unknown) => {});
         res(1);
       } catch (e: unknown) {

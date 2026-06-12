@@ -2,16 +2,13 @@ import { beforeAll, describe } from "vitest";
 import { app } from "./setup.ts";
 import routesTest from "./tests/routes.test.ts";
 console.clear();
-describe("App Test running", async () => {
+describe("App Test running", () => {
   let $app = new app({
     basePath: "/api",
     signinUrl: "/api/users/signin",
   });
   beforeAll(async () => {
-    // configure app before tests
-    // await $app.configure();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   });
 
   /**
@@ -20,13 +17,9 @@ describe("App Test running", async () => {
    * - tests will be executed in the order of declaration
    *
    * E.G.
-   * await User($app);
-   * await someTest($app);
-   * 
+   * User($app);
+   * someTest($app);
    */
 
-  await routesTest($app);
-
-  // process.exit(0);
-
+  routesTest($app);
 });

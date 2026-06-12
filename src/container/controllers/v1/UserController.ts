@@ -6,6 +6,7 @@ export default class UserController extends Controller {
   get user() {
     return this.models.user;
   }
+
   /**
    * Write a New ModelEntry
    * @param {request} [ExpressRequest] Object
@@ -74,14 +75,11 @@ export default class UserController extends Controller {
     try {
       let {email, pass} = request?.body
       let user = await this.user.findByCredentials(email, pass)
-      let token = await user.generateAuthToken("dev");
+      let token = await user.generateAuthToken(process.env.environment || "local");
       return {user, token};
     } catch(e: any) {
       throw e;
     }
   }
 
-  async forget (request, response) {
-    return await this.user.collection.drop();
-  }
 }

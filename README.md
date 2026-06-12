@@ -52,7 +52,9 @@ npm install
    Key variables:
    ```env
    APP_NAME=CHASI
-   ServerPort=3010
+   ServerPort=3010-3020   # range — tries 3010 first, falls back through 3020
+   # ServerPort=3010       # single port
+   # ServerPort=3010,3011,3012  # explicit list
    environment=local
 
    # Database
@@ -214,6 +216,31 @@ All config files live in `src/config/` and are fully TypeScript-typed. Key files
 | `apispec.ts` | `ApiSpecConfig` | OpenAPI spec output, schema filters, security, components |
 | `sdkbuilder.ts` | `SdkBuilderConfig` | SDK output path, host, HTTP client, route filters, formatter |
 
+### Port selection
+
+`serverConfig.port` accepts three forms. When the chosen port is already in use the runtime tries the next candidate in order until one succeeds.
+
+```ts
+// single port
+port: 3010
+
+// explicit list — tried in order
+port: [3010, 3011, 3012]
+
+// inclusive range
+port: { start: 3010, end: 3020 }
+```
+
+`ServerPort` in `.env` overrides the config and supports the same three notations as a string:
+
+```env
+ServerPort=3010          # single
+ServerPort=3010-3020     # range
+ServerPort=3010,3011,3012 # list
+```
+
+Once the server binds successfully, `process.env.ServerPort` and `global.__basepath` are updated to reflect the actual port.
+
 ### Environment modes
 
 `src/config/server.ts` supports named server modes (e.g. `local`, `dev`) each with their own protocol and SSL cert paths. Set `environment` to switch between them:
@@ -238,7 +265,32 @@ serviceCluster: {
 }
 ```
 
-> Set the compiler `environment` to `"prod"` before enabling clustering — Vite's dev server is not cluster-safe.
+**How it works**
+
+The primary process forks `workers` child processes. All workers share the same port (handled by the OS or the Node.js round-robin scheduler). Only the **lead worker** (the first forked) forwards structured log sections (DATABASE, BOOT, SERVICES, ROUTE REGISTRY) to the primary's terminal dashboard — non-lead workers only forward unhandled exceptions, keeping the display clean. When any worker crashes and restarts, it inherits the same lead/non-lead role as the process it replaces.
+
+**Terminal dashboard in cluster mode**
+
+Each worker produces formatted log output using the primary's terminal width, which is injected as `TERM_COLS` at fork time (workers have no TTY of their own). The dashboard redraws on every new log entry and on terminal resize.
+
+**Graceful shutdown**
+
+On `SIGTERM` or `SIGINT` the primary calls `worker.disconnect()` on each worker, giving in-flight requests up to 5 seconds to complete before `process.exit(0)`. To trigger a clean shutdown programmatically:
+
+```bash
+kill -TERM <primary-pid>
+```
+
+**Using `compiler` alongside `serviceCluster`**
+
+Both modules can be enabled at the same time. Workers automatically skip the Vite engine setup — only the primary process initialises the compiler. Set the compiler `environment` to `"prod"` for production cluster deployments:
+
+```ts
+// src/config/compiler.ts
+environment: "prod",
+```
+
+> Running the compiler in `"dev"` (Vite HMR) mode while `serviceCluster` is active is not recommended — Vite's dev server is not designed for multi-process use.
 
 ---
 
@@ -645,11 +697,102 @@ export default defineConfig({
 
 ---
 
-## View / SSR
+## CompilerEngine
 
-Chasi uses [Vite](https://vitejs.dev/) for server-side rendering. The frontend project lives in `src/container/html/web/` and is configured in `src/config/compiler.ts`.
+The `CompilerEngine` module integrates [Vite](https://vitejs.dev/) SSR into Chasi, letting you colocate a Vue, React, or any Vite-compatible frontend alongside your API. Each entry in the `engines` array maps a Vite project to an Express router prefix and handles both `"dev"` (HMR) and `"prod"` (static build + SSR renderer) modes.
 
-Switch between `"dev"` (Vite HMR) and `"prod"` (static build) by changing the `environment` variable at the top of `compiler.ts`.
+Configure it in `src/config/compiler.ts`:
+
+```ts
+import { CompilerEngineConfig, Builder } from "../container/modules/compilerEngine/compiler.js";
+
+let environment: "dev" | "prod" = "prod";
+
+const config: CompilerEngineConfig = {
+  enabled: true,
+  engines: [
+    {
+      name: "web",                              // must match router.mount() prop
+      environment,                              // "dev" = HMR | "prod" = static build
+      root: join(dirpath, "container/html/web"),
+      ssrServerModule: "entry-server.js",       // filename in .out/server/ (output ext, not source)
+      serverBuild: {
+        outDir: "./.out/server",
+        emptyOutDir: true,
+        ssr: "./entry-server.js",               // source entry for SSR bundle
+      },
+      clientBuild: {
+        outDir: "./.out/client",
+        emptyOutDir: true,
+        manifest: true,
+        ssrManifest: true,
+      },
+      configPath: resolve(join(dirpath, "container/html/web/ssr.config.js")),
+      mountedTo: "/pub",                        // MUST match the router prefix
+      hook: async (getConfig, ctx) => {
+        if (environment === "prod") await Builder.distribute(ctx.root);
+        await Builder.prodSetup(getConfig, ctx);
+      },
+    },
+  ],
+};
+```
+
+### `CompilerEngineConfig`
+
+| Property | Type | Description |
+|---|---|---|
+| `enabled` | `boolean` | Master switch. Set `false` for API-only servers with no frontend. Engines are also skipped when `process.env.testMode === "enabled"`. |
+| `engines` | `builderConfig[]` | One entry per Vite project. All engine hooks run in parallel via `Promise.all` during `server.hooks.beforeApp`. |
+
+### `builderConfig` — per-engine options
+
+| Property | Type | Description |
+|---|---|---|
+| `name` | `string` | Unique name. Must match the first element of `props` passed to `router.mount()` in `RouterServiceProvider`. |
+| `environment` | `"dev" \| "prod"` | `"dev"` starts Vite's dev server with HMR. `"prod"` runs a full Vite build and serves static output. |
+| `root` | `string` | Absolute path to the Vite project directory containing `ssr.config.js` and `index.html`. |
+| `ssrServerModule` | `string` | Filename of the compiled SSR entry inside `.out/server/`. Vite compiles `.jsx`/`.tsx` → `.js`, so this must use the **output** extension — `"entry-server.js"` even when the source is `entry-server.jsx`. |
+| `serverBuild` | `vite.BuildOptions` | Vite build options for the Node.js SSR bundle. `ssr` is the source entry path. |
+| `clientBuild` | `vite.BuildOptions` | Vite build options for the browser bundle. `manifest: true` and `ssrManifest: true` are required for asset URL injection into SSR HTML. |
+| `configPath` | `string` | Absolute path to the Vite config file. Using a dedicated `ssr.config.js` isolates SSR options from any client-only config. |
+| `mountedTo` | `string` | **Must exactly match the `prefix` of the router this engine is mounted on.** Chasi passes `mountedTo` as Vite's `base` option at build time — it is baked into every asset URL in compiled HTML/JS. A mismatch causes all CSS, JS, and image assets to 404 at runtime. |
+| `hook` | `Function` | Called during `server.hooks.beforeApp`. Typically `Builder.distribute(ctx.root)` (prod only) then `Builder.prodSetup(getConfig, ctx)`. Runs on the primary process only — not per worker. |
+
+### `ssr.config.js` requirements
+
+The config file **must** export a **function** (not a plain object):
+
+```js
+// ✅ correct — Builder.getConfigs() calls the default export as a function
+export default defineConfig(() => ({
+  plugins: [vue()],
+  appType: "custom",
+  server: { middlewareMode: true },
+}));
+
+// ❌ wrong — returns an object, not a callable; throws TypeError: .default is not a function
+export default defineConfig({
+  plugins: [vue()],
+});
+```
+
+### Dev vs prod
+
+| Mode | Behaviour |
+|------|-----------|
+| `"dev"` | `vite.createServer()` — HMR active, no build step, source served directly. **Not safe with `serviceCluster`**. |
+| `"prod"` | `vite.build()` for both server and client bundles, then serves compiled output as static files. Use for CI, staging, and all cluster deployments. |
+
+Switch modes by changing `environment` at the top of `src/config/compiler.ts`.
+
+### Multiple engines
+
+Declare multiple entries in `engines`. All hooks run in parallel. Each engine needs a unique `name` and a distinct `mountedTo` prefix. Make each project self-contained — if two engines share files via aliases and both call `Builder.sanitize()`, one engine's cleanup can delete files the other engine still needs during the parallel build.
+
+### Compiler + `serviceCluster`
+
+Both can be enabled simultaneously (**v4.1.0+**). Workers skip Vite setup via a `cluster.isWorker` guard — only the primary process initialises the compiler. Always use `environment: "prod"` in cluster deployments; Vite's HMR server is not multi-process safe.
 
 ---
 
@@ -850,6 +993,25 @@ formatter: (code) => prettier.format(code, { parser: "babel" })
 ---
 
 ## Release Notes
+
+### v4.1.0
+
+- **Port selection** — `serverConfig.port` now accepts a `number`, `number[]`, or `{ start, end }` range object; the `ServerPort` env var also accepts `"3010-3020"` range notation and `"3010,3011,3012"` list notation; when the chosen port is in use the runtime automatically retries each candidate in order until one succeeds, then updates `process.env.ServerPort` and `global.__basepath` to the resolved port
+- **Terminal dashboard** — boot display rebuilt with a branded header (framework name + version), a runtime status bar showing Node.js version, PID, environment, port, and uptime, per-section icons and distinct colors for each group (DATABASE, ROUTE REGISTRY, BOOT, SERVICES, EXCEPTIONS, LOGS, THREADS, PERFORMANCE, WORKERS), and a route count badge on the ROUTE REGISTRY header
+- **Console redraw** — replaced `console.clear()` (which wipes the terminal scrollback buffer) with `\x1b[2J\x1b[H` (erase visible screen, cursor home); scroll history is now preserved across every live update; redraws are debounced to collapse rapid burst writes into a single repaint; the dashboard re-renders correctly on terminal resize
+- **Cluster + compiler compatibility** — `serviceCluster` and `compiler` can now be enabled simultaneously; workers skip the Vite engine setup via a `cluster.isWorker` guard so only the primary process initialises the compiler
+- **Cluster dashboard correctness** — only the lead worker forwards structured log sections (DATABASE, BOOT, SERVICES, ROUTE REGISTRY) to the primary; all workers forward unhandled exceptions; this eliminates N×M duplicate entries in the dashboard when running with multiple workers
+- **Terminal width in workers** — workers have no TTY; the primary now injects `TERM_COLS` into `process.env` before forking so all log formatters produce correctly-padded output instead of falling back to a hardcoded 100-column width
+- **Lead worker role on restart** — when a worker crashes and is re-forked, `process.env.lead` is set to the same value as the crashed worker so the replacement inherits the correct lead/non-lead role; previously all restarted workers became non-lead, silently stopping structured log forwarding
+- **Graceful shutdown** — the primary now handles `SIGTERM` and `SIGINT` by calling `worker.disconnect()` on each worker and allowing up to 5 seconds for in-flight requests to complete before exiting; previously the primary exited immediately, killing workers mid-request
+- **`Storage.destroy()`** — new method removes the `resize` event listener and clears the performance-tracking `setInterval`; prevents listener/timer accumulation on hot reload
+- **Cluster error visibility** — unhandled errors in `consumeStream`, `handleServiceActions`, and `handleSocketActions` now write to the `exceptions` dashboard section instead of being silently swallowed
+- **`StreamBucket` duplicate dispatch fixed** — `runTasks()` previously used `Promise.all` with `splice(index, 1)` per concurrent callback; stale indices caused processed tasks to remain in the stack and be dispatched again on the next data chunk, producing duplicate log entries; fixed by snapshotting and clearing the stack before processing
+- **`StreamBucket` overflow data loss fixed** — `checkOverFlow()` called `appendStreamData(this.overflow)` before clearing `this.overflow`; the bucket proxy re-routed the data back into overflow (because `_readystate` was still `false`) and the subsequent `this.overflow = ""` discarded it; the clear now happens before the append
+- **`StreamBucket` regex** — the pipe message delimiter regex `[^)]+?` silently truncated or dropped any log message containing a `)` character (stack traces, route patterns, function calls); changed to `[\s\S]+?` to match all content including `)` and newlines
+- **`forkOpts` structure fixed** — `cluster.fork(env)` expects a flat `{ KEY: value }` object; the previous `{ env: {...}, FORCE_COLOR: 3 }` structure caused workers to receive `process.env.env = "[object Object]"` and miss the intended overrides
+- **Test suite** — fixed 8 bugs in the Vitest test setup: `async describe` preventing synchronous test registration, orphaned top-level `$app` instance shadowing the parameter in `routes.test.ts`, incorrect `/forget` and `/signin` route URLs, invalid `"update"` HTTP method type in `Helper`, and `authenticate()` sending `password` instead of the expected `pass` field
+- **Controller loading in test mode** — fixed dynamic `import()` of controllers when the project path contains spaces; `pathToFileURL` was URL-encoding the space as `%20`, causing Vite to fail resolving the module at test time; the raw filesystem path is now passed directly to `import()` in test mode
 
 ### v4.0.0
 - Added **ApiSpec** module — generates an OpenAPI 3.x JSON spec file on every boot from registered routes and auto-collected model schemas (MongoDB, Prisma, Drizzle)

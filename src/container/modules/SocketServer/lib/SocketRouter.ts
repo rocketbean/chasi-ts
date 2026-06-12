@@ -11,7 +11,11 @@ import Observer from "../../../../package/Observer/index.js";
 
 export type SockServerOptions = {
   setDefaultEvents?: boolean,
-  container: string
+  container: string,
+  /** Validate the upgrade request. Return the authenticated user or throw to reject. */
+  auth?: (request: any) => Promise<any> | any,
+  /** Ping interval in ms. Terminates connections that don't pong back. 0 = disabled. Default: 30000 */
+  heartbeat?: number,
 }
 
 export default class SocketRouter extends EventEmitter {
@@ -24,6 +28,7 @@ export default class SocketRouter extends EventEmitter {
   public opts: SockServerOptions = {
     setDefaultEvents: true,
     container: "",
+    heartbeat: 30000,
   };
   public _events;
   public channel: ChannelConstructor = Channel
@@ -51,30 +56,26 @@ export default class SocketRouter extends EventEmitter {
    * @param message [payload] socket params
    */
   async interpolateMessage(client, message) {
-    if (!cluster.isWorker && SocketRouter.$pipe) {
-      message.path = this.path;
-      SocketRouter.$pipe.write({
+    // Always fire locally — the connected client lives on this worker
+    this.emit(message.event, message.payload, client);
+    await this.linkObserverEvent(client, message);
+
+    // Forward to other workers so their connected clients also receive the event.
+    // Only workers write to the pipe; the primary thread never processes WS messages.
+    if (cluster.isWorker && SocketRouter.$pipe) {
+      await SocketRouter.$pipe.write({
         action: "websock:event",
-        transmit: message,
+        transmit: { ...message, path: this.path },
       });
-    } else {
-      this.emit(message.event, message.payload, client);
-      // if (SocketRouter?.$pipe) {
-      await this.linkObserverEvent(client, message)
-      // }
     }
   }
 
   async linkObserverEvent(client, message) {
-    let event = message.event;
-    let key = "NS["
-    let regx = /\[([^}]+)\]/s
-    // Logger.log(Object.keys(SocketRouter.$observer.$events))
-    Object.keys(SocketRouter.$observer.$events).map(async ev => {
-      if (event.includes(key)) {
-        await SocketRouter.$observer.emit(event, { client, message })
-      }
-    })
+    const event = message.event;
+    // NS[...] events are namespaced observer events — emit once, not per registered handler
+    if (event.startsWith("NS[") && SocketRouter.$observer) {
+      await SocketRouter.$observer.emit(event, { client, message });
+    }
   }
 
   /**
@@ -84,26 +85,23 @@ export default class SocketRouter extends EventEmitter {
    * @param client [Client] client instance that holds the socket data
    */
   defaultEvs(client) {
+    client.socket.on("pong", () => {
+      client._alive = true;
+    });
+
     client.socket.on("message", async (message) => {
       try {
-        message = message.toString();
-        message = JSON.parse(message);
+        message = JSON.parse(message.toString());
         await this.interpolateMessage(client, message);
       } catch (e) {
-        throw e;
+        client.sendEvent("error", { message: "Invalid message format or handler error." });
       }
     });
 
     client.socket
-      .on("close", (sock, code, reason) => {
-        this.removeClient(client);
-      })
-      .on("end", () => {
-        this.removeClient(client);
-      })
-      .on("error", () => {
-        this.removeClient(client);
-      });
+      .on("close", () => this.removeClient(client))
+      .on("end",   () => this.removeClient(client))
+      .on("error", () => this.removeClient(client));
   }
 
   /**
@@ -112,6 +110,7 @@ export default class SocketRouter extends EventEmitter {
    */
   removeClient(client) {
     this.clients = this.clients.filter((cl) => cl.id !== client.id);
+    this.emit("disconnect", {}, client);
   }
 
   /**
@@ -130,7 +129,7 @@ export default class SocketRouter extends EventEmitter {
   /** [setup()]
    * this method sets up the server
    * and listens to server events
-   * 
+   *
    * WebSocketServer [noServer] is enabled
    * to avoid conflicts to the running http server
    * @returns void
@@ -143,30 +142,61 @@ export default class SocketRouter extends EventEmitter {
     })
       .on("connection", (client, request) => {
         if (this.opts.setDefaultEvents) this.defaultEvs(client);
+        this.emit("connect", {}, client);
       })
       .on("error", (err) => Logger.log(err));
 
-    Base.fetchSync(this.options.container).then((fn) => {
-      const mod = fn as { default: (router: SocketRouter) => void };
-      this.evContainer = mod.default;
+    Base.fetchSync(this.options.container).then((fn: any) => {
+      this.evContainer = fn.default;
       this.evContainer(this);
     });
+
+    if (this.opts.heartbeat) this.startHeartbeat(this.opts.heartbeat);
     NetServer.register(this.path, this);
   }
 
-  /** [connect()]
-   * recieves the upgraded request
-   * and emits the [WS:WebSocketServer]
-   * connection event.
-   * @param sock  [WS:Socket]
-   * @param request [WS:Request]
-   * @param head [WS:Head]
+  /** [startHeartbeat()]
+   * pings all clients on the given interval and terminates
+   * any that do not respond with a pong — cleans up ghost connections.
    */
-  connect(sock, request, head) {
-    this.server.handleUpgrade(request, sock, head, (socket) => {
-      let client = new Client(socket, request, {
-        connections: [this.path],
+  startHeartbeat(interval: number) {
+    const timer = setInterval(() => {
+      this.clients = this.clients.filter((client) => {
+        if (!client._alive) {
+          client.socket.terminate();
+          return false;
+        }
+        client._alive = false;
+        client.socket.ping();
+        return true;
       });
+    }, interval);
+    this.server.on("close", () => clearInterval(timer));
+  }
+
+  /** [connect()]
+   * receives the upgraded request, runs optional auth, and emits the
+   * [WS:WebSocketServer] connection event.
+   * @param sock    [WS:Socket]
+   * @param request [WS:Request]
+   * @param head    [WS:Head]
+   */
+  async connect(sock, request, head) {
+    let user: any = null;
+
+    if (this.opts.auth) {
+      try {
+        user = await this.opts.auth(request);
+      } catch (e) {
+        sock.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+        sock.destroy();
+        return;
+      }
+    }
+
+    this.server.handleUpgrade(request, sock, head, (socket) => {
+      let client = new Client(socket, request, { connections: [this.path] });
+      client.user = user;
       this.clients.push(client);
       this.server.emit("connection", client, request);
     });

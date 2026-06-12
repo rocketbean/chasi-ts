@@ -1,20 +1,21 @@
 {
-  "version": "4.0.0",
+  "version": "4.1.0",
   "sections": [
     {
       "keywords": [
         "chasi-ts",
         "introduction",
         "requirements",
-        "drizzle",
-        "openapi",
-        "sdk"
+        "cluster",
+        "dashboard",
+        "port",
+        "terminal"
       ],
       "id": "intro",
       "icon": "view_in_ar",
       "label": "Introduction",
       "display": true,
-      "text": "A Rest-API framework that will boost the development, Secure the production, and ensures the scalability of your project. Chasi is modeled after an auto-mobile production, which may start with the chassis, and serve's as the car's foundation. v4.0.0 introduces the ApiSpec module for automatic OpenAPI 3.x spec generation and the SdkBuilder module for generating typed JavaScript SDK bundles consumed by frontend and mobile apps.",
+      "text": "A Rest-API framework that will boost the development, Secure the production, and ensures the scalability of your project. Chasi is modeled after an auto-mobile production, which may start with the chassis, and serve's as the car's foundation. v4.1.0 focuses on stability and cluster observability: a rebuilt terminal dashboard with live section tracking, debounced redraws that preserve scroll history, flexible port selection with automatic fallback, and a hardened serviceCluster module with graceful shutdown, correct lead-worker tracking across restarts, terminal-width inheritance for workers, and full compiler compatibility.",
       "controls": {
         "right": {
           "open": false
@@ -150,7 +151,13 @@
       "label": "Server",
       "display": true,
       "keywords": [
-        "server"
+        "server",
+        "port",
+        "cluster",
+        "dashboard",
+        "terminal",
+        "shutdown",
+        "graceful"
       ],
       "subcats": [
         {
@@ -158,6 +165,8 @@
           "label": "Server Configuration",
           "group": [
             "scport",
+            "scport-range",
+            "scport-list",
             "scenvi",
             "sccors",
             "scserviceCluster",
@@ -183,6 +192,28 @@
             "logInfo",
             "logWarn",
             "logError"
+          ]
+        },
+        {
+          "to": "terminalDashboard",
+          "label": "Terminal Dashboard",
+          "group": [
+            "td-sections",
+            "td-redraw",
+            "td-resize"
+          ]
+        },
+        {
+          "to": "clusterSection",
+          "label": "Service Clustering",
+          "group": [
+            "cls-lead",
+            "cls-termcols",
+            "cls-restart",
+            "cls-shutdown",
+            "cls-destroy",
+            "cls-compiler",
+            "cls-errors"
           ]
         }
       ],
@@ -218,7 +249,33 @@
             "config",
             "serverconfig"
           ],
-          "text": "This value will be passed to Chasi's core upon booting, and will serve as local serving port."
+          "text": "Accepts a single number, an explicit list, or a start/end range object. When the chosen port is already in use the runtime automatically tries the next candidate until one succeeds, then updates process.env.ServerPort and global.__basepath to the resolved value."
+        },
+        {
+          "id": "scport-range",
+          "label": "port — range",
+          "reference": [
+            "scport"
+          ],
+          "keywords": [
+            "port range",
+            "start",
+            "end",
+            "ServerPort"
+          ],
+          "text": "Declare a range as { start: 3010, end: 3020 } in config, or as the string \"3010-3020\" in the ServerPort env var. The runtime tries each port in order from start to end."
+        },
+        {
+          "id": "scport-list",
+          "label": "port — list",
+          "reference": [
+            "scport"
+          ],
+          "keywords": [
+            "port list",
+            "ServerPort comma"
+          ],
+          "text": "Declare an explicit list as [3010, 3011, 3012] in config, or as the comma-separated string \"3010,3011,3012\" in the ServerPort env var. Ports are tried in declaration order."
         },
         {
           "id": "scenvi",
@@ -256,9 +313,10 @@
             "serviceCluster",
             "clustering",
             "config",
-            "serverconfig"
+            "serverconfig",
+            "workers"
           ],
-          "text": "Enables Clustering for the api Chasi instace will be invoked on the number of workers decalared at serviceCluster[workers]."
+          "text": "Enables Node.js cluster mode. Chasi forks the configured number of worker processes. Only the lead worker (first forked) forwards structured log sections to the primary's terminal dashboard; all workers forward unhandled exceptions. Set schedulingPolicy to 1 for OS-default or 2 for round-robin (default)."
         },
         {
           "id": "schooks",
@@ -323,7 +381,7 @@
           "keywords": [
             "controllerDir"
           ],
-          "text": "Default Controllers Directory, Chasi will autoload this directoy as controllers."
+          "text": "Default Controllers Directory, Chasi will autoload this directory as controllers."
         },
         {
           "id": "sc-serviceBootstrap",
@@ -455,6 +513,184 @@
             "ready"
           ],
           "text": "state[3] server @boot lifecycle — actual booting of the server."
+        },
+        {
+          "id": "terminalDashboard",
+          "label": "Terminal Dashboard",
+          "sublabel": "[Storage / SessionStorage]",
+          "keywords": [
+            "terminal",
+            "dashboard",
+            "display",
+            "sections",
+            "redraw",
+            "resize"
+          ],
+          "text": "Chasi renders a live terminal dashboard on the primary process. It shows a branded header (framework name + version), a runtime status bar (Node version, PID, environment, port, uptime), and per-section blocks for THREADS, PERFORMANCE, DATABASE, ROUTE REGISTRY, SERVICES, BOOT, EXCEPTIONS, LOGS, and WORKERS. The display redraws on every new log entry and on terminal resize, debounced to a single repaint per burst."
+        },
+        {
+          "id": "td-sections",
+          "label": "Dashboard sections",
+          "reference": [
+            "terminalDashboard"
+          ],
+          "keywords": [
+            "sections",
+            "boot",
+            "database",
+            "services",
+            "route registry",
+            "workers",
+            "exceptions",
+            "logs"
+          ],
+          "text": "Each section only renders when it contains at least one entry. Sections render in a fixed order: THREADS → PERFORMANCE → DATABASE → ROUTE REGISTRY → SERVICES → BOOT → EXCEPTIONS → LOGS → WORKERS."
+        },
+        {
+          "id": "td-redraw",
+          "label": "Debounced redraw",
+          "reference": [
+            "terminalDashboard"
+          ],
+          "keywords": [
+            "redraw",
+            "debounce",
+            "burst",
+            "repaint"
+          ],
+          "text": "Rapid sequences of log writes (e.g. during boot) are collapsed into a single repaint ~50 ms after the last write. The visible screen is erased with \\x1b[2J\\x1b[H (cursor home) so the scrollback buffer is never cleared — previous terminal output remains accessible by scrolling up."
+        },
+        {
+          "id": "td-resize",
+          "label": "Resize handling",
+          "reference": [
+            "terminalDashboard"
+          ],
+          "keywords": [
+            "resize",
+            "terminal width",
+            "columns"
+          ],
+          "text": "The dashboard listens to process.stdout resize events and immediately redraws with the new terminal width. In cluster mode, worker processes inherit the primary's terminal width via TERM_COLS so all formatted log entries align correctly."
+        },
+        {
+          "id": "clusterSection",
+          "label": "Service Clustering",
+          "sublabel": "[ServiceCluster / src/config/server.ts]",
+          "keywords": [
+            "cluster",
+            "serviceCluster",
+            "workers",
+            "primary",
+            "lead",
+            "fork",
+            "shutdown"
+          ],
+          "text": "Enable Node.js multi-process clustering via serviceCluster in src/config/server.ts. The primary process manages worker lifecycle, pipes structured log data from the lead worker to the dashboard, and handles graceful shutdown on SIGTERM/SIGINT."
+        },
+        {
+          "id": "cls-lead",
+          "label": "Lead worker",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "lead",
+            "lead worker",
+            "log routing",
+            "dashboard sections"
+          ],
+          "text": "The first forked worker is designated the lead. Only the lead worker forwards structured log sections (DATABASE, BOOT, SERVICES, ROUTE REGISTRY) to the primary's dashboard. All workers forward unhandled exceptions. This prevents N×M duplicate entries when running multiple workers."
+        },
+        {
+          "id": "cls-termcols",
+          "label": "Terminal width",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "TERM_COLS",
+            "terminal width",
+            "columns",
+            "workers",
+            "formatters"
+          ],
+          "text": "Worker processes have no TTY — process.stdout.columns is undefined. The primary injects TERM_COLS into process.env before forking so all workers inherit the correct terminal width. Log formatters (Full, LeftFull, EndTraceFull) use this value to produce correctly-padded output."
+        },
+        {
+          "id": "cls-restart",
+          "label": "Worker restart",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "restart",
+            "exit",
+            "crash",
+            "lead role",
+            "re-fork"
+          ],
+          "text": "When a worker crashes and is re-forked, the replacement inherits the same lead or non-lead role as the process it replaces. The primary tracks leadWorkerId and sets process.env.lead correctly before each re-fork."
+        },
+        {
+          "id": "cls-shutdown",
+          "label": "Graceful shutdown",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "SIGTERM",
+            "SIGINT",
+            "graceful",
+            "shutdown",
+            "disconnect"
+          ],
+          "text": "On SIGTERM or SIGINT the primary calls worker.disconnect() on each worker, allowing up to 5 seconds for in-flight requests to complete before process.exit(0). Send SIGTERM to the primary PID to trigger a clean shutdown: kill -TERM <pid>."
+        },
+        {
+          "id": "cls-destroy",
+          "label": "Storage.destroy()",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "destroy",
+            "cleanup",
+            "resize listener",
+            "setInterval",
+            "memory"
+          ],
+          "text": "Call storage.destroy() to remove the terminal resize listener and clear the performance-tracking interval. Prevents listener and timer accumulation when the primary process reinitialises (e.g. hot reload)."
+        },
+        {
+          "id": "cls-compiler",
+          "label": "Compiler + Cluster",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "compiler",
+            "vite",
+            "cluster",
+            "compatibility",
+            "isWorker"
+          ],
+          "text": "The compiler (Vite SSR) module and serviceCluster can be enabled simultaneously. Workers automatically skip the Vite engine setup — only the primary process initialises the compiler. Set the compiler environment to \"prod\" for cluster deployments; Vite's dev server (HMR) is not designed for multi-process use."
+        },
+        {
+          "id": "cls-errors",
+          "label": "Cluster error surfacing",
+          "reference": [
+            "clusterSection"
+          ],
+          "keywords": [
+            "exceptions",
+            "errors",
+            "consumeStream",
+            "handleSocketActions",
+            "dashboard"
+          ],
+          "text": "Unhandled errors inside the primary's pipe message handler (consumeStream, handleServiceActions, handleSocketActions) are now written to the EXCEPTIONS section of the terminal dashboard instead of being silently dropped."
         }
       ],
       "controls": {
@@ -641,7 +877,7 @@
         },
         {
           "id": "RouterConfigInterface",
-          "label": "Router configuraion type",
+          "label": "Router configuration type",
           "keywords": [
             "RouterConfigInterface",
             "router",
@@ -1436,6 +1672,10 @@
             "ce-dev",
             "ce-prod"
           ]
+        },
+        {
+          "to": "ce-cluster",
+          "label": "Cluster + Compiler"
         }
       ],
       "glossary": [
@@ -1681,6 +1921,22 @@
             "SSR renderer"
           ],
           "text": "Calls vite.build() for both the SSR server bundle and client bundle, then mounts the compiled output as static files with an SSR renderer. Use prod for CI, staging, and all cluster deployments."
+        },
+        {
+          "id": "ce-cluster",
+          "label": "Cluster compatibility",
+          "reference": [
+            "compilerEngine",
+            "ce-prod"
+          ],
+          "keywords": [
+            "cluster",
+            "serviceCluster",
+            "isWorker",
+            "primary",
+            "compatibility"
+          ],
+          "text": "CompilerEngine and serviceCluster can be enabled simultaneously (v4.1.0+). Worker processes skip the Vite engine setup via a cluster.isWorker guard — only the primary process initialises the compiler. Always use environment: \"prod\" in cluster deployments; Vite's HMR dev server is not designed for multi-process use."
         }
       ],
       "controls": {
@@ -1804,7 +2060,7 @@
             "vitest config",
             "test config"
           ],
-          "text": "Vitest can be configured at [<root>/vitest.config.ts]."
+          "text": "Vitest can be configured at [<root>/vitest.config.ts]. The compiler engine is automatically skipped when process.env.testMode === \"enabled\"."
         },
         {
           "id": "tst-env",
@@ -1813,7 +2069,7 @@
           "keywords": [
             "test env vars"
           ],
-          "text": "A separate Environment for testing with real environment variables."
+          "text": "A separate environment file for testing. Set testMode=enabled to suppress compiler engine init and use a dedicated test database."
         },
         {
           "id": "tst-usage",
@@ -1969,11 +2225,9 @@
           "type": "<ApiSpecComponents>",
           "keywords": [
             "components",
-            "securitySchemes",
-            "responses",
-            "parameters"
+            "securitySchemes"
           ],
-          "text": "Shared component definitions merged into the generated spec. Auto-collected model schemas are added to components.schemas automatically — no need to declare them here. Use this block for reusable responses, parameters, and security schemes referenced via $ref from endpoint specs."
+          "text": "Shared component definitions merged into the generated spec. Auto-collected model schemas are added to components.schemas automatically."
         },
         {
           "id": "asc-security",
@@ -1986,7 +2240,7 @@
             "global security",
             "bearerAuth"
           ],
-          "text": "Global security requirement applied to all protected routes. Routes in AuthRouteExceptions automatically receive security: [] (public). Per-endpoint spec can override this."
+          "text": "Global security requirement applied to all protected routes. Routes in AuthRouteExceptions automatically receive security: [] (public)."
         },
         {
           "id": "asc-schemas",
@@ -1997,10 +2251,9 @@
           "type": "<ApiSpecSchemaFilter>",
           "keywords": [
             "schema filter",
-            "drivers filter",
-            "models filter"
+            "drivers filter"
           ],
-          "text": "Controls which database connections and models are included in the auto-collected components.schemas block. Omit entirely to collect from all connections and all models."
+          "text": "Controls which database connections and models are included in the auto-collected components.schemas block."
         },
         {
           "id": "apispecSchemas",
@@ -2013,7 +2266,7 @@
             "model schemas",
             "x-driver"
           ],
-          "text": "Schemas are auto-collected from all active database connections at boot. MongoDB models, Prisma models, and Drizzle tables are all supported. Every generated schema entry includes an x-driver extension field with the source connection name."
+          "text": "Schemas are auto-collected from all active database connections at boot. MongoDB models, Prisma models, and Drizzle tables are all supported. Every generated schema entry includes an x-driver extension field."
         },
         {
           "id": "asm-keyformat",
@@ -2027,7 +2280,7 @@
             "schema key",
             "prefixed"
           ],
-          "text": "Controls how schema keys appear in components.schemas. \"plain\" (default) uses the bare model name (e.g. user, users). \"prefixed\" prepends the connection name with a colon separator (e.g. test:user, pg:properties, mysql:User). Affects all $ref paths in endpoint specs."
+          "text": "Controls how schema keys appear in components.schemas. \"plain\" uses the bare model name; \"prefixed\" prepends the connection name (e.g. test:user, pg:properties)."
         },
         {
           "id": "asm-drivers",
@@ -2041,7 +2294,7 @@
             "include",
             "exclude"
           ],
-          "text": "Connection-level filter. include allowlists specific connection keys; exclude denylists them. include takes precedence if both are set. Omit to collect from all connections."
+          "text": "Connection-level filter. include allowlists specific connection keys; exclude denylists them."
         },
         {
           "id": "asm-models",
@@ -2054,7 +2307,7 @@
             "models filter",
             "per-driver models"
           ],
-          "text": "Model-level filter keyed by connection name. Applied after the driver filter. Names are matched case-insensitively. Example: { pg: { exclude: [\"users\",\"userApps\"] }, dev: { exclude: [\"user\"] } }."
+          "text": "Model-level filter keyed by connection name. Applied after the driver filter."
         },
         {
           "id": "apispecRoutes",
@@ -2065,10 +2318,9 @@
           "keywords": [
             "route spec",
             "spec option",
-            "endpoint spec",
             "inline spec"
           ],
-          "text": "Only endpoints with a spec option in their route declaration appear in the generated document. The spec object follows OpenAPI 3.x Operation structure. Tags are auto-derived from the enclosing route.group prefix when not explicitly set. Auth is auto-resolved from AuthRouteExceptions."
+          "text": "Only endpoints with a spec option appear in the generated document. Tags auto-derive from route.group prefix; auth auto-resolves from AuthRouteExceptions."
         },
         {
           "id": "asr-spec",
@@ -2082,7 +2334,7 @@
             "route spec",
             "PathItem"
           ],
-          "text": "Pass spec as the third argument to any route method: route.post('/path', 'Controller@method', { spec: { summary, requestBody, responses, security, ... } }). The object follows OpenAPI Operation shape."
+          "text": "Pass spec as the third argument to any route method. Follows OpenAPI Operation shape."
         },
         {
           "id": "asr-security",
@@ -2093,10 +2345,9 @@
           "type": "<SecurityRequirement[]>",
           "keywords": [
             "security",
-            "public route",
-            "security:[]"
+            "public route"
           ],
-          "text": "security: [] marks the route as public — no JWT header in Swagger UI. Omit to inherit the global security from config/apispec.ts. Public routes (AuthRouteExceptions) are automatically assigned security: [] if not explicitly set."
+          "text": "security: [] marks the route as public. Public routes (AuthRouteExceptions) receive security: [] automatically."
         },
         {
           "id": "asr-tags",
@@ -2110,7 +2361,7 @@
             "auto tags",
             "group tags"
           ],
-          "text": "Tags group operations in Swagger UI. If not set in the endpoint spec, tags are auto-derived from the enclosing route.group prefix (e.g. /users → \"Users\"). Group spec.tags are merged in during route registration."
+          "text": "If not set, tags auto-derive from the enclosing route.group prefix."
         },
         {
           "id": "asr-middlewares",
@@ -2121,10 +2372,9 @@
           "type": "<string[]>",
           "keywords": [
             "x-middlewares",
-            "middleware",
-            "extension"
+            "middleware"
           ],
-          "text": "Effective middlewares (after .except() exclusions) are written to x-middlewares on every operation as an OpenAPI extension. Not rendered by Swagger UI natively but machine-readable for tooling."
+          "text": "Effective middlewares written to x-middlewares as an OpenAPI extension on every operation."
         },
         {
           "id": "apispecExample",
@@ -2134,10 +2384,9 @@
           ],
           "keywords": [
             "apispec example",
-            "route spec example",
             "$ref example"
           ],
-          "text": "route.post('/signup', 'v1/UserController@create', { spec: { summary: 'Register a new user', security: [], requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['name','email','password'], properties: { name: { type: 'string' }, email: { type: 'string', format: 'email' }, password: { type: 'string', format: 'password' } } } } } }, responses: { 200: { description: 'Created user', content: { 'application/json': { schema: { $ref: '#/components/schemas/test:user' } } } }, 400: { description: 'Email already exists' } } } });"
+          "text": "route.post('/signup', 'v1/UserController@create', { spec: { summary: 'Register a new user', security: [], requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['name','email','password'], properties: { name: { type: 'string' }, email: { type: 'string', format: 'email' }, password: { type: 'string', format: 'password' } } } } } }, responses: { 200: { description: 'Created user' }, 400: { description: 'Email already exists' } } } });"
         }
       ],
       "controls": {
@@ -2230,7 +2479,7 @@
             "bundle",
             "javascript"
           ],
-          "text": "SdkBuilder initialises during beforeServerBoot() via SdkBuilderServiceProvider. It collects registered routes, runs sdk() validation handlers at build time, generates a JavaScript bundle, and clears all sdk() handlers from endpoints before the server starts accepting requests — ensuring they never affect backend operations."
+          "text": "SdkBuilder initialises during beforeServerBoot() via SdkBuilderServiceProvider. It collects registered routes, runs sdk() validation handlers at build time, generates a JavaScript bundle, and clears all sdk() handlers from endpoints before the server starts accepting requests."
         },
         {
           "id": "sdkbuilderConfig",
@@ -2255,7 +2504,7 @@
           "keywords": [
             "sdkbuilder enabled"
           ],
-          "text": "Master switch. Set to false to disable SDK generation. Controlled by the SDKBUILDER_ENABLED environment variable."
+          "text": "Master switch. Set to false to disable SDK generation."
         },
         {
           "id": "sdb-host",
@@ -2268,7 +2517,7 @@
             "sdkbuilder host",
             "HOST"
           ],
-          "text": "Base URL injected into the generated SDK as HOST. Every request function is prefixed with this value. Set via the SDK_HOST environment variable."
+          "text": "Base URL injected into the generated SDK as HOST."
         },
         {
           "id": "sdb-output",
@@ -2280,7 +2529,7 @@
           "keywords": [
             "sdkbuilder output"
           ],
-          "text": "Controls the output filename and formatter. The path is always resolved from the project root. Directories are created automatically if they do not exist."
+          "text": "Controls the output filename and formatter. The path is resolved from the project root."
         },
         {
           "id": "sdb-httpClient",
@@ -2294,7 +2543,7 @@
             "fetch",
             "axios"
           ],
-          "text": "HTTP client used in the generated bundle. \"fetch\" (default) uses the native Fetch API — no dependencies. \"axios\" emits axios-based request code; the consumer app must have axios installed."
+          "text": "HTTP client used in the generated bundle. \"fetch\" uses the native Fetch API; \"axios\" requires axios in the consumer app."
         },
         {
           "id": "sdb-routers",
@@ -2306,7 +2555,7 @@
           "keywords": [
             "routers filter"
           ],
-          "text": "Router names (from RouterServiceProvider) to include. Omit or leave empty to include all registered routers."
+          "text": "Router names to include. Omit to include all registered routers."
         },
         {
           "id": "sdb-exclude",
@@ -2318,7 +2567,7 @@
           "keywords": [
             "exclude routes"
           ],
-          "text": "Routes excluded from the generated SDK. Same shape as AuthRouteExceptions: [{ m: \"post\", url: \"/api/users/forget\" }]."
+          "text": "Routes excluded from the generated SDK."
         },
         {
           "id": "sdkbuilderOutput",
@@ -2330,10 +2579,9 @@
             "output",
             "formatter",
             "terser",
-            "uglify",
-            "prettier"
+            "uglify"
           ],
-          "text": "The formatter function is called on the raw generated code before writing to disk. The default formatter uses terser (minify + mangle). Any function with signature (code: string) => string | Promise<string> is accepted."
+          "text": "The formatter function is called on the raw generated code before writing to disk."
         },
         {
           "id": "sdb-filename",
@@ -2346,7 +2594,7 @@
             "filename",
             "output path"
           ],
-          "text": "File name or relative path for the generated bundle. Resolved from the project root. Missing directories are created automatically. Example: \"sdk/chasi.sdk.js\"."
+          "text": "File name or relative path for the generated bundle. Resolved from project root."
         },
         {
           "id": "sdb-formatter",
@@ -2357,10 +2605,9 @@
           "type": "<SdkBuilderFormatter>",
           "keywords": [
             "formatter",
-            "terser",
-            "uglify"
+            "terser"
           ],
-          "text": "Post-processing function applied before writing. Type: (code: string) => string | Promise<string>. Omit to write the raw output without post-processing."
+          "text": "Post-processing function: (code: string) => string | Promise<string>. Omit to write raw output."
         },
         {
           "id": "sdb-terser",
@@ -2368,13 +2615,13 @@
           "reference": [
             "sdkbuilderOutput"
           ],
-          "sublabel": "[./src/container/modules/SdkBuilder/formatters/terser.ts]",
+          "sublabel": "[formatters/terser.ts]",
           "keywords": [
             "terser",
             "minify",
             "mangle"
           ],
-          "text": "Built-in terser formatter exported from formatters/terser.ts. Import and pass to output.formatter. Compresses and mangles the generated bundle using terser with compress.passes: 2 and format.comments: false. Falls back to unformatted output if terser fails."
+          "text": "Built-in terser formatter. Import and pass to output.formatter. Falls back to unformatted output if terser fails."
         },
         {
           "id": "sdkbuilderSdk",
@@ -2387,7 +2634,7 @@
             "SdkMiddlewareFn",
             "validation handler"
           ],
-          "text": "The .sdk() method on an Endpoint registers validation handlers that run in two contexts: (1) at build time, called with a SdkBuildContext so route configuration can be validated; (2) in the generated bundle as serialised inline functions executed before every HTTP request."
+          "text": "The .sdk() method on an Endpoint registers validation handlers that run at build time and are serialised into the generated bundle as inline client-side validators."
         },
         {
           "id": "sdb-sdk-method",
@@ -2400,7 +2647,7 @@
             "sdk",
             "SdkMiddlewareFn"
           ],
-          "text": "Register a single validation handler. Signature: (params: unknown, next: SdkNextFn) => void | Promise<void>. Call next() to advance the chain; throw to halt it."
+          "text": "Register a single validation handler. Signature: (params, next) => void. Call next() to advance; throw to halt."
         },
         {
           "id": "sdb-sdk-array",
@@ -2410,10 +2657,9 @@
           ],
           "type": "<SdkMiddlewareFn[]>",
           "keywords": [
-            "sdk array",
-            "multiple validators"
+            "sdk array"
           ],
-          "text": "Pass an array of handlers — they run in declaration order. Equivalent to chaining multiple .sdk() calls."
+          "text": "Pass an array of handlers — they run in declaration order."
         },
         {
           "id": "sdb-sdk-chain",
@@ -2425,7 +2671,7 @@
             "sdk chain",
             "method chain"
           ],
-          "text": "Returns the Endpoint instance for chaining: route.post('/path', 'Ctrl@method', { spec: {...} }).sdk(validateFn).middleware('auth')."
+          "text": "Returns the Endpoint instance for chaining: route.post(...).sdk(fn).middleware('auth')."
         },
         {
           "id": "sdb-sdk-group",
@@ -2435,10 +2681,9 @@
           ],
           "type": "<SdkMiddlewareFn | SdkMiddlewareFn[]>",
           "keywords": [
-            "group sdk",
-            "inherited sdk"
+            "group sdk"
           ],
-          "text": "Declare sdk on a route.group({ sdk: [fn] }) — handlers are prepended to all endpoints in that group."
+          "text": "Declare sdk on a route.group({ sdk: [fn] }) — prepended to all endpoints in that group."
         },
         {
           "id": "sdb-sdk-router",
@@ -2448,10 +2693,9 @@
           ],
           "type": "<SdkMiddlewareFn | SdkMiddlewareFn[]>",
           "keywords": [
-            "router sdk",
-            "RouterConfigInterface sdk"
+            "router sdk"
           ],
-          "text": "Declare sdk on a RouterConfigInterface — handlers are prepended to every route in that router. Execution order: router sdk → group sdk → route sdk."
+          "text": "Declare sdk on a RouterConfigInterface — prepended to every route in that router. Execution order: router → group → route."
         },
         {
           "id": "sdkbuilderGenerated",
@@ -2464,7 +2708,7 @@
             "bundle structure",
             "ES module"
           ],
-          "text": "The generated file is an ES module with named exports per route namespace and a default export aggregating all namespaces. Routes are grouped by their first non-param path segment (e.g. /api/users/* → export const users = { ... })."
+          "text": "The generated file is an ES module with named exports per route namespace and a default export aggregating all namespaces."
         },
         {
           "id": "sdb-gen-structure",
@@ -2474,10 +2718,9 @@
           ],
           "keywords": [
             "bundle structure",
-            "export const",
-            "default export"
+            "export const"
           ],
-          "text": "Each namespace group is exported as a named const (export const users = { signin: async(...) => ... }). A default export bundles all namespaces: export default { users }."
+          "text": "Each namespace group is exported as a named const. A default export bundles all namespaces."
         },
         {
           "id": "sdb-gen-validate",
@@ -2489,7 +2732,7 @@
             "validate",
             "required fields"
           ],
-          "text": "Generated helper that checks required fields from the endpoint's OpenAPI spec.requestBody schema before making the request. Throws { status: 422, message: '[SDK] Missing required field: \"...\"' } on failure."
+          "text": "Generated helper that checks required fields from the endpoint's OpenAPI requestBody schema. Throws { status: 422 } on failure."
         },
         {
           "id": "sdb-gen-request",
@@ -2503,7 +2746,7 @@
             "axios",
             "HTTP"
           ],
-          "text": "Generated helper that makes the HTTP call using the configured httpClient. Adds Authorization: Bearer <token> when the route is protected. Throws the parsed error response on non-2xx status."
+          "text": "Generated helper that makes the HTTP call. Adds Authorization: Bearer <token> for protected routes."
         },
         {
           "id": "sdb-gen-runsdk",
@@ -2516,7 +2759,7 @@
             "sdk chain",
             "validation chain"
           ],
-          "text": "Generated helper emitted only when at least one route has .sdk() handlers. Executes the serialised handler chain before _request(). Receives the payload and the handlers array; each handler calls next() to advance."
+          "text": "Generated helper emitted only when at least one route has .sdk() handlers. Executes the serialised handler chain before _request()."
         },
         {
           "id": "sdkbuilderExample",
@@ -2526,10 +2769,9 @@
           ],
           "keywords": [
             "sdkbuilder example",
-            "generated sdk example",
             "usage"
           ],
-          "text": "Route: route.post('/signin', 'UserController@signin', { spec: { ... } }).sdk((params, next) => { if (!params?.email) throw new Error('email required'); next(); }). Generated: signin: async (payload = {}) => { _validate(payload, ['email','pass']); await _runSdk(payload, [(params, next) => { if (!params?.email) throw new Error('email required'); next(); }]); return _request('post', '/api/users/signin', payload); }"
+          "text": "Route: route.post('/signin', 'UserController@signin', { spec: { ... } }).sdk((params, next) => { if (!params?.email) throw new Error('email required'); next(); }). Generated: signin: async (payload = {}) => { _validate(payload, ['email','pass']); await _runSdk(payload, [...]); return _request('post', '/api/users/signin', payload); }"
         }
       ],
       "controls": {
