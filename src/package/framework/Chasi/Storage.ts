@@ -149,8 +149,7 @@ export default class SessionStorage {
 
   format(data: any): string {
     const cols = this._cols;
-    const ver  = process.env.npm_package_version || "4.1.0";
-
+    const ver = process.env.npm_package_version || process.env.APP_VERSION || "unknown";
     // ── header banner ─────────────────────────────────────────────
     const titleText = `  ◆  CHASI-TS  v${ver}  `;
     const headerPad = this._fill(Math.max(0, cols - titleText.length));
