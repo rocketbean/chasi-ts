@@ -19,7 +19,7 @@ export default (server: SocketRouter) => {
 
   // ── Channel: join ─────────────────────────────────────────────────────
   server.on("channel:join", (payload, client) => {
-    const { name } = payload;
+    const name = payload?.name;
     if (!name) return client.sendEvent("error", { message: "channel name required" });
     const ch = Channel._create(name, { path: server.path });
     ch.subscribe(client);
