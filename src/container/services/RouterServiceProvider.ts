@@ -18,6 +18,29 @@ export default class RouterServiceProvider
   async boot() {
     return [
       new Router(<RouterConfigInterface>{
+        name: "api",
+        auth: "dev",
+        prefix: "/api",
+        namespace: "container/http/api.js",
+        ControllerDir: ["container/controllers"],
+        middleware: [],
+        AuthRouteExceptions: [
+          { m: "post", url: "/api/users/signin" },
+          { m: "post", url: "/api/users/signup" },
+        ],
+        data: (): {} => {
+          return {
+            chasiVer: "4.1.0",
+          };
+        },
+        before: (_request: any, response: any, _data: any) => {
+          try {
+            response.set("Content-Type", "application/json");
+          } catch (e) {}
+        },
+        displayLog: 1,
+      }),
+      new Router(<RouterConfigInterface>{
         name: "chasi",
         auth: false,
         prefix: "/",
@@ -32,31 +55,6 @@ export default class RouterServiceProvider
             exec: CompilerEngine.instance,
           },
         ],
-        displayLog: 1,
-      }),
-      new Router(<RouterConfigInterface>{
-        name: "api",
-        auth: "dev",
-        prefix: "/api",
-        namespace: "container/http/api.js",
-        ControllerDir: ["container/controllers"],
-        middleware: [],
-        AuthRouteExceptions: [
-          { m: "post", url: "/api/users/signin" },
-          { m: "post", url: "/api/users/signup" },
-          { m: "post", url: "/api/users/forget" },
-          { m: "post", url: "/api/users/pg-signup" },
-        ],
-        data: (): {} => {
-          return {
-            chasiVer: "3.0.0",
-          };
-        },
-        before: (request: any, response: any, data: any) => {
-          try {
-            response.set("Content-Type", "application/json");
-          } catch (e) {}
-        },
         displayLog: 1,
       }),
     ];

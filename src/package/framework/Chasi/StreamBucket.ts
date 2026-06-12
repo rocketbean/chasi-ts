@@ -82,20 +82,24 @@ export default class StreamBucket {
 
   checkOverFlow() {
     if (this.overflow.length >= 1) {
-      Logger.log("overflown....")
-      this.appendStreamData(this.overflow)
-      this.overflow = ""
+      const pending = this.overflow;
+      this.overflow = "";
+      this.appendStreamData(pending);
     }
   }
 
   async runTasks() {
+    // Snapshot and clear the stack before processing so concurrent callbacks
+    // don't race on splice indices, which would leave tasks in the stack and
+    // cause them to be dispatched again on the next data chunk.
+    const tasks = [...this.stack];
+    this.stack = [];
     await Promise.all(
-      this.stack.map(async (task, index) => {
-        await this.cb(this.worker, task.value)
-        this._bucket.value = this._bucket.value.replace(task.raw, "")
-        this.stack.splice(index, 1)
+      tasks.map(async (task) => {
+        await this.cb(this.worker, task.value);
+        this._bucket.value = this._bucket.value.replace(task.raw, "");
       })
-    )
+    );
   }
 
   appendStreamData(streamdata: string) {
@@ -103,7 +107,7 @@ export default class StreamBucket {
   }
 
   splitWithIndex(str: string): { startIndex: number; endIndex: number; raw: string; value: string }[] {
-    let regx = /\<=====\|([^)]+?)\|=====\>/gm;
+    let regx = /\<=====\|([\s\S]+?)\|=====\>/gm;
     let res = [...str.matchAll(regx)];
     return res.map(r => {
       return {

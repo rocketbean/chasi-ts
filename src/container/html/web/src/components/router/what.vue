@@ -222,6 +222,19 @@ async boot() {
       tag: "Number<0|1>",
       desc: `an option to print route information in the terminal.`
     },
+    {
+      hook: "rci-sdk",
+      title: "sdk?",
+      sub: "[router.sdk]",
+      tag: "<SdkMiddlewareFn | SdkMiddlewareFn[]>",
+      desc: `SDK validation handlers applied to every route in this router.
+        Accepts a single handler or an array. Handlers are prepended to all endpoints
+        during route expansion and serialised by
+        <a class="tag is-dark">SdkBuilder</a> into the generated bundle.
+        Execution order: <strong>router sdk → group sdk → route sdk</strong>.
+        These handlers only run during SDK compilation — they are cleared from all
+        endpoints before the server begins handling requests.`
+    },
   ]
 })
 

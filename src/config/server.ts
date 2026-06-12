@@ -3,11 +3,20 @@ import os from "os";
 
 export default <serverConfig>{
   /**
-   * TCP port the HTTP/HTTPS server listens on.
-   * Sourced from `process.env.ServerPort`; falls back to `3010`.
-   * Make sure this port is open in your firewall and not in use by another process.
+   * Port (or ports) the server may listen on.
+   *
+   * Three forms are accepted:
+   *   number              — single port:           3010
+   *   number[]            — explicit list:         [3010, 3011, 3012]
+   *   { start, end }      — inclusive range:       { start: 3010, end: 3020 }
+   *
+   * When the chosen port is already in use the runtime automatically tries
+   * the next candidate in order until one succeeds.
+   * `process.env.ServerPort` overrides this value; accepted string forms are
+   * a single number (`"3010"`), a range (`"3010-3020"`), or a comma-separated
+   * list (`"3010,3011"`).
    */
-  port: checkout(process.env.ServerPort, 3010),
+  port: checkout(process.env.ServerPort, { start: 3010, end: 3020 }),
 
   /**
    * Active server environment name.

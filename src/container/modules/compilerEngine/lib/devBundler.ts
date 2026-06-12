@@ -18,9 +18,17 @@ export default class devBundler extends Bundler implements BundlerInterface {
   async connectMws() {
     this.$app.use(this.base, this.$server.middlewares);
     this.$app.all(this.base + "*", async (req, res, next) => {
-      if (req.originalUrl.includes(this.base)) {
+      const _base = this.base.endsWith("/") ? this.base.slice(0, -1) : this.base;
+      if (req.originalUrl === _base || req.originalUrl.startsWith(_base + "/")) {
         try {
           const url = req.originalUrl.replace(this.base, "/");
+          const urlPath = url.split("?")[0];
+          if (!this.isValidRoute(urlPath)) {
+            return res
+              .status(404)
+              .set({ "Content-Type": "text/html" })
+              .end(this.notFoundResponse());
+          }
           let html = await this.render(url);
           res.status(200).set({ "Content-Type": "text/html" }).end(html);
         } catch (e) {

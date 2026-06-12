@@ -1,19 +1,56 @@
 import { SocketRouter } from "../modules/SocketServer/NetServer.js";
+import Channel from "../modules/SocketServer/lib/Channel.js";
 
 export default (server: SocketRouter) => {
-  server.on("trigger", (payload) => {
-    server.clients.map((client) => client.send(payload));
+  // ── Lifecycle ─────────────────────────────────────────────────────────
+  server.on("connect", (_, client) => {
+    Logger.log(`WS connected   id=${client.id} user=${client.user?.id ?? "anon"}`);
+    client.sendEvent("connected", { id: client.id });
   });
 
-  server.on("broadcast", (payload) => {
-    server.clients.map((client) => client.send(payload));
+  server.on("disconnect", (_, client) => {
+    Logger.log(`WS disconnected id=${client.id}`);
   });
 
-  server.on("pull", (payload) => {
-    server.clients.map((client) => client.send(payload));
+  // ── Broadcast to all connected clients ────────────────────────────────
+  server.on("broadcast", (payload, client) => {
+    server.clients.forEach((c) => c.sendEvent("broadcast", payload));
   });
 
-  server.on("push", (payload) => {
-    server.clients.map((client) => client.send(payload));
+  // ── Channel: join ─────────────────────────────────────────────────────
+  server.on("channel:join", (payload, client) => {
+    if (!client) return;
+    const name = payload?.name;
+    if (!name) return client.sendEvent("error", { message: "channel name required" });
+    const ch = Channel._create(name, { path: server.path });
+    ch.subscribe(client);
+    client.sendEvent("channel:joined", { name });
+  });
+
+  // ── Channel: leave ────────────────────────────────────────────────────
+  server.on("channel:leave", (payload, client) => {
+    if (!client) return;
+    const name = payload?.name;
+    if (!name) return client.sendEvent("error", { message: "channel name required" });
+    const ch = Channel.get(name);
+    if (ch) ch.unsubscribe(client);
+    client.sendEvent("channel:left", { name });
+  });
+
+  // ── Channel: send to a specific channel ───────────────────────────────
+  server.on("channel:send", (payload, client) => {
+    if (!client) return;
+    const name = payload?.name;
+    const data = payload?.data;
+    if (!name) return client.sendEvent("error", { message: "channel name required" });
+    const ch = Channel.get(name);
+    if (!ch) return client.sendEvent("error", { message: `channel "${name}" not found` });
+    ch.send(data, { path: server.path });
+  });
+
+  // ── Ping / pong (manual, separate from WS protocol heartbeat) ─────────
+  server.on("ping", (_, client) => {
+    if (!client) return;
+    client.sendEvent("pong", { ts: Date.now() });
   });
 };

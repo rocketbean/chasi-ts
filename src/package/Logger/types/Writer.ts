@@ -28,9 +28,15 @@ export default abstract class Writer {
   }
 
   get cols() {
-    return process.stdout.columns - Writer.groups.length * 2;
+    // process.stdout.columns is undefined in cluster workers (stdout is /dev/null).
+    // Fall back to TERM_COLS injected by the primary at fork time.
+    // Subtract 3 to match the "   " prefix Storage adds before every entry —
+    // full-width formatters (Full, EndTraceFull, LeftFull) pad to exactly cols
+    // chars, so without this reservation they overflow by 3 and wrap.
+    const cols = process.stdout.columns || Number(process.env.TERM_COLS) || 100;
+    return Math.max(0, cols - (Writer.groups.length * 2) - 3);
   }
-
+  
   style(key: string): Writable {
     this.displayAs = this.logType[key];
     return this;

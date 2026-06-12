@@ -65,7 +65,7 @@
       <span class="sub-text">
         Let's run our test.
       </span>
-      <code-container mapping="testing/usage/onSuccessTest" :options="{ theme: 'vitesse-dark', lang: 'shell' }">
+      <code-container mapping="testing/onSuccessTest" :options="{ theme: 'vitesse-dark', lang: 'shell' }">
         <template v-slot:comment>
           <p> - run: "npm run test"</p>
           <p> - we should see something like this.</p>

@@ -118,6 +118,7 @@ export default class CompilerEngine {
         bundler.rebase(base);
         await bundler.setup(this.$app);
         let routes = await bundler.routeRegistry();
+        bundler.knownRoutes = routes.map((r) => r.path);
         await router.collectEndpointFn((route) => {
           routes.forEach((r) => {
             route.dynamic(r.path, () => {}, props[0]);

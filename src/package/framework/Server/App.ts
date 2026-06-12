@@ -5,6 +5,7 @@ import Base from "../../Base.js";
 import cors from "cors";
 import Authentication from "./Authentication.js";
 import { Iobject, serverConfig } from "../Interfaces.js";
+import type { PortRange } from "./Server.types.js";
 import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
 
@@ -63,38 +64,99 @@ export default class App extends Consumer {
     await this.auth.init();
   }
 
+  private _resolvePorts(): number[] {
+    const toPort = (v: unknown): number | null => {
+      const n = typeof v === "number" ? v : Number(String(v).trim());
+      return Number.isInteger(n) && n >= 1 && n <= 65535 ? n : null;
+    };
+
+    const p: unknown = this.config.port;
+    if (Array.isArray(p)) {
+      const ports = p.map(toPort).filter((n): n is number => n !== null);
+      if (ports.length === 0) throw new Error("Invalid port list (empty after validation)");
+      return ports;
+    }
+
+    if (p && typeof p === "object" && "start" in (p as any) && "end" in (p as any)) {
+      const start = toPort((p as PortRange).start);
+      const end = toPort((p as PortRange).end);
+      if (start === null || end === null || end < start) {
+        throw new Error(`Invalid port range: ${JSON.stringify(p)}`);
+      }
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    }
+
+    const str = String(p ?? "").trim();
+    const range = str.match(/^(\d+)-(\d+)$/);
+    if (range) {
+      const start = toPort(range[1]);
+      const end = toPort(range[2]);
+      if (start === null || end === null || end < start) {
+        throw new Error(`Invalid ServerPort range: "${str}"`);
+      }
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    }
+
+    if (str.includes(",")) {
+      const ports = str.split(",").map(toPort).filter((n): n is number => n !== null);
+      if (ports.length === 0) throw new Error(`Invalid ServerPort list: "${str}"`);
+      return ports;
+    }
+
+    const single = toPort(str);
+    if (single === null) throw new Error(`Invalid ServerPort value: "${str}"`);
+    return [single];
+  }
+
+  private _tryListen(ports: number[]): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      const attempt = (i: number): void => {
+        if (i >= ports.length) {
+          reject(new Error(`All ports in [${ports.join(", ")}] are in use`));
+          return;
+        }
+        const port = ports[i];
+        const onError = (err: NodeJS.ErrnoException): void => {
+          if (err.code === "EADDRINUSE") attempt(i + 1);
+          else reject(err);
+        };
+        this.$httpServer.once("error", onError);
+        this.$httpServer.listen(port, () => {
+          this.$httpServer.removeListener("error", onError);
+          resolve(port);
+        });
+      };
+      attempt(0);
+    });
+  }
+
   async bootup(): Promise<void> {
-    global.__basepath = `${this.mode.protocol}://localhost:${this.config.port}`;
     await this.install();
-    return new Promise<void>((res, rej) => {
-      this.$httpServer.on("error", (err: Error) => rej(err));
-      this.$httpServer.listen(this.config.port, async () => {
-        this.loggers.full.write("SERVING IN: ", "cool", "boot");
-        App.servelog.forEach((str) => {
-          let protocol = this.mode.protocol;
+    const port = await this._tryListen(this._resolvePorts());
+    this.config.port = port;
+    process.env.ServerPort = String(port);
+    global.__basepath = `${this.mode.protocol}://localhost:${port}`;
+    this.loggers.full.write("SERVING IN: ", "cool", "boot");
+    App.servelog.forEach((str) => {
+      this.loggers.EndTraceFull.write(
+        `╟► ${this.mode.protocol}://localhost:${port}${str}`,
+        "systemRead",
+        "boot",
+      );
+    });
+    const nets = networkInterfaces();
+    Object.keys(nets).forEach((key) => {
+      nets[key]
+        .filter((addr) => addr.family == "IPv4")
+        .forEach((net) => {
+          const ipv = net.address == "127.0.0.1" ? "localhost" : net.address;
           this.loggers.EndTraceFull.write(
-            `╟► ${protocol}://localhost:${this.config.port}${str}`,
+            `╟► ${this.mode.protocol}://${ipv}:${port}`,
             "systemRead",
             "boot",
           );
         });
-        let nets = networkInterfaces();
-        Object.keys(nets).forEach((key) => {
-          nets[key]
-            .filter((addr) => addr.family == "IPv4")
-            .forEach((net) => {
-              let protocol = this.mode.protocol;
-              let ipv = net.address == "127.0.0.1" ? "localhost" : net.address;
-              this.loggers.EndTraceFull.write(
-                `╟► ${protocol}://${ipv}:${this.config.port}`,
-                "systemRead",
-                "boot",
-              );
-            });
-        });
-        this.loggers.EndTraceFull.write("╟", "systemRead", "boot");
-        res();
-      });
     });
+    this.loggers.EndTraceFull.write("╟", "systemRead", "boot");
   }
 }

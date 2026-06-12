@@ -6,6 +6,7 @@ export default class UserController extends Controller {
   get user() {
     return this.models.user;
   }
+
   /**
    * Write a New ModelEntry
    * @param {request} [ExpressRequest] Object
@@ -81,7 +82,4 @@ export default class UserController extends Controller {
     }
   }
 
-  async forget (request, response) {
-    return await this.user.collection.drop();
-  }
 }

@@ -41,7 +41,7 @@ export default class Base {
     const result: Record<string, unknown> = {};
     await Promise.all(
       Object.keys(_mods).map(async (key) => {
-        let _fp = pathToFileURL(__testMode() ? key : key + ".js").href;
+        let _fp = __testMode() ? key : pathToFileURL(key + ".js").href;
         result[key] = await import(_fp)
           .then((_content) => _content.default)
           .catch((e: unknown) => {

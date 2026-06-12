@@ -51,10 +51,9 @@ export default class Session {
   }
 
   static async validates(config) {
-    if (!config?.compiler?.enabled) {
-      return;
-    } else Writer.log = process.stdout.write;
-    return;
+    if (!config?.compiler?.enabled) return;
+    // Use a wrapper so the second "subject" arg isn't misread as a buffer encoding.
+    Writer.log = (msg: any) => process.stdout.write(String(msg));
   }
 
   static async beforeSessionHook(config: Iobject) {
@@ -76,7 +75,6 @@ export default class Session {
       let pipe = new PipeHandler();
       global.Logger = Logger.init()
       if (Session.checkMainThread()) {
-        await Session.validates(config);
         await cluster.createCluster();
       } else {
         await cluster.storage.setPipe(pipe);

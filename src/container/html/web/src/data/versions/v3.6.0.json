@@ -2,63 +2,144 @@
   "version": "3.6.0",
   "sections": [
     {
-      "keywords": ["chasi-ts", "introduction", "requirements", "drizzle"],
+      "keywords": [
+        "chasi-ts",
+        "introduction",
+        "requirements",
+        "drizzle"
+      ],
       "id": "intro",
       "icon": "view_in_ar",
       "label": "Introduction",
       "display": true,
       "text": "A Rest-API framework that will boost the development, Secure the production, and ensures the scalability of your project. Chasi is modeled after an auto-mobile production, which may start with the chassis, and serve's as the car's foundation. Engineers can then layout plan/layout/design which engine to use, wheels, transmissions, electrical components, and some other modules. Chasi runs on macOS, Linux, and Windows.",
       "controls": {
-        "right": { "open": false },
-        "header": { "subheader": { "open": true } }
+        "right": {
+          "open": false
+        },
+        "header": {
+          "subheader": {
+            "open": true
+          }
+        }
       },
       "requirements": [
-        { "id": "node", "label": "Node", "value": ">=20.0.0", "keywords": ["node", "nodejs", "requirements", "version", "introduction"], "text": "Minimum Node.js version required to run chasi-ts." },
-        { "id": "npm", "label": "NPM", "value": ">=8.0.0", "keywords": ["npm", "requirements", "version", "introduction"], "text": "Minimum NPM version required to install and manage chasi-ts dependencies." },
-        { "id": "git", "label": "Git", "value": ">=2.0.0", "keywords": ["git", "requirements", "version", "introduction"], "text": "Minimum Git version required for chasi-ts project management." }
+        {
+          "id": "node",
+          "label": "Node",
+          "value": ">=20.0.0",
+          "keywords": [
+            "node",
+            "nodejs",
+            "requirements",
+            "version",
+            "introduction"
+          ],
+          "text": "Minimum Node.js version required to run chasi-ts."
+        },
+        {
+          "id": "npm",
+          "label": "NPM",
+          "value": ">=8.0.0",
+          "keywords": [
+            "npm",
+            "requirements",
+            "version",
+            "introduction"
+          ],
+          "text": "Minimum NPM version required to install and manage chasi-ts dependencies."
+        },
+        {
+          "id": "git",
+          "label": "Git",
+          "value": ">=2.0.0",
+          "keywords": [
+            "git",
+            "requirements",
+            "version",
+            "introduction"
+          ],
+          "text": "Minimum Git version required for chasi-ts project management."
+        }
       ]
     },
     {
-      "keywords": ["install"],
+      "keywords": [
+        "install"
+      ],
       "id": "install",
       "icon": "settings_input_svideo",
       "label": "Installation",
       "display": true,
       "subcats": [
-        { "to": "NpmInit", "label": "npm" },
-        { "to": "chasiInstall", "label": "chasi-cli" },
-        { "to": "Github", "label": "Github" },
-        { "to": "GettingStarted", "label": "Getting Started" }
+        {
+          "to": "NpmInit",
+          "label": "npm"
+        },
+        {
+          "to": "chasiInstall",
+          "label": "chasi-cli"
+        },
+        {
+          "to": "Github",
+          "label": "Github"
+        },
+        {
+          "to": "GettingStarted",
+          "label": "Getting Started"
+        }
       ],
       "glossary": [
         {
           "id": "NpmInit",
           "label": "Initializing npm",
-          "keywords": ["initialize", "init", "npm"],
+          "keywords": [
+            "initialize",
+            "init",
+            "npm"
+          ],
           "text": "this is the most recommended way of initializing chasi, please note that this step requires node, npm and git installed in your environment."
         },
         {
           "id": "chasiInstall",
           "label": "via chasi-cli",
-          "keywords": ["chasi-cli", "cli", "init"],
+          "keywords": [
+            "chasi-cli",
+            "cli",
+            "init"
+          ],
           "text": "this requires chasi-cli to be globally installed on the system."
         },
         {
           "id": "Github",
           "label": "Github",
-          "keywords": ["Github", "fork", "clone"],
+          "keywords": [
+            "Github",
+            "fork",
+            "clone"
+          ],
           "text": "via Github fork/clone, etc."
         },
         {
           "id": "GettingStarted",
           "label": "Getting Started",
-          "keywords": ["start", "boot", "run"],
+          "keywords": [
+            "start",
+            "boot",
+            "run"
+          ],
           "text": "there is a template of environment file right after installation (./template.env), which can be copied as a reference for setting up a .env file."
         }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     },
     {
@@ -66,174 +147,333 @@
       "icon": "dns",
       "label": "Server",
       "display": true,
-      "keywords": ["server"],
+      "keywords": [
+        "server"
+      ],
       "subcats": [
         {
           "to": "serverConfig",
           "label": "Server Configuration",
-          "group": ["scport", "scenvi", "sccors", "scserviceCluster", "schooks", "scmodes"]
+          "group": [
+            "scport",
+            "scenvi",
+            "sccors",
+            "scserviceCluster",
+            "schooks",
+            "scmodes"
+          ]
         },
         {
           "to": "serverContainer",
           "label": "Container",
-          "group": ["sc-name", "sc-controllerDir", "sc-serviceBootstrap", "sc-middlewares"]
+          "group": [
+            "sc-name",
+            "sc-controllerDir",
+            "sc-serviceBootstrap",
+            "sc-middlewares"
+          ]
         },
         {
           "to": "loggerSection",
           "label": "Logger",
-          "group": ["logLog", "logInfo", "logWarn", "logError"]
+          "group": [
+            "logLog",
+            "logInfo",
+            "logWarn",
+            "logError"
+          ]
         }
       ],
       "glossary": [
         {
           "id": "serverConfig",
           "label": "Configuration",
-          "keywords": ["server", "config", "serverconfig"],
+          "keywords": [
+            "server",
+            "config",
+            "serverconfig"
+          ],
           "text": "configurations applied to the server"
         },
         {
           "id": "server-ssr",
           "label": "SSR",
-          "keywords": ["ssr", "build", "compilerEngine"],
+          "keywords": [
+            "ssr",
+            "build",
+            "compilerEngine"
+          ],
           "text": "Chasi's server side rendering is powered by vitejs, a powerful compiler that uses roll-up to compile files. checkout ref: https://vitejs.dev/ to learn more."
         },
         {
           "id": "scport",
           "label": "port",
-          "reference": ["serverConfig"],
-          "keywords": ["port", "config", "serverconfig"],
+          "reference": [
+            "serverConfig"
+          ],
+          "keywords": [
+            "port",
+            "config",
+            "serverconfig"
+          ],
           "text": "This value will be passed to Chasi's core upon booting, and will serve as local serving port."
         },
         {
           "id": "scenvi",
           "label": "environment",
-          "reference": ["serverConfig"],
-          "keywords": ["environment", "config", "serverconfig"],
+          "reference": [
+            "serverConfig"
+          ],
+          "keywords": [
+            "environment",
+            "config",
+            "serverconfig"
+          ],
           "text": "Server environment to be used, this option will refer to serverConfig.modes[environment] and will launch the configuration set declared from this mode."
         },
         {
           "id": "sccors",
           "label": "cors",
-          "reference": ["serverConfig"],
-          "keywords": ["cors", "config", "serverconfig"],
+          "reference": [
+            "serverConfig"
+          ],
+          "keywords": [
+            "cors",
+            "config",
+            "serverconfig"
+          ],
           "text": "this object will be passed to NPM[Cors] package. reference: https://www.npmjs.com/package/cors"
         },
         {
           "id": "scserviceCluster",
           "label": "serviceCluster",
-          "reference": ["serverConfig"],
-          "keywords": ["serviceCluster", "clustering", "config", "serverconfig"],
+          "reference": [
+            "serverConfig"
+          ],
+          "keywords": [
+            "serviceCluster",
+            "clustering",
+            "config",
+            "serverconfig"
+          ],
           "text": "Enables Clustering for the api Chasi instace will be invoked on the number of workers decalared at serviceCluster[workers], it will be equal to the available cpus by default."
         },
         {
           "id": "schooks",
           "label": "hooks",
-          "reference": ["serverConfig"],
-          "keywords": ["hooks", "config", "serverconfig"],
+          "reference": [
+            "serverConfig"
+          ],
+          "keywords": [
+            "hooks",
+            "config",
+            "serverconfig"
+          ],
           "text": "interact with Chasi's lifecycle"
         },
         {
           "id": "scmodes",
           "label": "modes",
-          "reference": ["serverConfig"],
-          "keywords": ["modes", "config", "serverconfig"],
+          "reference": [
+            "serverConfig"
+          ],
+          "keywords": [
+            "modes",
+            "config",
+            "serverconfig"
+          ],
           "text": "for setting up a specific server environment and add that inside [modes]property change the [environment] property to a specific selection, please note that the selected environment must be registered in this property."
         },
         {
           "id": "serverContainer",
           "label": "Container",
-          "reference": ["server", "serverConfig"],
-          "keywords": ["server", "container", "serverconfig"],
+          "reference": [
+            "server",
+            "serverConfig"
+          ],
+          "keywords": [
+            "server",
+            "container",
+            "serverconfig"
+          ],
           "sub": "[./src/config/container]",
           "text": "Container configuration is for managing the container registry. E.G controllers directory, middlewares and service providers, as well as the API/APP name of the project. The idea of this configurations is to isolate developers interaction to chasi's internal modules."
         },
         {
           "id": "sc-name",
           "label": "Name",
-          "reference": ["serverContainer", "serverConfig"],
-          "keywords": ["serverContainer name", "name", "serverconfig"],
+          "reference": [
+            "serverContainer",
+            "serverConfig"
+          ],
+          "keywords": [
+            "serverContainer name",
+            "name",
+            "serverconfig"
+          ],
           "text": "target name for the APP/API/etc."
         },
         {
           "id": "sc-controllerDir",
           "label": "ControllerDir",
-          "reference": ["serverContainer", "serverConfig"],
-          "keywords": ["serverContainer controllerDir", "controllerDir", "serverconfig"],
+          "reference": [
+            "serverContainer",
+            "serverConfig"
+          ],
+          "keywords": [
+            "serverContainer controllerDir",
+            "controllerDir",
+            "serverconfig"
+          ],
           "text": "Default Controllers Directory, Chasi will autoload this directoy as controllers, when [Router][controllersDir] property is missing from the config. this controllers will only be registered if the [JS][TS]file is a type of controller"
         },
         {
           "id": "sc-serviceBootstrap",
           "label": "ServiceBootstrap",
-          "reference": ["serverContainer", "serverConfig"],
-          "keywords": ["serverContainer serviceBootstrap", "serviceBootstrap", "serverconfig"],
+          "reference": [
+            "serverContainer",
+            "serverConfig"
+          ],
+          "keywords": [
+            "serverContainer serviceBootstrap",
+            "serviceBootstrap",
+            "serverconfig"
+          ],
           "text": "this is an outside chasi module registry, ideally a logic gate in between controller's request and response, socket server's logic. services are ideal for wrapping the API's logic and processes."
         },
         {
           "id": "sc-middlewares",
           "label": "Middlewares",
-          "reference": ["serverContainer", "serverConfig"],
-          "keywords": ["serverContainer middlewares", "middlewares", "serverconfig"],
+          "reference": [
+            "serverContainer",
+            "serverConfig"
+          ],
+          "keywords": [
+            "serverContainer middlewares",
+            "middlewares",
+            "serverconfig"
+          ],
           "text": "Middlewares must be registered here before it can be applied to any routing container, group, endpoint, or even in the websockets or channels. It is good to put request validations or verifications in middlewares to centralize gates in the environment."
         },
         {
           "id": "loggerSection",
           "label": "Logger",
-          "keywords": ["logger", "log", "info", "warn", "error", "debug"],
+          "keywords": [
+            "logger",
+            "log",
+            "info",
+            "warn",
+            "error",
+            "debug"
+          ],
           "text": "A global Logger instance is available throughout the application without any import. It provides console-like methods for different log levels, each rendered with a distinct prefix and color in the terminal."
         },
         {
           "id": "logLog",
           "label": ".log()",
-          "reference": ["loggerSection"],
-          "keywords": ["logger", "log"],
+          "reference": [
+            "loggerSection"
+          ],
+          "keywords": [
+            "logger",
+            "log"
+          ],
           "text": "Outputs plain text to the terminal. Accepts multiple arguments; objects are automatically pretty-printed with util.inspect (depth: null, colors: true)."
         },
         {
           "id": "logInfo",
           "label": ".info()",
-          "reference": ["loggerSection"],
-          "keywords": ["logger", "info"],
+          "reference": [
+            "loggerSection"
+          ],
+          "keywords": [
+            "logger",
+            "info"
+          ],
           "text": "Outputs an informational message prefixed with ℹ in cyan. Behaves identically to Logger.log with a distinct color for at-a-glance identification."
         },
         {
           "id": "logWarn",
           "label": ".warn()",
-          "reference": ["loggerSection"],
-          "keywords": ["logger", "warn", "warning"],
+          "reference": [
+            "loggerSection"
+          ],
+          "keywords": [
+            "logger",
+            "warn",
+            "warning"
+          ],
           "text": "Outputs a warning message prefixed with ⚠ in yellow. Use for non-critical issues, deprecation notices, or configuration anomalies."
         },
         {
           "id": "logError",
           "label": ".error()",
-          "reference": ["loggerSection"],
-          "keywords": ["logger", "error", "severe"],
+          "reference": [
+            "loggerSection"
+          ],
+          "keywords": [
+            "logger",
+            "error",
+            "severe"
+          ],
           "text": "Outputs an error message prefixed with ✖ in red. Use for exceptions and critical failures."
         },
         {
           "id": "ev-start",
           "label": "Server Start",
-          "reference": ["server", "serverConfig"],
-          "keywords": ["server start", "start", "event", "@start"],
+          "reference": [
+            "server",
+            "serverConfig"
+          ],
+          "keywords": [
+            "server start",
+            "start",
+            "event",
+            "@start"
+          ],
           "text": "state[0] server @start lifecycle this event is mainly for setting up Observer module to run and read the lifecycle of everything. and data collection and registries in service providers/ third party module before instantiation."
         },
         {
           "id": "ev-initialize",
           "label": "Server Initialize",
-          "reference": ["server", "serverConfig"],
-          "keywords": ["server initialize", "initialize", "event", "@initialize"],
+          "reference": [
+            "server",
+            "serverConfig"
+          ],
+          "keywords": [
+            "server initialize",
+            "initialize",
+            "event",
+            "@initialize"
+          ],
           "text": "state[1|2] server @init lifecycle, which initializes DB and routers. as well as consuming route layers."
         },
         {
           "id": "ev-boot",
           "label": "Server boot",
-          "reference": ["server", "serverConfig"],
-          "keywords": ["server boot", "initialize", "event", "@boot", "ready"],
+          "reference": [
+            "server",
+            "serverConfig"
+          ],
+          "keywords": [
+            "server boot",
+            "initialize",
+            "event",
+            "@boot",
+            "ready"
+          ],
           "text": "state[3] server @boot or server readystate lifecycle, which checks and returns the error container, instantiation of modules, and consuming layer for controllers. Then the actual booting of the server"
         }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     },
     {
@@ -241,24 +481,44 @@
       "icon": "fork_right",
       "label": "Router",
       "display": true,
-      "keywords": ["router", "routing"],
+      "keywords": [
+        "router",
+        "routing"
+      ],
       "subcats": [
-        { "to": "RouterServiceProvider", "label": "RouterServiceProvider" },
+        {
+          "to": "RouterServiceProvider",
+          "label": "RouterServiceProvider"
+        },
         {
           "to": "RouterConfigInterface",
           "label": "RouterConfigInterface",
           "group": [
-            "rci-name", "rci-auth", "rci-prefix", "rci-namespace",
-            "rci-middleware", "rci-controllerDir", "rci-AuthRouteExceptions",
-            "rci-data", "rci-mount", "rci-before", "rci-after", "rci-displayLog"
+            "rci-name",
+            "rci-auth",
+            "rci-prefix",
+            "rci-namespace",
+            "rci-middleware",
+            "rci-controllerDir",
+            "rci-AuthRouteExceptions",
+            "rci-data",
+            "rci-mount",
+            "rci-before",
+            "rci-after",
+            "rci-displayLog"
           ]
         },
         {
           "to": "RouterNamespace",
           "label": "RouterNamespace",
           "group": [
-            "RouteEndpoint", "RouteGroup", "rgp-middleware", "rgp-prefix",
-            "rgp-controller", "rgp-before", "rgp-after"
+            "RouteEndpoint",
+            "RouteGroup",
+            "rgp-middleware",
+            "rgp-prefix",
+            "rgp-controller",
+            "rgp-before",
+            "rgp-after"
           ]
         }
       ],
@@ -267,178 +527,343 @@
           "id": "RouterNamespace",
           "label": "Router Namespace",
           "sublabel": "[./src/container/http]",
-          "keywords": ["router", "namespace"],
+          "keywords": [
+            "router",
+            "namespace"
+          ],
           "text": "A file where routing logic can be applied. This file might contain endpoint, groups or middleware declaration. Namespace allows route isolation, which can be useful for having multiple API's with different logic/implemantation. the file must export a default function and the route instance will be supplied as an argument which will be used to declare endpoint, group and routing logics. this will then be passed to the app registry and will be consumed before server boot event."
         },
         {
           "id": "RouteGroup",
           "label": "Router Group",
-          "reference": ["RouterNamespace"],
-          "keywords": ["router group", "RouteGroup", "namespace", "group"],
+          "reference": [
+            "RouterNamespace"
+          ],
+          "keywords": [
+            "router group",
+            "RouteGroup",
+            "namespace",
+            "group"
+          ],
           "text": "Route group is an endpoint wrapper which applies declared options to the wrapped endpoint, for instance a route prefix, controller, middleware, before and after request events. In case of middleware conflict, route endpoint declaration will be applied."
         },
         {
           "id": "rgp-middleware",
           "label": "middleware",
-          "reference": ["RouteGroup"],
-          "keywords": ["middleware", "router group middleware", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouteGroup"
+          ],
+          "keywords": [
+            "middleware",
+            "router group middleware",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "array of middleware names, middlewares listed under this group will be implemented across the group endpoints"
         },
         {
           "id": "rgp-prefix",
           "label": "prefix",
-          "reference": ["RouteGroup"],
-          "keywords": ["prefix", "router group prefix", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouteGroup"
+          ],
+          "keywords": [
+            "prefix",
+            "router group prefix",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "value will be prepended to the endpoint path."
         },
         {
           "id": "rgp-controller",
           "label": "controller",
-          "reference": ["RouteGroup"],
-          "keywords": ["controller", "router group controller", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouteGroup"
+          ],
+          "keywords": [
+            "controller",
+            "router group controller",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "controller path must be under (./config/container.ts[ControllerDir]) path declaration. can be shorthanded if '@' is present before the file declaration e.g. : 'posts@PostController' then the route endpoint can be shorthanded as route.post('index', 'index'),  this will translate to (posts/PostController@index)"
         },
         {
           "id": "rgp-before",
           "label": "before",
-          "reference": ["RouteGroup"],
-          "keywords": ["before", "router group before", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouteGroup"
+          ],
+          "keywords": [
+            "before",
+            "router group before",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "before() ev will be emitted before function/controller execution"
         },
         {
           "id": "rgp-after",
           "label": "after",
-          "reference": ["RouteGroup"],
-          "keywords": ["after", "router group after", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouteGroup"
+          ],
+          "keywords": [
+            "after",
+            "router group after",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "after() will be emitted before sending a response object to the client"
         },
         {
           "id": "RouteEndpoint",
           "label": "Router Endpoint",
-          "reference": ["RouterNamespace", "RouteGroup"],
-          "keywords": ["router", "namespace", "endpoint"],
+          "reference": [
+            "RouterNamespace",
+            "RouteGroup"
+          ],
+          "keywords": [
+            "router",
+            "namespace",
+            "endpoint"
+          ],
           "text": "Routing endpoint points to a callback function, which can be a Controller Method or a callback function. Endpoints is a part of a Router Namespace or can be a part of a route group. Endpoints also specifies the #HTTPMethod, and can have similar address but must have a different HTTPMethod."
         },
         {
           "id": "RouterServiceProvider",
           "label": "RouterServiceProvider",
           "sublabel": "[./src/container/services/RouterServiceProvider]",
-          "keywords": ["RouterConfig", "RouterServiceProvider", "router"],
+          "keywords": [
+            "RouterConfig",
+            "RouterServiceProvider",
+            "router"
+          ],
           "text": "In RouterServiceProvider file, Routers are registered inside the boot method, which is a ServiceProvider method, that is being executed before the server( @start) event, which is part of Chasi's lifecycle. ServiceProvider@boot method is mainly for collecting information, before it runs in the registry. Router instance needs to be invoked inside the boot function"
         },
         {
           "id": "RouterConfigInterface",
           "label": "Router configuraion type",
-          "keywords": ["RouterConfigInterface", "router", "type"],
+          "keywords": [
+            "RouterConfigInterface",
+            "router",
+            "type"
+          ],
           "text": "router type declaration"
         },
         {
           "id": "rci-name",
           "label": "name",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["name", "router name", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "name",
+            "router name",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "the value will be used as an index and must be unique."
         },
         {
           "id": "rci-auth",
           "label": "auth",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["auth", "router auth", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "auth",
+            "router auth",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "authentication can be configured from [./config/authentication] please specify a driver that is registered from the auth configuration file or you can set this parameter to false || null, if you intend not to use any auth for your router {String} {Boolean[false]} {null}"
         },
         {
           "id": "rci-prefix",
           "label": "prefix",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["prefix", "router prefix", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "prefix",
+            "router prefix",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "value will be appended to all the routes that will be registered under a router's instance"
         },
         {
           "id": "rci-namespace",
           "label": "namespace",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["namespace", "router namespace", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "namespace",
+            "router namespace",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "a string path to a router container file."
         },
         {
           "id": "rci-middleware",
           "label": "middleware",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["middleware", "router middleware", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "middleware",
+            "router middleware",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "middleware/s listed under this property will be implemented, to all the routes registered in the instance, except* if the route endpoint/group have a declaration of a middleware excemption"
         },
         {
           "id": "rci-controllerDir",
           "label": "controllerdir",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["controllerdir", "router controllerdir", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "controllerdir",
+            "router controllerdir",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "a string path/s that will be added to router's controller path registry."
         },
         {
           "id": "rci-AuthRouteExceptions",
           "label": "AuthRouteExceptions?",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["AuthRouteExceptions", "router AuthRouteExceptions", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "AuthRouteExceptions",
+            "router AuthRouteExceptions",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "Option to excempt a route endpoint/s from AuthGuards, all routes that will be excempted in Auth implementations will have no access to the [request.auth] property in <Request>."
         },
         {
           "id": "rci-data",
           "label": "data?",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["data", "router data", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "data",
+            "router data",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "router hook, declared data inside this hook will be avilable throughout this Router[Instance] you can access data property via this.$data inside a controller/method or by adding a 3rd argument in a route function"
         },
         {
           "id": "rci-mount",
           "label": "mount?",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["mount", "router mount", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "mount",
+            "router mount",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "a router hook where third party modules can be registered/mounted"
         },
         {
           "id": "rci-before",
           "label": "before?",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["before", "router before", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "before",
+            "router before",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "this function will be invoke before a request is passed into controller/handler function."
         },
         {
           "id": "rci-after",
           "label": "after?",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["after", "router after", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "after",
+            "router after",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "this function will be invoked before a request is sent back to the client."
         },
         {
           "id": "rci-displayLog",
           "label": "displayLog?",
-          "reference": ["RouterConfigInterface"],
-          "keywords": ["displayLog", "router displayLog", "RouterConfigInterface", "router"],
+          "reference": [
+            "RouterConfigInterface"
+          ],
+          "keywords": [
+            "displayLog",
+            "router displayLog",
+            "RouterConfigInterface",
+            "router"
+          ],
           "text": "an option to print route information in the terminal."
         }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     },
     {
-      "keywords": ["controller"],
+      "keywords": [
+        "controller"
+      ],
       "id": "controller",
       "icon": "videogame_asset",
       "label": "Controller",
       "display": true,
       "subcats": [
-        { "to": "controller", "label": "Controller" },
+        {
+          "to": "controller",
+          "label": "Controller"
+        },
         {
           "to": "example-usage",
           "label": "Example Usage",
-          "group": ["usage-namespace", "usage-controller", "usage-model"]
+          "group": [
+            "usage-namespace",
+            "usage-controller",
+            "usage-model"
+          ]
         },
         {
           "to": "example-responses",
           "label": "Responses",
-          "group": ["res-post", "res-get", "res-get-user", "res-patch-user", "res-del-user"]
+          "group": [
+            "res-post",
+            "res-get",
+            "res-get-user",
+            "res-patch-user",
+            "res-del-user"
+          ]
         }
       ],
       "glossary": [
@@ -446,41 +871,139 @@
           "id": "controller",
           "label": "Controller",
           "sublabel": "[./src/container/controllers]",
-          "keywords": ["controller", "methods"],
+          "keywords": [
+            "controller",
+            "methods"
+          ],
           "text": "Handles incoming request and client response, Controllers are the process in between the logic of an endpoint."
         },
-        { "id": "usage-namespace", "label": "Namespace Example", "keywords": ["Controller usage", "example", "namespace"] },
-        { "id": "usage-controller", "label": "Controller Example", "keywords": ["Controller usage", "example"] },
-        { "id": "usage-model", "label": "DBModel Example", "keywords": ["DBModel usage", "example", "DBModel"] },
-        { "id": "res-post", "label": "Example Post Request", "keywords": ["Controller usage", "example"] },
-        { "id": "res-get", "label": "Example Get Request", "keywords": ["Controller usage", "example"] },
-        { "id": "res-get-user", "label": "Example Dynamic Get Request", "keywords": ["Controller usage", "example"] },
-        { "id": "res-patch-user", "label": "Example Dynamic Patch Request", "keywords": ["Controller usage", "example"] },
-        { "id": "res-del-user", "label": "Example Dynamic Delete Request", "keywords": ["Controller usage", "example"] }
+        {
+          "id": "usage-namespace",
+          "label": "Namespace Example",
+          "keywords": [
+            "Controller usage",
+            "example",
+            "namespace"
+          ]
+        },
+        {
+          "id": "usage-controller",
+          "label": "Controller Example",
+          "keywords": [
+            "Controller usage",
+            "example"
+          ]
+        },
+        {
+          "id": "usage-model",
+          "label": "DBModel Example",
+          "keywords": [
+            "DBModel usage",
+            "example",
+            "DBModel"
+          ]
+        },
+        {
+          "id": "res-post",
+          "label": "Example Post Request",
+          "keywords": [
+            "Controller usage",
+            "example"
+          ]
+        },
+        {
+          "id": "res-get",
+          "label": "Example Get Request",
+          "keywords": [
+            "Controller usage",
+            "example"
+          ]
+        },
+        {
+          "id": "res-get-user",
+          "label": "Example Dynamic Get Request",
+          "keywords": [
+            "Controller usage",
+            "example"
+          ]
+        },
+        {
+          "id": "res-patch-user",
+          "label": "Example Dynamic Patch Request",
+          "keywords": [
+            "Controller usage",
+            "example"
+          ]
+        },
+        {
+          "id": "res-del-user",
+          "label": "Example Dynamic Delete Request",
+          "keywords": [
+            "Controller usage",
+            "example"
+          ]
+        }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     },
     {
-      "keywords": ["database", "mongodb", "nosql", "drizzle", "orm", "sql", "postgresql", "mysql", "sqlite"],
+      "keywords": [
+        "database",
+        "mongodb",
+        "nosql",
+        "drizzle",
+        "orm",
+        "sql",
+        "postgresql",
+        "mysql",
+        "sqlite"
+      ],
       "id": "database",
       "icon": "storage",
       "label": "Database",
       "display": true,
       "subcats": [
-        { "to": "database", "label": "Database" },
+        {
+          "to": "database",
+          "label": "Database"
+        },
         {
           "to": "DatabaseConfig",
           "label": "Database Config",
-          "group": ["dc-host", "dc-bootWithDB", "dc-hideLogConnectionStrings", "dc-default", "dc-connections"]
+          "group": [
+            "dc-host",
+            "dc-bootWithDB",
+            "dc-hideLogConnectionStrings",
+            "dc-default",
+            "dc-connections"
+          ]
         },
-        { "to": "db-model", "label": "Model", "group": ["db-model-con"] },
+        {
+          "to": "db-model",
+          "label": "Model",
+          "group": [
+            "db-model-con"
+          ]
+        },
         {
           "to": "drizzle",
           "label": "Drizzle ORM",
-          "group": ["drizzle-adapter", "drizzle-schema", "drizzle-globals", "drizzle-query", "drizzle-model-method"]
+          "group": [
+            "drizzle-adapter",
+            "drizzle-schema",
+            "drizzle-globals",
+            "drizzle-query",
+            "drizzle-model-method"
+          ]
         }
       ],
       "glossary": [
@@ -488,106 +1011,265 @@
           "id": "database",
           "label": "Database",
           "sublabel": "[./src/config/database.ts]",
-          "keywords": ["database", "db"],
+          "keywords": [
+            "database",
+            "db"
+          ],
           "text": "Chasi Database Handler automatically connects on the declared named connection in [DatabaseConfig.connections]. Supports MongoDB, Prisma, and Drizzle ORM. All connections are declared in a single config file and connected automatically at boot."
         },
         {
           "id": "db-model",
           "label": "Model",
           "sublabel": "[./src/container/models]",
-          "keywords": ["model", "database model", "methods"],
+          "keywords": [
+            "model",
+            "database model",
+            "methods"
+          ],
           "text": "Chasi Model wraps and extends Mongoose Model, and will inherit mongoose model methods. Chasi Model also can handle different database connections by specifying the name of the connection to use [./config/database::connections] in the model."
         },
         {
           "id": "db-model-con",
           "label": "Model Connection",
-          "reference": ["db-model"],
-          "keywords": ["model", "connection", "database"],
+          "reference": [
+            "db-model"
+          ],
+          "keywords": [
+            "model",
+            "connection",
+            "database"
+          ],
           "text": "For multiple database connection, a connection can be specified by adding a third argument in the Model.connect() wrapper. please note that models will connect to the default connection if none is specified."
         },
-        { "id": "dc-host", "label": "Host", "reference": ["DatabaseConfig"], "type": "<string>", "keywords": ["DatabaseConfig", "host", "db", "config"], "text": "A connection name to connect." },
-        { "id": "dc-bootWithDB", "label": "BootWithDB", "reference": ["DatabaseConfig"], "type": "<boolean>", "keywords": ["DatabaseConfig", "BootWithDB", "db", "config"], "text": "If enabled, chasi will throw an execution error if one of the DBConnections failed." },
-        { "id": "dc-hideLogConnectionStrings", "label": "hideLogConnectionStrings", "reference": ["DatabaseConfig"], "type": "<boolean>", "keywords": ["DatabaseConfig", "hideLogConnectionStrings", "db", "config"], "text": "Hides the connection string" },
-        { "id": "dc-default", "label": "default", "reference": ["DatabaseConfig"], "type": "<string>", "keywords": ["DatabaseConfig", "default", "db", "config"], "text": "The default connection to be used by the models if none is specified" },
+        {
+          "id": "dc-host",
+          "label": "Host",
+          "reference": [
+            "DatabaseConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "DatabaseConfig",
+            "host",
+            "db",
+            "config"
+          ],
+          "text": "A connection name to connect."
+        },
+        {
+          "id": "dc-bootWithDB",
+          "label": "BootWithDB",
+          "reference": [
+            "DatabaseConfig"
+          ],
+          "type": "<boolean>",
+          "keywords": [
+            "DatabaseConfig",
+            "BootWithDB",
+            "db",
+            "config"
+          ],
+          "text": "If enabled, chasi will throw an execution error if one of the DBConnections failed."
+        },
+        {
+          "id": "dc-hideLogConnectionStrings",
+          "label": "hideLogConnectionStrings",
+          "reference": [
+            "DatabaseConfig"
+          ],
+          "type": "<boolean>",
+          "keywords": [
+            "DatabaseConfig",
+            "hideLogConnectionStrings",
+            "db",
+            "config"
+          ],
+          "text": "Hides the connection string"
+        },
+        {
+          "id": "dc-default",
+          "label": "default",
+          "reference": [
+            "DatabaseConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "DatabaseConfig",
+            "default",
+            "db",
+            "config"
+          ],
+          "text": "The default connection to be used by the models if none is specified"
+        },
         {
           "id": "dc-connections",
           "label": "Connections",
-          "reference": ["DatabaseConfig"],
+          "reference": [
+            "DatabaseConfig"
+          ],
           "type": "<{[key: string]: DBProperty}>",
-          "keywords": ["DatabaseConfig", "connections", "db", "config"],
+          "keywords": [
+            "DatabaseConfig",
+            "connections",
+            "db",
+            "config"
+          ],
           "text": "A database connection declaration, entries will be process in DB Handler's registry and will try to connect upon boot.",
-          "coderef": { "ref": "database/config/connections" }
+          "coderef": {
+            "ref": "database/config/connections"
+          }
         },
         {
           "id": "drizzle",
           "label": "Drizzle ORM",
           "sublabel": "[driver: \"drizzle\"]",
-          "keywords": ["drizzle", "drizzle orm", "orm", "sql", "postgresql", "mysql", "sqlite", "database"],
+          "keywords": [
+            "drizzle",
+            "drizzle orm",
+            "orm",
+            "sql",
+            "postgresql",
+            "mysql",
+            "sqlite",
+            "database"
+          ],
           "text": "Chasi includes a first-class Drizzle ORM driver. Declare a Drizzle connection in config/database.ts with driver: \"drizzle\", then access the live query client via this.models.connectionName._db or the static Model.drizzle(\"connectionName\") accessor."
         },
         {
           "id": "drizzle-adapter",
           "label": "adapter",
-          "reference": ["drizzle"],
+          "reference": [
+            "drizzle"
+          ],
           "type": "<DrizzleAdapter>",
-          "keywords": ["drizzle adapter", "drizzle", "node-postgres", "mysql2", "better-sqlite3", "libsql", "postgres-js"],
+          "keywords": [
+            "drizzle adapter",
+            "drizzle",
+            "node-postgres",
+            "mysql2",
+            "better-sqlite3",
+            "libsql",
+            "postgres-js"
+          ],
           "text": "The drizzle-orm sub-path to use for the connection. Determines which underlying database client is used. Supported values: \"node-postgres\" (pg), \"postgres-js\" (postgres), \"mysql2\", \"better-sqlite3\", \"libsql\" (Turso). The corresponding peer package must be installed separately."
         },
         {
           "id": "drizzle-schema",
           "label": "schema",
-          "reference": ["drizzle"],
+          "reference": [
+            "drizzle"
+          ],
           "type": "<string>",
-          "keywords": ["drizzle schema", "drizzle", "table", "pgTable", "mysqlTable", "sqliteTable"],
+          "keywords": [
+            "drizzle schema",
+            "drizzle",
+            "table",
+            "pgTable",
+            "mysqlTable",
+            "sqliteTable"
+          ],
           "text": "Path to the schema file relative to src/. The file must export Drizzle table definitions as named exports. Each exported table is accessible as this.models.connectionName.tableName after boot. Do not use a default export — named exports only."
         },
         {
           "id": "drizzle-globals",
           "label": "globals",
-          "reference": ["drizzle"],
+          "reference": [
+            "drizzle"
+          ],
           "type": "<Record<string, unknown>>",
-          "keywords": ["drizzle globals", "drizzle", "drizzle client", "mysql2 client", "postgres-js client"],
+          "keywords": [
+            "drizzle globals",
+            "drizzle",
+            "drizzle client",
+            "mysql2 client",
+            "postgres-js client"
+          ],
           "text": "Extra options forwarded to the drizzle() constructor. Required for client-based adapters (mysql2, postgres-js) that cannot accept a bare connection string: pass the pre-built client as globals.client. Also accepts drizzle logger, cache, and other DrizzleConfig options."
         },
         {
           "id": "drizzle-query",
           "label": "Querying",
-          "reference": ["drizzle"],
-          "keywords": ["drizzle query", "drizzle", "select", "insert", "update", "delete", "orm"],
+          "reference": [
+            "drizzle"
+          ],
+          "keywords": [
+            "drizzle query",
+            "drizzle",
+            "select",
+            "insert",
+            "update",
+            "delete",
+            "orm"
+          ],
           "text": "Access the Drizzle query client inside a controller via this.models.connectionName._db. Table definitions from the schema file are available as this.models.connectionName.tableName. Use drizzle-orm helpers (eq, and, or, etc.) for query conditions."
         },
         {
           "id": "drizzle-model-method",
           "label": "Model.drizzle()",
-          "reference": ["drizzle"],
+          "reference": [
+            "drizzle"
+          ],
           "type": "<DrizzleDB>",
-          "keywords": ["drizzle model", "Model.drizzle", "drizzle static", "drizzle accessor"],
+          "keywords": [
+            "drizzle model",
+            "Model.drizzle",
+            "drizzle static",
+            "drizzle accessor"
+          ],
           "text": "Static method on the base Model class that returns the live Drizzle query client for a named connection. Useful outside of controllers, for example in service providers or event handlers: Model.drizzle(\"connectionName\")."
         }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     },
     {
-      "keywords": ["observer", "event", "events", "emitter", "event-handler"],
+      "keywords": [
+        "observer",
+        "event",
+        "events",
+        "emitter",
+        "event-handler"
+      ],
       "id": "observer",
       "icon": "local_activity",
       "label": "Observer",
       "display": true,
       "subcats": [
-        { "to": "observer", "label": "Observer" },
-        { "to": "obs-execution", "label": "How events run" },
+        {
+          "to": "observer",
+          "label": "Observer"
+        },
+        {
+          "to": "obs-execution",
+          "label": "How events run"
+        },
         {
           "to": "observerConfig",
           "label": "Configuration",
-          "group": ["obs-events", "obs-beforeEmit", "obs-afterEmit", "obs-ObserverConfig"]
+          "group": [
+            "obs-events",
+            "obs-beforeEmit",
+            "obs-afterEmit",
+            "obs-ObserverConfig"
+          ]
         },
         {
           "to": "observerEvents",
           "label": "Events",
-          "group": ["obs-event-class", "obs-emit", "obs-when", "obs-lifecycle"]
+          "group": [
+            "obs-event-class",
+            "obs-emit",
+            "obs-when",
+            "obs-lifecycle"
+          ]
         }
       ],
       "glossary": [
@@ -595,172 +1277,674 @@
           "id": "observer",
           "label": "Observer",
           "sublabel": "[./src/package/Observer/index.ts]",
-          "keywords": ["observer", "event bus", "async emitter", "$observer"],
+          "keywords": [
+            "observer",
+            "event bus",
+            "async emitter",
+            "$observer"
+          ],
           "text": "Chasi's built-in async event system. A single Observer instance is created at boot from src/config/observer.ts and exposed as $observer on the Handler and on every Controller (this.$observer). Custom events must be registered in observer.ts before emit() can use them. Event execution runs on the async emitter, isolated from the HTTP request — omit await on emit() in controllers to return a response while the event pipeline still runs."
         },
         {
           "id": "obs-execution",
           "label": "How events run",
-          "reference": ["observer"],
-          "keywords": ["execution", "async", "fire and forget", "detached", "background", "await"],
+          "reference": [
+            "observer"
+          ],
+          "keywords": [
+            "execution",
+            "async",
+            "fire and forget",
+            "detached",
+            "background",
+            "await"
+          ],
           "text": "Custom events must be listed in src/config/observer.ts events before emit(alias) works. When dispatched, the pipeline (validate → onemit → fire → fireListeners → emitted) runs on AsyncEventEmitter, separate from Express request/response timing. In controllers, this.$observer.emit(...) without await lets res.json() return immediately while the event continues. Use await only when the client must wait. Errors in a detached event do not change an HTTP status already sent."
         },
         {
           "id": "observerConfig",
           "label": "Observer configuration",
           "sublabel": "[./src/config/observer.ts]",
-          "reference": ["observer"],
-          "keywords": ["observer config", "ObserverConfig", "observer.ts"],
+          "reference": [
+            "observer"
+          ],
+          "keywords": [
+            "observer config",
+            "ObserverConfig",
+            "observer.ts"
+          ],
           "text": "Typed as ObserverConfig. Maps custom event aliases to class paths under src/, and optionally defines global beforeEmit and afterEmit hooks that wrap every event's fire() unless an event class overrides onemit or emitted."
         },
         {
           "id": "obs-events",
           "label": "events",
-          "reference": ["observerConfig"],
+          "reference": [
+            "observerConfig"
+          ],
           "type": "events",
-          "keywords": ["events registry", "ObserverConfig events", "register event"],
+          "keywords": [
+            "events registry",
+            "ObserverConfig events",
+            "register event"
+          ],
           "text": "Required registry for custom events. Every alias you pass to emit() must appear here with a class path relative to src/ (no extension). Unlisted aliases are not loaded at boot and will not run. Registered during Observer.setup() on startup — restart after adding new events.",
-          "coderef": { "ref": "observer/config/events" }
+          "coderef": {
+            "ref": "observer/config/events"
+          }
         },
         {
           "id": "obs-beforeEmit",
           "label": "beforeEmit",
-          "reference": ["observerConfig"],
+          "reference": [
+            "observerConfig"
+          ],
           "type": "(params) => Promise<void>",
-          "keywords": ["beforeEmit", "global hook", "pre-event"],
+          "keywords": [
+            "beforeEmit",
+            "global hook",
+            "pre-event"
+          ],
           "text": "Global hook invoked in onemit() immediately before an event's fire() runs. `this` is the Event instance; `params` is the payload from emit(). Skipped for events that define their own onemit/beforeEmit.",
-          "coderef": { "ref": "observer/config/beforeEmit" }
+          "coderef": {
+            "ref": "observer/config/beforeEmit"
+          }
         },
         {
           "id": "obs-afterEmit",
           "label": "afterEmit",
-          "reference": ["observerConfig"],
+          "reference": [
+            "observerConfig"
+          ],
           "type": "(params) => Promise<void>",
-          "keywords": ["afterEmit", "global hook", "post-event"],
+          "keywords": [
+            "afterEmit",
+            "global hook",
+            "post-event"
+          ],
           "text": "Global hook invoked in emitted() after fire() and when() listeners complete. Use for audit logging or metrics. Skipped when the event class defines its own emitted/afterEmit.",
-          "coderef": { "ref": "observer/config/afterEmit" }
+          "coderef": {
+            "ref": "observer/config/afterEmit"
+          }
         },
         {
           "id": "obs-ObserverConfig",
           "label": "ObserverConfig",
-          "reference": ["observerConfig"],
+          "reference": [
+            "observerConfig"
+          ],
           "type": "ObserverConfig",
-          "keywords": ["ObserverConfig", "observer types", "events type"],
+          "keywords": [
+            "ObserverConfig",
+            "observer types",
+            "events type"
+          ],
           "text": "Type exported from package/Observer/index.ts: { events: events; beforeEmit: Function; afterEmit: Function }. The nested events type is Record<string, string> — event alias → src-relative class path."
         },
         {
           "id": "observerEvents",
           "label": "Events",
           "sublabel": "[./src/container/events/]",
-          "keywords": ["events", "Event class", "EventInterface", "custom events"],
+          "keywords": [
+            "events",
+            "Event class",
+            "EventInterface",
+            "custom events"
+          ],
           "text": "Custom events are classes extending package/Observer/Event.ts and implementing EventInterface. Each implements validate(params, next) and fire(params). Framework lifecycle events (__before__, __ready__, etc.) live under package/statics/horizon/events/ and are registered internally — not in observer.ts events map."
         },
         {
           "id": "obs-event-class",
           "label": "Event class",
-          "reference": ["observerEvents"],
+          "reference": [
+            "observerEvents"
+          ],
           "type": "EventInterface",
-          "keywords": ["Event", "EventInterface", "Authorize", "container/events"],
+          "keywords": [
+            "Event",
+            "EventInterface",
+            "Authorize",
+            "container/events"
+          ],
           "text": "Extend Event and implement validate (must call next()) and fire. Listeners from when() run in fireListeners after fire(). Example: src/container/events/Authorize.ts mapped as authorized in observer config.",
-          "coderef": { "ref": "observer/events/eventClass" }
+          "coderef": {
+            "ref": "observer/events/eventClass"
+          }
         },
         {
           "id": "obs-emit",
           "label": "$observer.emit()",
-          "reference": ["observerEvents"],
+          "reference": [
+            "observerEvents"
+          ],
           "type": "(event: string, params?: Record<string, unknown>) => Promise<void>",
-          "keywords": ["emit", "dispatch event", "fire event"],
+          "keywords": [
+            "emit",
+            "dispatch event",
+            "fire event"
+          ],
           "text": "Dispatch a registered event by alias (must exist in observer.ts events). Fire-and-forget in controllers: this.$observer.emit('authorized', payload) without await — response can return while fire() still runs. Block until done: await this.$observer.emit(...). Also on Handler.Instance.$observer and Provider.$observer.",
-          "coderef": { "ref": "observer/events/emit" }
+          "coderef": {
+            "ref": "observer/events/emit"
+          }
         },
         {
           "id": "obs-when",
           "label": "$observer.when()",
-          "reference": ["observerEvents"],
+          "reference": [
+            "observerEvents"
+          ],
           "type": "(key, fn, opts?) => void",
-          "keywords": ["when", "listener", "subscribe"],
+          "keywords": [
+            "when",
+            "listener",
+            "subscribe"
+          ],
           "text": "Attach a listener to a registered event. Callback signature: (listenerParams, emitParams). Used to hook lifecycle events such as __ready__ from service providers.",
-          "coderef": { "ref": "observer/events/when" }
+          "coderef": {
+            "ref": "observer/events/when"
+          }
         },
         {
           "id": "obs-lifecycle",
           "label": "Lifecycle events",
-          "reference": ["observerEvents"],
-          "keywords": ["__before__", "__initialize__", "__after__", "__boot__", "__ready__", "__exception__", "lifecycle"],
+          "reference": [
+            "observerEvents"
+          ],
+          "keywords": [
+            "__before__",
+            "__initialize__",
+            "__after__",
+            "__boot__",
+            "__ready__",
+            "__exception__",
+            "lifecycle"
+          ],
           "text": "Built-in framework events orchestrate boot: __before__ (DB + auth + routers), __initialize__ / __after__ (router layers), __boot__ (service providers), __ready__ (HTTP server listening), __exception__ (global error handler). Emitted by Handler during the initializing → initialized state machine."
         }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     },
     {
-      "keywords": ["general"],
+      "keywords": [
+        "compiler",
+        "vite",
+        "ssr",
+        "compilerEngine",
+        "frontend",
+        "html",
+        "engine",
+        "build",
+        "dev",
+        "prod"
+      ],
+      "id": "compilerEngine",
+      "icon": "code_blocks",
+      "label": "Compiler Engine",
+      "display": true,
+      "text": "CompilerEngine integrates Vite SSR into Chasi, letting you colocate a Vue, React, or any Vite-compatible frontend alongside your API. Each engine entry maps a Vite project to an Express router prefix and handles dev (HMR) and prod (static build + SSR renderer) modes. Configure it in src/config/compiler.ts.",
+      "subcats": [
+        {
+          "to": "compilerEngine",
+          "label": "Compiler Engine"
+        },
+        {
+          "to": "compilerEngineConfig",
+          "label": "Configuration",
+          "group": [
+            "ce-enabled",
+            "ce-engines"
+          ]
+        },
+        {
+          "to": "builderConfig",
+          "label": "Engine Config",
+          "group": [
+            "bc-name",
+            "bc-environment",
+            "bc-root",
+            "bc-ssrServerModule",
+            "bc-serverBuild",
+            "bc-clientBuild",
+            "bc-configPath",
+            "bc-mountedTo",
+            "bc-hook"
+          ]
+        },
+        {
+          "to": "ce-ssrconfig",
+          "label": "ssr.config.js"
+        },
+        {
+          "to": "ce-modes",
+          "label": "Dev / Prod Modes",
+          "group": [
+            "ce-dev",
+            "ce-prod"
+          ]
+        }
+      ],
+      "glossary": [
+        {
+          "id": "compilerEngine",
+          "label": "Compiler Engine",
+          "sublabel": "[./src/config/compiler.ts]",
+          "keywords": [
+            "compiler",
+            "compilerEngine",
+            "vite",
+            "ssr"
+          ],
+          "text": "Chasi's built-in Vite SSR integration module. Declared in src/config/compiler.ts and managed by the CompilerEngine class. Engines are set up in parallel during server.hooks.beforeApp on the primary process only."
+        },
+        {
+          "id": "compilerEngineConfig",
+          "label": "CompilerEngineConfig",
+          "sublabel": "[./src/container/modules/compilerEngine]",
+          "keywords": [
+            "CompilerEngineConfig",
+            "compiler config"
+          ],
+          "text": "Top-level compiler configuration type. Contains two properties: enabled (master switch) and engines (array of builderConfig entries)."
+        },
+        {
+          "id": "ce-enabled",
+          "label": "enabled",
+          "reference": [
+            "compilerEngineConfig"
+          ],
+          "type": "<boolean>",
+          "keywords": [
+            "compiler enabled",
+            "master switch"
+          ],
+          "text": "Master switch. Set to false to disable all Vite compilation — e.g. for API-only deployments. Engines are also automatically skipped when process.env.testMode === \"enabled\"."
+        },
+        {
+          "id": "ce-engines",
+          "label": "engines",
+          "reference": [
+            "compilerEngineConfig"
+          ],
+          "type": "<builderConfig[]>",
+          "keywords": [
+            "engines",
+            "engine list"
+          ],
+          "text": "Array of engine instances. All engine hooks run in parallel via Promise.all during server.hooks.beforeApp. Each engine must have a unique name and a distinct mountedTo prefix."
+        },
+        {
+          "id": "builderConfig",
+          "label": "builderConfig",
+          "sublabel": "[engine entry type]",
+          "keywords": [
+            "builderConfig",
+            "engine config",
+            "vite engine"
+          ],
+          "text": "Per-engine configuration object. Maps a Vite project root to an Express router prefix and defines how it is built and served in dev and prod modes."
+        },
+        {
+          "id": "bc-name",
+          "label": "name",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "engine name",
+            "builder name"
+          ],
+          "text": "Unique engine name. Must match the first prop passed to router.mount() in RouterServiceProvider so Chasi knows which engine to attach to which router."
+        },
+        {
+          "id": "bc-environment",
+          "label": "environment",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "\"dev\" | \"prod\"",
+          "keywords": [
+            "dev",
+            "prod",
+            "environment",
+            "HMR",
+            "build"
+          ],
+          "text": "\"dev\" starts Vite's dev server with HMR — source files are served directly without a build step. \"prod\" runs vite.build() for both the SSR server bundle and client bundle, then serves static output."
+        },
+        {
+          "id": "bc-root",
+          "label": "root",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "root",
+            "vite root",
+            "project root"
+          ],
+          "text": "Absolute path to the Vite project directory — the folder containing ssr.config.js and the index.html shell file."
+        },
+        {
+          "id": "bc-ssrServerModule",
+          "label": "ssrServerModule",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "ssrServerModule",
+            "entry server",
+            "ssr entry"
+          ],
+          "text": "Filename of the compiled SSR entry in the .out/server/ output directory. Vite compiles .jsx and .tsx sources to .js, so this must use the output extension — e.g. \"entry-server.js\" even when the source file is entry-server.jsx."
+        },
+        {
+          "id": "bc-serverBuild",
+          "label": "serverBuild",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<vite.BuildOptions>",
+          "keywords": [
+            "serverBuild",
+            "ssr build",
+            "server bundle"
+          ],
+          "text": "Vite build options for the Node.js SSR bundle. outDir is relative to root. ssr points to the source entry file (not the output filename). emptyOutDir: true prevents stale build artifacts."
+        },
+        {
+          "id": "bc-clientBuild",
+          "label": "clientBuild",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<vite.BuildOptions>",
+          "keywords": [
+            "clientBuild",
+            "client bundle",
+            "manifest"
+          ],
+          "text": "Vite build options for the browser bundle. manifest: true and ssrManifest: true are required — they generate the manifest.json Chasi uses to inject hashed asset URLs into SSR-rendered HTML."
+        },
+        {
+          "id": "bc-configPath",
+          "label": "configPath",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "configPath",
+            "ssr.config.js",
+            "vite config"
+          ],
+          "text": "Absolute path to the Vite config file. A dedicated ssr.config.js is recommended so SSR-specific options (middlewareMode, appType: \"custom\") stay isolated from any client-only config."
+        },
+        {
+          "id": "bc-mountedTo",
+          "label": "mountedTo",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<string>",
+          "keywords": [
+            "mountedTo",
+            "base",
+            "router prefix",
+            "asset prefix"
+          ],
+          "text": "Must exactly match the prefix of the router this engine is attached to in RouterServiceProvider. Chasi passes mountedTo as Vite's base option at build time — it is baked into every asset URL in compiled HTML and JS. A mismatch causes all CSS, JS, and image assets to 404 at runtime."
+        },
+        {
+          "id": "bc-hook",
+          "label": "hook",
+          "reference": [
+            "builderConfig"
+          ],
+          "type": "<Function>",
+          "keywords": [
+            "hook",
+            "beforeApp",
+            "prodSetup",
+            "distribute"
+          ],
+          "text": "Called during server.hooks.beforeApp before Express starts accepting requests. In prod mode: Builder.distribute(ctx.root) compiles TS to dist, then Builder.prodSetup(getConfig, ctx) wires static serving and the SSR renderer into Express. Runs on the primary process only."
+        },
+        {
+          "id": "ce-ssrconfig",
+          "label": "ssr.config.js",
+          "sublabel": "[defineConfig function form]",
+          "keywords": [
+            "ssr.config.js",
+            "defineConfig",
+            "function form",
+            "vite config"
+          ],
+          "text": "The config file must use the function form: export default defineConfig(() => ({ ... })). Builder.getConfigs() calls the default export as a function — the plain object form defineConfig({}) returns an object and throws TypeError: .default is not a function at boot."
+        },
+        {
+          "id": "ce-modes",
+          "label": "Dev / Prod Modes",
+          "reference": [
+            "compilerEngine"
+          ],
+          "keywords": [
+            "dev mode",
+            "prod mode",
+            "HMR",
+            "static build"
+          ],
+          "text": "Switch modes by changing the environment variable at the top of src/config/compiler.ts. All engines in the array should use the same environment value."
+        },
+        {
+          "id": "ce-dev",
+          "label": "Dev mode",
+          "reference": [
+            "ce-modes"
+          ],
+          "type": "\"dev\"",
+          "keywords": [
+            "dev",
+            "HMR",
+            "vite server"
+          ],
+          "text": "Calls vite.createServer() with middlewareMode: true. HMR is active and files are served directly from source with no build step. Not safe to use when serviceCluster is enabled."
+        },
+        {
+          "id": "ce-prod",
+          "label": "Prod mode",
+          "reference": [
+            "ce-modes"
+          ],
+          "type": "\"prod\"",
+          "keywords": [
+            "prod",
+            "build",
+            "static",
+            "SSR renderer"
+          ],
+          "text": "Calls vite.build() for both the SSR server bundle and client bundle, then mounts the compiled output as static files with an SSR renderer. Use prod for CI, staging, and all cluster deployments."
+        }
+      ],
+      "controls": {
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
+      }
+    },
+    {
+      "keywords": [
+        "general"
+      ],
       "id": "general",
       "label": "general",
       "display": false,
       "glossary": [
-        { "id": "expressjs", "label": "express", "keywords": ["initialize", "init", "npm"], "text": "Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications" },
-        { "id": "ServiceProvider", "label": "ServiceProvider", "keywords": ["ServiceProvider"], "text": "A way to manage inner/outer modules, chasi allows separation of logic/implementation. Developers can utilize this implementation to further isolate logic." },
-        { "id": "CompilerEngine", "label": "CompilerEngine", "keywords": ["compilerengine", "compiler", "engine"], "text": "chasi internal module that handles SSR and frontend stuff" },
-        { "id": "HTTPMethod", "label": "HTTP Method", "keywords": ["HTTP", "HTTPMethod", "protocol"], "text": "HTTP method of an endpoint, e.g. (GET, POST, PUT, DELETE, OPTIONS, PATCH, SEARCH). a full route endpoint can be similar but have a different HTTP method, and will be routed accordingly." },
-        { "id": "vitest", "label": "Vitest", "keywords": ["vitest", "testing", "test runner", "tdd"], "text": "A native test runner that magically works with TypeScript, and follows most common patterns in testing, but is lightning fast. You can check vitest website for more info: https://vitest.dev/" }
+        {
+          "id": "expressjs",
+          "label": "express",
+          "keywords": [
+            "initialize",
+            "init",
+            "npm"
+          ],
+          "text": "Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications"
+        },
+        {
+          "id": "ServiceProvider",
+          "label": "ServiceProvider",
+          "keywords": [
+            "ServiceProvider"
+          ],
+          "text": "A way to manage inner/outer modules, chasi allows separation of logic/implementation. Developers can utilize this implementation to further isolate logic."
+        },
+        {
+          "id": "CompilerEngine",
+          "label": "CompilerEngine",
+          "keywords": [
+            "compilerengine",
+            "compiler",
+            "engine"
+          ],
+          "text": "chasi internal module that handles SSR and frontend stuff"
+        },
+        {
+          "id": "HTTPMethod",
+          "label": "HTTP Method",
+          "keywords": [
+            "HTTP",
+            "HTTPMethod",
+            "protocol"
+          ],
+          "text": "HTTP method of an endpoint, e.g. (GET, POST, PUT, DELETE, OPTIONS, PATCH, SEARCH). a full route endpoint can be similar but have a different HTTP method, and will be routed accordingly."
+        },
+        {
+          "id": "vitest",
+          "label": "Vitest",
+          "keywords": [
+            "vitest",
+            "testing",
+            "test runner",
+            "tdd"
+          ],
+          "text": "A native test runner that magically works with TypeScript, and follows most common patterns in testing, but is lightning fast. You can check vitest website for more info: https://vitest.dev/"
+        }
       ]
     },
     {
-      "keywords": ["test", "testing", "api testing"],
+      "keywords": [
+        "test",
+        "testing",
+        "api testing"
+      ],
       "id": "testing",
       "icon": "labs",
       "label": "API Testing",
       "display": true,
       "subcats": [
-        { "to": "testing", "label": "TDD" },
+        {
+          "to": "testing",
+          "label": "TDD"
+        },
         {
           "to": "testingShowcase",
           "label": "setting up your test environment",
-          "group": ["tst-vitest-config", "tst-env"]
+          "group": [
+            "tst-vitest-config",
+            "tst-env"
+          ]
         },
-        { "to": "testingUsages", "label": "example usage", "group": ["tst-usage"] }
+        {
+          "to": "testingUsages",
+          "label": "example usage",
+          "group": [
+            "tst-usage"
+          ]
+        }
       ],
       "glossary": [
         {
           "id": "testing",
           "label": "TDD on Chasi",
           "sublabel": "[./test/*.test.ts]",
-          "keywords": ["testing", "tdd", "api testing", "vitest"],
+          "keywords": [
+            "testing",
+            "tdd",
+            "api testing",
+            "vitest"
+          ],
           "text": "Test-Driven Development practice is fully supported by Chasi, Powered by vitest, developers can check the default vitest configuration in [<root>/vitest.config.ts], you can also check environment variables [<root>/test/.env.test] being passed when working with TDD. By default, when process.env[testMode] is enabled, compiler engines will be disabled as vitest will be working with [./src] directory with Typescript."
         },
         {
           "id": "tst-vitest-config",
           "label": "vitest.config.ts",
-          "reference": ["testingShowcase"],
+          "reference": [
+            "testingShowcase"
+          ],
           "type": "https://vitest.dev/config/#env",
-          "keywords": ["vitest config", "config", "test config", "environment"],
+          "keywords": [
+            "vitest config",
+            "config",
+            "test config",
+            "environment"
+          ],
           "text": "Vitest can be configured at [<root>/vitest.config.ts], Chasi provides a default config that works with [<root>/test] directory, developers can check other vitest configurations that can be suitable for the needs at :https://vitest.dev/config/#env"
         },
         {
           "id": "tst-env",
           "label": "test environment",
           "sublabel": "[./test/.env.test]",
-          "reference": ["testingShowcase"],
+          "reference": [
+            "testingShowcase"
+          ],
           "type": "<environment variables>",
-          "keywords": ["test env vars", "environment variables"],
+          "keywords": [
+            "test env vars",
+            "environment variables"
+          ],
           "text": "A separate Environment for testing. This is to enable developers to run an actual test with real environment, instead of mocking responses, though mocks can still be easily configured/created if needed."
         },
         {
           "id": "tst-usage",
           "label": "Testing /users/*",
           "sublabel": "Testing endpoints [/users]",
-          "reference": ["testingUsages"],
+          "reference": [
+            "testingUsages"
+          ],
           "type": "<environment variables>",
-          "keywords": ["test usages", "usages", "example"],
+          "keywords": [
+            "test usages",
+            "usages",
+            "example"
+          ],
           "text": "Suppose we have a group of endpoints to test into our api, let's say /users endpoint. Implementing the default test configs, a file `user.test.ts` can be created under /test directory. And it may look like this at first"
         }
       ],
       "controls": {
-        "right": { "open": true },
-        "header": { "subheader": { "open": false } }
+        "right": {
+          "open": true
+        },
+        "header": {
+          "subheader": {
+            "open": false
+          }
+        }
       }
     }
   ]

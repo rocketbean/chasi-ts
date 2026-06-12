@@ -25,7 +25,7 @@ const specs = {
             schema: {
               type: "object",
               properties: {
-                user: { $ref: "#/components/schemas/test:user" },
+                user: { $ref: "#/components/schemas/user" },
                 token: { type: "string" },
               },
             },
@@ -61,20 +61,13 @@ const specs = {
         description: "Created user",
         content: {
           "application/json": {
-            schema: { $ref: "#/components/schemas/test:user" },
+            schema: { $ref: "#/components/schemas/user" },
           },
         },
       },
       400: { description: "Email already exists" },
     }
   },
-  forget: {
-    summary: "Drop user collection (test mode only)",
-    security: [],
-    responses: {
-      200: { description: "Collection dropped" },
-    },
-  }
 }
 
 export default specs;
