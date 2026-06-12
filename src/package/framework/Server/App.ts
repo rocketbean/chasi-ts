@@ -65,22 +65,47 @@ export default class App extends Consumer {
   }
 
   private _resolvePorts(): number[] {
-    const p = this.config.port;
-    if (Array.isArray(p)) return p;
-    if (typeof p === "object" && "start" in p) {
-      const { start, end } = p as PortRange;
+    const toPort = (v: unknown): number | null => {
+      const n = typeof v === "number" ? v : Number(String(v).trim());
+      return Number.isInteger(n) && n >= 1 && n <= 65535 ? n : null;
+    };
+
+    const p: unknown = this.config.port;
+    if (Array.isArray(p)) {
+      const ports = p.map(toPort).filter((n): n is number => n !== null);
+      if (ports.length === 0) throw new Error("Invalid port list (empty after validation)");
+      return ports;
+    }
+
+    if (p && typeof p === "object" && "start" in (p as any) && "end" in (p as any)) {
+      const start = toPort((p as PortRange).start);
+      const end = toPort((p as PortRange).end);
+      if (start === null || end === null || end < start) {
+        throw new Error(`Invalid port range: ${JSON.stringify(p)}`);
+      }
       return Array.from({ length: end - start + 1 }, (_, i) => start + i);
     }
-    const str = String(p).trim();
+
+    const str = String(p ?? "").trim();
     const range = str.match(/^(\d+)-(\d+)$/);
     if (range) {
-      const start = Number(range[1]), end = Number(range[2]);
+      const start = toPort(range[1]);
+      const end = toPort(range[2]);
+      if (start === null || end === null || end < start) {
+        throw new Error(`Invalid ServerPort range: "${str}"`);
+      }
       return Array.from({ length: end - start + 1 }, (_, i) => start + i);
     }
+
     if (str.includes(",")) {
-      return str.split(",").map(s => Number(s.trim())).filter(n => n > 0);
+      const ports = str.split(",").map(toPort).filter((n): n is number => n !== null);
+      if (ports.length === 0) throw new Error(`Invalid ServerPort list: "${str}"`);
+      return ports;
     }
-    return [Number(str)];
+
+    const single = toPort(str);
+    if (single === null) throw new Error(`Invalid ServerPort value: "${str}"`);
+    return [single];
   }
 
   private _tryListen(ports: number[]): Promise<number> {
