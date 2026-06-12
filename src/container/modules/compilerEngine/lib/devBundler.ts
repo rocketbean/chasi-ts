@@ -18,7 +18,8 @@ export default class devBundler extends Bundler implements BundlerInterface {
   async connectMws() {
     this.$app.use(this.base, this.$server.middlewares);
     this.$app.all(this.base + "*", async (req, res, next) => {
-      if (req.originalUrl.includes(this.base)) {
+      const _base = this.base.endsWith("/") ? this.base.slice(0, -1) : this.base;
+      if (req.originalUrl === _base || req.originalUrl.startsWith(_base + "/")) {
         try {
           const url = req.originalUrl.replace(this.base, "/");
           const urlPath = url.split("?")[0];

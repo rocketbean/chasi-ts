@@ -61,7 +61,8 @@ export default class prodBundler extends Bundler implements BundlerInterface {
       }),
     );
     this.$app.all("*", async (req, res, next) => {
-      if (req.originalUrl.includes(this.base)) {
+      const _base = this.base.endsWith("/") ? this.base.slice(0, -1) : this.base;
+      if (req.originalUrl === _base || req.originalUrl.startsWith(_base + "/")) {
         try {
           const url = req.originalUrl.replace(this.base, "/");
           const urlPath = url.split("?")[0];

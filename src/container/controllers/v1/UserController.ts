@@ -75,7 +75,7 @@ export default class UserController extends Controller {
     try {
       let {email, pass} = request?.body
       let user = await this.user.findByCredentials(email, pass)
-      let token = await user.generateAuthToken(process.env.environment || "dev");
+      let token = await user.generateAuthToken("dev");
       return {user, token};
     } catch(e: any) {
       throw e;
