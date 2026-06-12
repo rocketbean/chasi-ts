@@ -12,7 +12,9 @@ export default <serverConfig>{
    *
    * When the chosen port is already in use the runtime automatically tries
    * the next candidate in order until one succeeds.
-   * `process.env.ServerPort` overrides this value (single number only).
+   * `process.env.ServerPort` overrides this value; accepted string forms are
+   * a single number (`"3010"`), a range (`"3010-3020"`), or a comma-separated
+   * list (`"3010,3011"`).
    */
   port: checkout(process.env.ServerPort, { start: 3010, end: 3020 }),
 
