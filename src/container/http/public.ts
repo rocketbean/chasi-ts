@@ -12,7 +12,7 @@ export default (route: Route) => {
    *
    */
   
-  route.get("index", (request: Request, response: Response) => {
+  route.get("index", (request, response) => {
     return "Welcome";
   });
 

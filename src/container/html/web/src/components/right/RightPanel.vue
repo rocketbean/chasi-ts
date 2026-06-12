@@ -6,7 +6,8 @@
     </div>
     <nav class="w2-rp-nav">
       <template v-for="cat in subcats" :key="cat.to">
-        <a
+        <button
+          type="button"
           class="w2-rp-item"
           :class="{ 'w2-rp-item--active': activeId === cat.to }"
           @click="go(cat)"
@@ -15,11 +16,12 @@
             <span class="w2-rp-dot"></span>
           </span>
           <span class="w2-rp-label">{{ cat.label }}</span>
-        </a>
+        </button>
         <template v-if="cat.group?.length > 0">
-          <a
+          <button
             v-for="item in cat.group"
             :key="item.to"
+            type="button"
             class="w2-rp-item w2-rp-item--sub"
             :class="{ 'w2-rp-item--active': activeId === item.to }"
             @click="go(item)"
@@ -28,7 +30,7 @@
               <span class="w2-rp-dot"></span>
             </span>
             <span class="w2-rp-label">{{ item.label }}</span>
-          </a>
+          </button>
         </template>
       </template>
     </nav>

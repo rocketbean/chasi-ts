@@ -4,7 +4,7 @@
       <div class="w2-about-card">
 
         <!-- Close -->
-        <button class="w2-about-close" @click="$emit('close')">
+        <button type="button" class="w2-about-close" aria-label="Close" @click="$emit('close')">
           <span class="material-symbols-rounded">close</span>
         </button>
 

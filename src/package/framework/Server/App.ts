@@ -5,7 +5,7 @@ import Base from "../../Base.js";
 import cors from "cors";
 import Authentication from "./Authentication.js";
 import { Iobject, serverConfig } from "../Interfaces.js";
-import { PortRange } from "./Server.types.js";
+import type { PortRange } from "./Server.types.js";
 import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
 

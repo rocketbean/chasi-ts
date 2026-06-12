@@ -24,6 +24,7 @@ onMounted(() => {
   const el = canvas.value
   if (!el) return
   const ctx = el.getContext('2d')
+  if (!ctx) return
   const mouse = { x: -9999, y: -9999 }
   let W, H, particles, raf
   const N = 70
