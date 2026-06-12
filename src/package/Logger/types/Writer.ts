@@ -34,7 +34,7 @@ export default abstract class Writer {
     // full-width formatters (Full, EndTraceFull, LeftFull) pad to exactly cols
     // chars, so without this reservation they overflow by 3 and wrap.
     const cols = process.stdout.columns || Number(process.env.TERM_COLS) || 100;
-    return cols - (Writer.groups.length * 2) - 3;
+    return Math.max(0, cols - (Writer.groups.length * 2) - 3);
   }
   
   style(key: string): Writable {

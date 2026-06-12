@@ -238,6 +238,7 @@ export default class SessionStorage {
         }
       }
     } else {
+      if (!Array.isArray(this.data[target])) this.data[target] = [];
       this.data[target].push(message);
       this._redraw();
     }
