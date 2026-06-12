@@ -235,6 +235,8 @@ export default class ServiceCluster {
         });
         cluster.on("exit", (deadWorker: ClusterWorker) => {
           this.workers = this.workers.filter((w) => w.id !== deadWorker.id);
+          this.pids = this.pids.filter((p) => p !== `${deadWorker.process.pid}`);
+          this.ids = this.ids.filter((id) => id !== `${deadWorker.id}`);
           // Restore the correct lead flag before re-forking so the replacement
           // worker inherits the same role as the one that crashed.
           process.env["lead"] = deadWorker.id === this.leadWorkerId ? "1" : "0";

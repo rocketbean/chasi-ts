@@ -19,6 +19,7 @@ export default (server: SocketRouter) => {
 
   // ── Channel: join ─────────────────────────────────────────────────────
   server.on("channel:join", (payload, client) => {
+    if (!client) return;
     const name = payload?.name;
     if (!name) return client.sendEvent("error", { message: "channel name required" });
     const ch = Channel._create(name, { path: server.path });
@@ -28,6 +29,7 @@ export default (server: SocketRouter) => {
 
   // ── Channel: leave ────────────────────────────────────────────────────
   server.on("channel:leave", (payload, client) => {
+    if (!client) return;
     const name = payload?.name;
     if (!name) return client.sendEvent("error", { message: "channel name required" });
     const ch = Channel.get(name);
@@ -37,6 +39,7 @@ export default (server: SocketRouter) => {
 
   // ── Channel: send to a specific channel ───────────────────────────────
   server.on("channel:send", (payload, client) => {
+    if (!client) return;
     const name = payload?.name;
     const data = payload?.data;
     if (!name) return client.sendEvent("error", { message: "channel name required" });
@@ -47,6 +50,7 @@ export default (server: SocketRouter) => {
 
   // ── Ping / pong (manual, separate from WS protocol heartbeat) ─────────
   server.on("ping", (_, client) => {
+    if (!client) return;
     client.sendEvent("pong", { ts: Date.now() });
   });
 };
