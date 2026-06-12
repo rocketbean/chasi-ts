@@ -1,13 +1,13 @@
-import { describe, expect, test, beforeAll } from "vitest";
+import { describe, expect, test } from "vitest";
 import App from "../helper.ts";
 console.clear();
 
+const runId = Date.now();
+const testEmail = `testuser_${runId}@test.com`;
+const testAlias = `testuser_${runId}`;
+
 export default ($app: App) => {
 describe("Route capabilities", () => {
-  beforeAll(async () => {
-    await $app.send({ url: "/users/forget", method: "post" });
-  });
-
   describe("Route resolution", () => {
     test("unknown route returns 404", async () => {
       const res = await $app.send({ url: "/nonexistent", method: "get", raw: true });
@@ -26,7 +26,7 @@ describe("Route capabilities", () => {
         url: "/users/signup",
         method: "post",
         logUrl: true,
-        data: { name: "Test User", email: "test@test.com", alias: "testuser", password: "securepass" },
+        data: { name: "Test User", email: testEmail, alias: testAlias, password: "securepass" },
       });
       if (res.statusCode !== 200) console.error("[signup 200]", res.statusCode, res.body);
       expect(res.statusCode).toBe(200);
@@ -36,7 +36,7 @@ describe("Route capabilities", () => {
       const res = await $app.send({
         url: "/users/signup",
         method: "post",
-        data: { name: "Test User", email: "test@test.com", alias: "testuser", password: "securepass" },
+        data: { name: "Test User", email: testEmail, alias: testAlias, password: "securepass" },
       });
       expect(res.statusCode).not.toBe(200);
     });
@@ -47,7 +47,7 @@ describe("Route capabilities", () => {
       const res = await $app.send({
         url: "/users/signin",
         method: "post",
-        data: { email: "test@test.com" },
+        data: { email: testEmail },
       });
       if (res.statusCode !== 422) console.error("[signin 422]", res.statusCode, res.body);
       expect(res.statusCode).toBe(422);
@@ -57,7 +57,7 @@ describe("Route capabilities", () => {
       const res = await $app.send({
         url: "/users/signin",
         method: "post",
-        data: { email: "test@test.com", pass: "securepass" },
+        data: { email: testEmail, pass: "securepass" },
       });
       if (res.statusCode !== 200) console.error("[signin 200]", res.statusCode, res.body);
       expect(res.statusCode).toBe(200);
@@ -69,7 +69,7 @@ describe("Route capabilities", () => {
       const res = await $app.send({
         url: "/users/signin",
         method: "post",
-        data: { email: "test@test.com", pass: "wrongpassword" },
+        data: { email: testEmail, pass: "wrongpassword" },
       });
       expect(res.statusCode).not.toBe(200);
     });
