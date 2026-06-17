@@ -55,6 +55,7 @@ export default class Models extends Base {
     }
     Object.keys(this.$databases).map((db: string) => {
       let _d = this.$databases[db];
+      if (!_d) return;
       Models.collection[db] = {};
 
       if (_d.driverName === "mongodb") {

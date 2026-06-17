@@ -116,8 +116,10 @@ export default class Base {
 
   static async _fsFetchDir<T>(dir: string): Promise<T[]> {
     const _p = path.join(__filepath, dir);
+    const _absDir = path.join(___location, dir);
+    if (!fs.existsSync(_absDir)) return [];
     return await Promise.all(
-      fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
+      fs.readdirSync(_absDir).map(async (file: string) => {
         try {
           const content: T = (await import(`${path.join(_p, file)}`)).default;
           return content;
