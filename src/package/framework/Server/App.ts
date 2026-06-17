@@ -116,15 +116,23 @@ export default class App extends Consumer {
           return;
         }
         const port = ports[i];
+        // onListening/onError are paired per attempt and must be explicitly
+        // removed when an attempt fails — otherwise each failed listen(port, cb)
+        // call accumulates a stale "listening" once-listener, and the first
+        // registered one (port 3010) fires when the server finally binds on
+        // a later port (e.g. 3012), resolving the Promise with the wrong port.
+        const onListening = (): void => {
+          this.$httpServer.removeListener("error", onError);
+          resolve(port);
+        };
         const onError = (err: NodeJS.ErrnoException): void => {
+          this.$httpServer.removeListener("listening", onListening);
           if (err.code === "EADDRINUSE") attempt(i + 1);
           else reject(err);
         };
+        this.$httpServer.once("listening", onListening);
         this.$httpServer.once("error", onError);
-        this.$httpServer.listen(port, () => {
-          this.$httpServer.removeListener("error", onError);
-          resolve(port);
-        });
+        this.$httpServer.listen(port);
       };
       attempt(0);
     });

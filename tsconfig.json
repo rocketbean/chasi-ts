@@ -38,6 +38,7 @@
     "**/*.spec.json",
     "test",
     "vitest.config.ts",
-    ".vscode"
+    ".vscode",
+    "train/*"
   ]
 }

@@ -19,3 +19,4 @@ src/container/prisma/client
 sdk/*
 api.spec.json
 .claude
+train

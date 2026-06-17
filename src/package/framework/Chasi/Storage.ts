@@ -160,7 +160,8 @@ export default class SessionStorage {
     // ── runtime status ────────────────────────────────────────────
     const dot  = chalk.hex("334155")(" · ");
     const env  = (checkout(process.env.environment, "local") as string);
-    const port = (checkout(process.env.ServerPort, "3010") as string);
+    const rawPort = (checkout(process.env.ServerPort, "") as string);
+    const port = /^\d+$/.test(rawPort) ? rawPort : "···";
     const statusLine =
       "  " +
       chalk.hex("4ade80").bold(`Node ${process.version}`) + dot +

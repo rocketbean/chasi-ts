@@ -84,7 +84,9 @@ export default class Database implements ModuleInterface {
       }
     }
 
-    this.$databases["_"] = this.$databases[this.config.default];
+    if (this.$databases[this.config.default]) {
+      this.$databases["_"] = this.$databases[this.config.default];
+    }
   }
 
   async log(): Promise<void> {

@@ -148,6 +148,10 @@ export default class ServiceCluster {
         }
         if (action.includes("server::ready")) {
           const worker = _prop.worker as Record<string, unknown>;
+          const transmit = _prop.transmit as Record<string, unknown>;
+          if (transmit?.port != null) {
+            process.env.ServerPort = String(transmit.port);
+          }
           this.storage.write(`Worker ${worker.id}  pid ${worker.pid}  ready\n`, "workers");
         }
       }

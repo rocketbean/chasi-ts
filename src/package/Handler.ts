@@ -218,6 +218,7 @@ export class Handler extends Base {
           pid: cluster.worker.process.pid,
           status: this.state,
           id: cluster.worker.id,
+          port: this.config.server.port,
         },
       });
     }
