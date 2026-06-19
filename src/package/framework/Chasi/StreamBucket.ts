@@ -1,122 +1,46 @@
 import { Worker as ClusterWorker } from "cluster";
+import { PIPE_DELIM } from "./PipeHandler.js";
 
-export type task = {
-  id: string,
-  value: string,
-  raw: string,
-  position: strPos
-}
-
-export type strPos = {
-  start: string,
-  startIndex: number,
-  end: string
-  endIndex: number,
-}
-
+/**
+ * Reassembles framed messages arriving from a worker over its stdio pipe.
+ *
+ * Bytes from the pipe arrive in arbitrary fragments — a single frame can be
+ * split across many chunks and several frames can land in one chunk. This
+ * buffers the raw stream and emits every complete `<=====|…|=====>` frame to the
+ * callback, leaving any partial tail in the buffer until the rest arrives.
+ *
+ * The previous implementation used a Proxy + overflow + index-rewriting scheme
+ * that dropped every frame once input was fragmented or bursty, which broke all
+ * cross-worker socket delivery under load.
+ */
 export default class StreamBucket {
+  private buffer: string = "";
+  // Serializes async callbacks so frames are delivered in arrival order and
+  // never overlap, regardless of how the stream is chunked.
+  private chain: Promise<unknown> = Promise.resolve();
 
-  public _bucket: { value: string } = { value: "" }
-  public overflow: string = ""
-  public _readystate: boolean = true
-  public bucketProxy = new Proxy(this._bucket, {
-    get: (o, key) => {
-      return Reflect.get(o, key);
-    },
-    set: (o, key, value) => {
-      if (this.readystate) {
-        Reflect.set(o, key, value);
-        this.mapBucketString(Reflect.get(o, key));
-      } else this.overflow += value
-      return true
-    }
-  })
-
-  public stack: task[] = []
-  public data: unknown;
-
-  public prop = {
-    delim: {
-      start: "<=====|",
-      end: "|=====>"
-    }
-  }
   constructor(
     private worker: ClusterWorker,
-    private cb: (worker: ClusterWorker, chunk: string) => Promise<unknown>
-  ) { }
+    private cb: (worker: ClusterWorker, chunk: string) => Promise<unknown>,
+  ) {}
 
-  get bucket(): typeof this.bucketProxy { return this.bucketProxy; }
-  set bucket(v: typeof this.bucketProxy) { this.bucketProxy = v; }
-  get readystate(): boolean { return this._readystate; }
-  async mapBucketString(str: string): Promise<void> {
-    this._readystate = false;
-    this.splitWithIndex(str).map(res => {
-      let nstr = str.slice(res.startIndex, res.endIndex)
-      let id = __getRandomStr(5);
-      if (nstr.includes(this.prop.delim.start) && nstr.includes(this.prop.delim.end)) {
-        let delS = `<${id}|`;
-        let delE = `|${id}>`
-        nstr = nstr.replace(this.prop.delim.start, delS).replace(this.prop.delim.end, delE);
-        this._bucket.value = this._bucket.value.replace(this._bucket.value.slice(res.startIndex, res.endIndex), nstr)
-        if (!this.stack.find(v => v.id == id)) {
-          this.stack.push({
-            id,
-            value: nstr.replace(delS, "").replace(delE, "").trim(),
-            raw: nstr,
-            position: {
-              start: delS,
-              startIndex: res.startIndex,
-              end: delE,
-              endIndex: res.endIndex,
-
-            }
-          })
-        }
-      }
-    })
-    await this.runTasks()
-    this.checkOverFlow()
-    this._readystate = true;
-  }
-
-  checkOverFlow() {
-    if (this.overflow.length >= 1) {
-      const pending = this.overflow;
-      this.overflow = "";
-      this.appendStreamData(pending);
+  appendStreamData(streamdata: string): void {
+    this.buffer += streamdata;
+    const { start, end } = PIPE_DELIM;
+    let s: number;
+    let e: number;
+    while (
+      (s = this.buffer.indexOf(start)) !== -1 &&
+      (e = this.buffer.indexOf(end, s + start.length)) !== -1
+    ) {
+      const payload = this.buffer.slice(s + start.length, e).trim();
+      this.buffer = this.buffer.slice(e + end.length);
+      this.chain = this.chain.then(() => this.cb(this.worker, payload));
+    }
+    // Discard junk that accumulates before any start delimiter so a corrupt
+    // stream can't grow the buffer without bound.
+    if (this.buffer.indexOf(start) === -1 && this.buffer.length > 1_000_000) {
+      this.buffer = "";
     }
   }
-
-  async runTasks() {
-    // Snapshot and clear the stack before processing so concurrent callbacks
-    // don't race on splice indices, which would leave tasks in the stack and
-    // cause them to be dispatched again on the next data chunk.
-    const tasks = [...this.stack];
-    this.stack = [];
-    await Promise.all(
-      tasks.map(async (task) => {
-        await this.cb(this.worker, task.value);
-        this._bucket.value = this._bucket.value.replace(task.raw, "");
-      })
-    );
-  }
-
-  appendStreamData(streamdata: string) {
-    this.bucket.value += streamdata;
-  }
-
-  splitWithIndex(str: string): { startIndex: number; endIndex: number; raw: string; value: string }[] {
-    let regx = /\<=====\|([\s\S]+?)\|=====\>/gm;
-    let res = [...str.matchAll(regx)];
-    return res.map(r => {
-      return {
-        startIndex: r.index,
-        endIndex: r.index + r[0].length,
-        raw: r[0],
-        value: r[1]
-      }
-    })
-  }
-
 }

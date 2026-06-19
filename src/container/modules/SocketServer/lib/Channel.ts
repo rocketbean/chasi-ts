@@ -111,7 +111,7 @@ export default class Channel {
    * TODO! 
    */
   static create(name: string, props: ChannelConfig, emitter = true) {
-    if (this.$pipe) {
+    if (emitter && this.$pipe) {
       this.$pipe.write({
         action: "websock:channel",
         event: "create",

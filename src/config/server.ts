@@ -81,7 +81,7 @@ export default <serverConfig>{
      * Enables worker process clustering.
      * `false` runs the app in a single process (default for development).
      */
-    enabled: false,
+    enabled: checkout(process.env.CLUSTER, false),
 
     /**
      * Tracks memory heap usage across workers and logs it periodically.
@@ -105,7 +105,7 @@ export default <serverConfig>{
      * Defaults to half the available logical CPU count to leave headroom.
      * Tune this based on load-test results for your specific workload.
      */
-    workers: Math.round(os.cpus().length / 2),
+    workers: Number(checkout(process.env.WORKERS, Math.round(os.cpus().length / 2))),
 
     /**
      * Low-level Node.js cluster settings forwarded to `cluster.setupPrimary()`.
@@ -163,6 +163,12 @@ export default <serverConfig>{
     dev: {
       key: checkout(process.env.devKey),
       cert: checkout(process.env.devCert),
+      /**
+       * Optional trusted CA chain. Supply this when you don't want to bundle
+       * the intermediate/root certs into `cert`. Accepts a single path or an
+       * array of paths, e.g. `ca: [process.env.devCa, "certs/root.pem"]`.
+       */
+      // ca: checkout(process.env.devCa),
       protocol: "https",
     },
 
