@@ -42,17 +42,15 @@ export default class NetServer {
       NetServer.$routers[payload.path].emit(payload.event, payload.payload);
     });
     this.$pipe.on("websock:channel", (payload) => {
+      // Channels created without an explicit path belong to the default "/" router.
+      const path = payload.transmit.props?.path ?? "/";
+      const router = NetServer.$routers[path];
+      if (!router) return;
       if (payload.event == "create") {
-        NetServer.$routers[payload.transmit.props.path].channel.create(
-          payload.transmit.name,
-          payload.transmit.props,
-          false)
+        router.channel.create(payload.transmit.name, payload.transmit.props, false);
       } else if (payload.event == "send") {
-        let ch = NetServer.$routers[payload.transmit.props.path].channel.get(payload.transmit.channel)
-        ch.send(
-          payload.transmit.payload,
-          payload.transmit.props,
-          false)
+        const ch = router.channel.get(payload.transmit.channel);
+        if (ch) ch.send(payload.transmit.payload, payload.transmit.props, false);
       }
     });
   }

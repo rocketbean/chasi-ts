@@ -1,5 +1,6 @@
 import http from "http";
 import https from "https";
+import path from "path";
 import Consumer from "./Consumer.js";
 import Base from "../../Base.js";
 import cors from "cors";
@@ -9,10 +10,22 @@ import type { PortRange } from "./Server.types.js";
 import { networkInterfaces } from "os";
 import { Writable } from "../../Logger/types/Writer.js";
 
+/** Loaded TLS material handed to (http|https).createServer(). */
+type TLSServerConfig = {
+  key?: Buffer | string;
+  cert?: Buffer | string;
+  ca?: (Buffer | string)[];
+};
+
 export default class App extends Consumer {
   $httpServer: http.Server | https.Server;
   env: string;
-  mode: { protocol: "http" | "https"; key?: string; cert?: string };
+  mode: {
+    protocol: "http" | "https";
+    key?: string;
+    cert?: string;
+    ca?: string | string[];
+  };
   protocol: typeof http | typeof https;
   private auth: Authentication;
   private _basepath: string;
@@ -46,14 +59,118 @@ export default class App extends Consumer {
    * fetching certificate and key file
    */
   async install(): Promise<void> {
-    const serverConfig: { cert?: Buffer | string; key?: Buffer | string } = {};
-    if (this.mode.key != null && this.mode.cert != null) {
-      serverConfig.key = Base._fsFetchFile(this.mode.key);
-      serverConfig.cert = Base._fsFetchFile(this.mode.cert);
-    }
+    const serverConfig: TLSServerConfig = {};
+    if (this.mode.protocol == "https") this._loadTLSCredentials(serverConfig);
     this.$server.use(cors(this.config.cors));
-    this.$httpServer = (this.protocol as typeof http).createServer(serverConfig as http.ServerOptions, this.$server as unknown as http.RequestListener);
+    try {
+      this.$httpServer = (this.protocol as typeof http).createServer(
+        serverConfig as http.ServerOptions,
+        this.$server as unknown as http.RequestListener,
+      );
+    } catch (e) {
+      // createServer builds the TLS secure context up front, so a key/cert
+      // mismatch or a malformed PEM is raised right here rather than on the
+      // first request — translate it into an actionable message.
+      this._reportTLSError(e as NodeJS.ErrnoException);
+    }
     return;
+  }
+
+  /**
+   * Loads the TLS key + certificate (and optional CA chain) for HTTPS mode and
+   * surfaces a clear, actionable error for the failures users actually hit:
+   *  - one or both paths are not configured for the active mode
+   *  - a file is missing or cannot be read on disk
+   * (A key/cert mismatch or malformed PEM is raised later by createServer
+   *  and reported by {@link _reportTLSError}.)
+   */
+  private _loadTLSCredentials(serverConfig: TLSServerConfig): void {
+    const missing: string[] = [];
+    if (this.mode.key == null) missing.push("key");
+    if (this.mode.cert == null) missing.push("cert");
+    if (missing.length) {
+      Logger.error(
+        `HTTPS is enabled for the "${this.config.environment}" mode but no ` +
+          `${missing.join(" and ")} ${missing.length > 1 ? "paths are" : "path is"} configured.`,
+        `Set the cert/key paths under config/server → modes.${this.config.environment} ` +
+          `(or the env vars they read from).`,
+      );
+      throw new Error(
+        `Missing HTTPS ${missing.join("/")} configuration for "${this.config.environment}" mode.`,
+      );
+    }
+
+    serverConfig.key = this._readTLSFile("key", this.mode.key as string);
+    serverConfig.cert = this._readTLSFile("cert", this.mode.cert as string);
+
+    // Optional: a CA chain supplied separately, so users don't have to bundle
+    // the intermediate/root certs into `cert`. Accepts one path or many.
+    if (this.mode.ca != null) {
+      const caPaths = (Array.isArray(this.mode.ca) ? this.mode.ca : [this.mode.ca]).filter(
+        (p): p is string => p != null && p !== "",
+      );
+      if (caPaths.length) {
+        serverConfig.ca = caPaths.map((p) => this._readTLSFile("ca", p));
+      }
+    }
+  }
+
+  /**
+   * Reads a single TLS file, mapping low-level fs errors to a readable reason.
+   */
+  private _readTLSFile(label: "key" | "cert" | "ca", filepath: string): Buffer | string {
+    const resolved = path.resolve(___location, filepath);
+    try {
+      return Base._fsFetchFile(filepath);
+    } catch (e) {
+      const err = e as NodeJS.ErrnoException;
+      let reason: string;
+      switch (err.code) {
+        case "ENOENT":
+          reason = "file not found";
+          break;
+        case "EACCES":
+          reason = "permission denied";
+          break;
+        case "EISDIR":
+          reason = "path is a directory, not a file";
+          break;
+        default:
+          reason = err.message || "unable to read file";
+      }
+      Logger.error(
+        `Failed to load HTTPS ${label} file (${reason}).\n  configured: ${filepath}\n  resolved:   ${resolved}`,
+      );
+      throw new Error(`Unable to load HTTPS ${label} file "${filepath}": ${reason}.`);
+    }
+  }
+
+  /**
+   * Translates an error thrown while building the HTTPS server (most commonly
+   * a key/cert mismatch or a corrupt/invalid PEM) into a clear message.
+   */
+  private _reportTLSError(err: NodeJS.ErrnoException): never {
+    const msg = err?.message ?? String(err);
+    const code = err?.code ?? "";
+    let hint: string;
+    if (code === "ERR_OSSL_X509_KEY_VALUES_MISMATCH" || /key values mismatch/i.test(msg)) {
+      hint = "The key and certificate do not match — they must be a matching pair.";
+    } else if (/PEM|no start line|bad|asn1|decode|wrong tag/i.test(msg)) {
+      hint = "The key or certificate is not valid PEM, or the file is corrupted.";
+    } else {
+      hint = "The HTTPS server could not be initialized with the provided credentials.";
+    }
+    Logger.error(
+      "Failed to start HTTPS server.",
+      `  ${hint}`,
+      `  key:   ${this.mode.key}`,
+      `  cert:  ${this.mode.cert}`,
+      ...(this.mode.ca != null
+        ? [`  ca:    ${Array.isArray(this.mode.ca) ? this.mode.ca.join(", ") : this.mode.ca}`]
+        : []),
+      `  cause: ${msg}`,
+    );
+    throw new Error(`HTTPS setup failed: ${hint}`);
   }
 
   /**

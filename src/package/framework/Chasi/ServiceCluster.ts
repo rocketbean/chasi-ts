@@ -4,6 +4,7 @@ import cluster, { Worker as ClusterWorker } from "cluster";
 import Storage from "./Storage.js";
 import Pipeline from "./Pipeline.js"
 import StreamBucket from "./StreamBucket.js";
+import { PIPE_DELIM } from "./PipeHandler.js";
 export type ServicePipeProp = {
   service: string;
   action: string;
@@ -104,9 +105,19 @@ export default class ServiceCluster {
     }
   }
 
+  /**
+   * Wrap a payload in the shared frame delimiters so the worker's PipeHandler
+   * can reassemble it across stream chunk boundaries. Without framing, coalesced
+   * or split writes break JSON.parse on the worker and the message is dropped.
+   */
+  private frame(payload: string): string {
+    return PIPE_DELIM.start + payload + PIPE_DELIM.end;
+  }
+
   async broadcast(message: string): Promise<void> {
+    const framed = this.frame(message);
     await Promise.all(this.workers.map(async (worker: ClusterWorker) => {
-      await (worker.process.stdio[4] as NodeJS.WritableStream).write(message);
+      await (worker.process.stdio[4] as NodeJS.WritableStream).write(framed);
     }));
   }
 
@@ -127,7 +138,7 @@ export default class ServiceCluster {
       if (action.includes("getTty")) {
         const { columns, rows } = process.stdout;
         (worker.process.stdio[4] as NodeJS.WritableStream).write(
-          JSON.stringify({ action, transmit: { columns, rows } }),
+          this.frame(JSON.stringify({ action, transmit: { columns, rows } })),
         );
       }
 
@@ -195,11 +206,10 @@ export default class ServiceCluster {
         // Exclude the originating worker — it already fired the event locally.
         // Broadcasting back to it would cause every event handler to run twice.
         const others = this.workers.filter((w) => w.id !== worker.id);
+        const framed = this.frame(JSON.stringify({ action: "socket:fire", transmit: _prop }));
         await Promise.all(
           others.map((w) =>
-            (w.process.stdio[4] as NodeJS.WritableStream).write(
-              JSON.stringify({ action: "socket:fire", transmit: _prop })
-            )
+            (w.process.stdio[4] as NodeJS.WritableStream).write(framed)
           )
         );
       } else {

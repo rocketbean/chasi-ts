@@ -85,6 +85,13 @@ export type serverModeConfig = {
     */
     cert?: string,
 
+    /** ?ca
+    * path(s) to trusted CA certificate file(s). Use this to supply an
+    * intermediate/root chain separately instead of bundling it into `cert`.
+    * Accepts a single path or an array of paths.
+    */
+    ca?: string | string[],
+
     /** ?protocol
     * http protocol option
     */
