@@ -1,0 +1,26 @@
+# Infrastructure for the deep-test INTEGRATION tier (DEEP_INTEGRATION=1).
+# Ports are offset from the app's docker-compose.yml so both can run at once.
+#
+#   docker compose -f deep-test/docker-compose.test.yml up -d
+#   DEEP_INTEGRATION=1 npx vitest run --config ./deep-test/vitest.deep.config.ts
+#   docker compose -f deep-test/docker-compose.test.yml down -v
+version: "3.8"
+services:
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: deeptest
+    ports:
+      - "5433:5432"
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: deeptest
+    ports:
+      - "3308:3306"
