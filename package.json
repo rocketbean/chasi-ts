@@ -48,6 +48,7 @@
     "@types/vue": "^2.0.0",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitejs/plugin-vue": "^5.0.4",
+    "@vitest/coverage-v8": "^2.1.4",
     "cpy-cli": "^4.2.0",
     "lite-server": "^2.6.1",
     "log-update": "^5.0.1",

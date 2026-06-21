@@ -72,7 +72,7 @@ deep-test/
 │   └── fixtures/               ← shared test data
 ├── unit/                       ← TIER 1: mock-first, zero infrastructure (always runs)
 │   ├── 01-foundation/   globals, checkout, deep-merge/equal, Base, Handler, Session, Logger
-│   ├── 02-config/       one file per src/config/*.ts (env permutations)
+│   ├── 02-config/       one file per src/config/*.ts + permutations.test.ts (cross-config matrix)
 │   ├── 03-errors/       CustomError, Exception, API/Chasi/Socket, logger channels
 │   ├── 04-observer/     Event, Listener, Observer emit (sync/async), horizon, Authorize
 │   ├── 05-database/     driver registry, drivers, Model.connect, container models
@@ -146,7 +146,7 @@ still imports — and skips — cleanly where the dep is absent.
 |-------|------|--------|-------|
 | 0 | Harness & scaffolding | ✅ | harness/, config, smoke |
 | 1 | Foundation, globals, bootstrap | ✅ | `unit/01-foundation` (7) |
-| 2 | Config loaders & scenarios | ✅ | `unit/02-config` (10) |
+| 2 | Config loaders & scenarios | ✅ | `unit/02-config` (10 per-file + `permutations` cross-config matrix) |
 | 3 | Errors & exception handling | ✅ | `unit/03-errors` (9) |
 | 4 | Observer & events | ✅ | `unit/04-observer` (6) |
 | 5 | Database, drivers & models | ✅ | `unit/05-database` (9) |
