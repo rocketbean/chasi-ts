@@ -26,6 +26,10 @@ export default defineConfig({
     environment: "node",
     env: loadEnv("test", process.cwd() + "/deep-test", ""),
     setupFiles: ["deep-test/harness/setup.ts"],
+    // Integration files each boot the real app (binds a port, writes api.spec.json).
+    // Run them one file at a time so the apps don't boot — or write — concurrently.
+    // The unit tier (no boot) keeps full file parallelism.
+    fileParallelism: !process.env.DEEP_INTEGRATION,
     testTimeout: 30000,
     hookTimeout: 30000,
     typecheck: {

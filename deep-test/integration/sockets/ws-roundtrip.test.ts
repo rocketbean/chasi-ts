@@ -16,7 +16,8 @@ describe.skipIf(!RUN)("integration › ws round-trip", () => {
 
   it("receives a 'connected' event on connect", async () => {
     const handler = await boot();
-    const port = handler.$app.config.server.port;
+    // App's own config IS the server config; bootup() assigns the bound port here.
+    const port = handler.$app.config.port ?? process.env.ServerPort;
     const { WebSocket } = await import("ws");
     const sock = new WebSocket(`ws://localhost:${port}/`);
 
