@@ -5,7 +5,8 @@ A TypeScript MVC framework for Node.js, built on Express. Chasi autoloads contro
 - **npm** — https://www.npmjs.com/package/@rocketbean/chasi-ts
 - **CLI** — https://www.npmjs.com/package/@rocketbean/create-chasi-ts
 - **GitHub** — https://github.com/rocketbean/chasi-ts
-
+- **Chasi-ts Docs** — https://chasi-ts.com
+OR
 > **Docs** — full interactive documentation is served locally. Start the server and open `http://localhost:3010` in your browser.
 
 ---
