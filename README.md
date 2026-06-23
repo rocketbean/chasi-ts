@@ -86,7 +86,7 @@ npm install
 | `npm run start` | Compile TypeScript and run the production server |
 | `npm run test` | Run the Vitest test suite |
 
-TypeScript compiles to `dist/` (CommonJS, ESNext target). The `postbuild` step automatically copies HTML templates from `src/container/html/` to `dist/container/html/`.
+TypeScript compiles to `dist/` (ES modules — `NodeNext`, ESNext target). The `postbuild` step automatically copies HTML templates from `src/container/html/` to `dist/container/html/`.
 
 ---
 
@@ -995,6 +995,21 @@ formatter: (code) => prettier.format(code, { parser: "babel" })
 
 ## Release Notes
 
+### v4.1.3
+- **Windows support** — fixed `ERR_UNSUPPORTED_ESM_URL_SCHEME` on Windows; the framework's dynamic `import()` of controllers, models, service providers, routes, and config (`src/package/Base.ts`) now wraps absolute filesystem paths with `pathToFileURL(...).href` instead of passing raw `C:\…` paths to the ESM loader (a no-op on macOS/Linux)
+- **Version reporting** — the framework version is now sourced directly from `package.json["chasiVersion"]` through a single cached accessor (`src/package/version.ts`); both the API `chasiVer` field and the terminal dashboard banner read from it instead of a hardcoded string or `npm_package_version`
+
+### v4.1.2
+- **HTTPS CA chain** — `serverConfig` now accepts an optional CA chain for HTTPS, allowing full certificate-chain configuration (`src/config/server.ts`, `Server.types.ts`, `App.ts`)
+- **`chasiVersion` field** — added a dedicated `chasiVersion` field to `package.json`, distinct from the npm `version`
+- **Inter-worker communication** — improved message framing in `PipeHandler` and reworked `StreamBucket` for reliable inter-worker messaging; refined `NetServer`/`Channel` socket handling
+- Added new entries to `template.env`
+
+### v4.1.1
+- **Error handling** — hardened error handling across modules; added database-existence checks (`Database.ts`, `Models.ts`) and proper cleanup of event listeners during server startup (`App.ts`, `Storage.ts`)
+- **Port handling** — refined server port selection/handling
+- **Tooling** — enhanced `.gitignore` and updated `tsconfig.json` to include the `train` directory
+
 ### v4.1.0
 
 - **Port selection** — `serverConfig.port` now accepts a `number`, `number[]`, or `{ start, end }` range object; the `ServerPort` env var also accepts `"3010-3020"` range notation and `"3010,3011,3012"` list notation; when the chosen port is in use the runtime automatically retries each candidate in order until one succeeds, then updates `process.env.ServerPort` and `global.__basepath` to the resolved port
@@ -1039,27 +1054,3 @@ formatter: (code) => prettier.format(code, { parser: "babel" })
 - Drizzle ORM entries added to the database section of the built-in docs (searchable adapter, schema, globals, querying, and `Model.drizzle` glossary items)
 - Documentation frontend updated to v3.6.0 as default version
 - Added **Observer** documentation page (Observer vs Events, `ObserverConfig` / `events` types, config file reference)
-
-### v3.5.0
-- Added **Drizzle ORM** database driver — supports PostgreSQL, MySQL, SQLite, and Turso alongside existing MongoDB/Prisma connections
-- Added global `Logger` with `.log()`, `.info()`, `.warn()`, `.error()` methods (available without import)
-- Added version switcher to built-in documentation UI
-- Improved Observer event system (`beforeEmit` / `afterEmit` global hooks)
-- TypeScript config types added to all `src/config/` files with full JSDoc
-- Dynamic requirements display in documentation — version-specific values per release
-- Global search now indexes requirements (node, npm, git) as searchable entries
-- Various documentation improvements
-
-### v3.0.0 (from v2.4.2)
-- TypeScript support added throughout the framework
-- Improved database driver architecture
-- Multiple simultaneous database connections
-- Improved Prisma DB driver integration
-- Improved Vite SSR integration
-- Node.js cluster support via `serviceCluster` config
-- JWT authentication driver with per-router configuration
-- Fixed bugs in the routing system
-- Enhanced error handling and exception logging
-- Improved middleware pipeline
-- Vitest integration for API testing
-- Environment-aware server modes (http/https per environment)
