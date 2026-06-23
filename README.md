@@ -10,6 +10,27 @@ OR
 > **Docs** — full interactive documentation is served locally. Start the server and open `http://localhost:3010` in your browser.
 
 ---
+## Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Scripts](#scripts)
+- [CLI](#cli)
+- [Architecture](#architecture)
+- [Configuration](#configuration)
+- [Routing](#routing)
+- [Database](#database)
+- [Observer & Events](#observer--events)
+- [Drizzle ORM](#drizzle-orm)
+- [Authentication](#authentication)
+- [Testing](#testing)
+- [CompilerEngine](#compilerengine)
+- [API Spec](#api-spec)
+- [SDK Builder](#sdk-builder)
+- [Release Notes](#release-notes)
+
+---
 
 ## Requirements
 
@@ -87,28 +108,6 @@ npm install
 | `npm run test` | Run the Vitest test suite |
 
 TypeScript compiles to `dist/` (ES modules — `NodeNext`, ESNext target). The `postbuild` step automatically copies HTML templates from `src/container/html/` to `dist/container/html/`.
-
----
-
-## Contents
-
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-- [Scripts](#scripts)
-- [CLI](#cli)
-- [Architecture](#architecture)
-- [Configuration](#configuration)
-- [Routing](#routing)
-- [Database](#database)
-- [Observer & Events](#observer--events)
-- [Drizzle ORM](#drizzle-orm)
-- [Authentication](#authentication)
-- [Testing](#testing)
-- [CompilerEngine](#compilerengine)
-- [API Spec](#api-spec)
-- [SDK Builder](#sdk-builder)
-- [Release Notes](#release-notes)
 
 ---
 
