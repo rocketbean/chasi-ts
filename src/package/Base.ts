@@ -3,6 +3,21 @@ import fs from "fs";
 import _ from "lodash";
 import { pathToFileURL } from "url";
 import { Iobject } from "./framework/Interfaces.js";
+
+/**
+ * Resolve a filesystem path into the correct specifier for a dynamic `import()`.
+ *
+ * - **Non-test (real Node ESM):** a `file://` URL is required — otherwise Windows
+ *   rejects absolute `C:\…` paths with `ERR_UNSUPPORTED_ESM_URL_SCHEME`. Node
+ *   correctly decodes percent-encoding (e.g. `%20`) back into the real path.
+ * - **Test mode (vite-node):** the raw filesystem path must be passed through.
+ *   `pathToFileURL` percent-encodes characters such as spaces (`%20`), which
+ *   vite-node does not decode — so it fails to resolve modules when the project
+ *   path contains spaces (e.g. `chasi-ts implement`).
+ */
+const toImportSpecifier = (p: string): string =>
+  __testMode() ? p : pathToFileURL(p).href;
+
 export const ProxyHandler: ProxyHandler<Record<string, unknown>> = {
   get: (target: Record<string, unknown>, prop: string | symbol): unknown => {
     const key = prop as string;
@@ -25,7 +40,7 @@ export default class Base {
     await Promise.all(
       fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
         const _fn_ = file.replace(".js", "").replace(".ts", "");
-        _mods[_fn_] = await import(pathToFileURL(path.join(_fp, file)).href)
+        _mods[_fn_] = await import(toImportSpecifier(path.join(_fp, file)))
           .then((_content) => _content.default)
           .catch((e: unknown) => {
             console.log(e);
@@ -87,14 +102,14 @@ export default class Base {
     let ext = path.extname(filepath);
     if (!ext) filepath += ".js";
     const _fp = path.join(__filepath, filepath);
-    return (await import(pathToFileURL(_fp).href)).default;
+    return (await import(toImportSpecifier(_fp))).default;
   }
 
   static fetchSync(filepath: string): Promise<unknown> {
     let ext = path.extname(filepath);
     if (!ext) filepath += ".js";
     const _fp = path.join(__filepath, filepath);
-    return import(pathToFileURL(_fp).href);
+    return import(toImportSpecifier(_fp));
   }
 
   static mergeObjects<T extends object>(target: T, sources: Partial<T>): T {
@@ -107,7 +122,7 @@ export default class Base {
       ext = ext == ".mw" ? "" : ext;
       if (!ext) filepath += __testMode() ? ".ts" : ".js";
       const _fp = path.join(__filepath, filepath);
-      const _c = await import(pathToFileURL(_fp).href);
+      const _c = await import(toImportSpecifier(_fp));
       return asDefault ? _c.default : _c;
     } catch (e: unknown) {
       console.log(e);
@@ -121,7 +136,7 @@ export default class Base {
     return await Promise.all(
       fs.readdirSync(_absDir).map(async (file: string) => {
         try {
-          const content: T = (await import(pathToFileURL(path.join(_p, file)).href)).default;
+          const content: T = (await import(toImportSpecifier(path.join(_p, file)))).default;
           return content;
         } catch (e: unknown) {
           console.log(e);
@@ -139,7 +154,7 @@ export default class Base {
 
   static _resetApp(): Promise<unknown> {
     const _fp = path.join(__filepath, "server.js");
-    return import(pathToFileURL(_fp).href);
+    return import(toImportSpecifier(_fp));
   }
 
   static async _fetchFilesFromDir(dir: string): Promise<Record<string, unknown>> {
@@ -148,7 +163,7 @@ export default class Base {
     await Promise.all(
       fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
         const _fn_ = file.replace(".js", "").replace(".ts", "");
-        _mods[_fn_] = await import(pathToFileURL(path.join(_fp, file)).href)
+        _mods[_fn_] = await import(toImportSpecifier(path.join(_fp, file)))
           .then((_content) => _content.default)
           .catch((e: unknown) => {
             console.log(e);
