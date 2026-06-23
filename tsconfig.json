@@ -39,6 +39,7 @@
     "test",
     "vitest.config.ts",
     ".vscode",
-    "train/*"
+    "train/*",
+    "deep-test"
   ]
 }
