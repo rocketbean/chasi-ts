@@ -6,6 +6,7 @@ import {
 import chalk from "chalk";
 import PipeHandler from "./PipeHandler.js";
 import cluster from "cluster";
+import { chasiVersion } from "../../version.js";
 
 export default class SessionStorage {
   public data: SessionStorageData = {
@@ -149,7 +150,7 @@ export default class SessionStorage {
 
   format(data: any): string {
     const cols = this._cols;
-    const ver = process.env.npm_package_version || process.env.APP_VERSION || "unknown";
+    const ver = chasiVersion();
     // ── header banner ─────────────────────────────────────────────
     const titleText = `  ◆  CHASI-TS  v${ver}  `;
     const headerPad = this._fill(Math.max(0, cols - titleText.length));

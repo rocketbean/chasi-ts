@@ -10,6 +10,7 @@ import CompilerEngine from "../modules/compilerEngine/compiler.js";
 import express from "express";
 import path from "path";
 import { RouterConfigInterface } from "Chasi/Router";
+import { chasiVersion } from "../../package/version.js";
 
 export default class RouterServiceProvider
   extends Provider
@@ -30,7 +31,7 @@ export default class RouterServiceProvider
         ],
         data: (): {} => {
           return {
-            chasiVer: "4.1.0",
+            chasiVer: chasiVersion(),
           };
         },
         before: (_request: any, response: any, _data: any) => {
