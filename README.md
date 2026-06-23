@@ -90,6 +90,28 @@ TypeScript compiles to `dist/` (ES modules — `NodeNext`, ESNext target). The `
 
 ---
 
+## Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Scripts](#scripts)
+- [CLI](#cli)
+- [Architecture](#architecture)
+- [Configuration](#configuration)
+- [Routing](#routing)
+- [Database](#database)
+- [Observer & Events](#observer--events)
+- [Drizzle ORM](#drizzle-orm)
+- [Authentication](#authentication)
+- [Testing](#testing)
+- [CompilerEngine](#compilerengine)
+- [API Spec](#api-spec)
+- [SDK Builder](#sdk-builder)
+- [Release Notes](#release-notes)
+
+---
+
 ## CLI
 
 Install the Chasi CLI globally or use it via `npx`:
