@@ -25,7 +25,7 @@ export default class Base {
     await Promise.all(
       fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
         const _fn_ = file.replace(".js", "").replace(".ts", "");
-        _mods[_fn_] = await import(path.join(_fp, file))
+        _mods[_fn_] = await import(pathToFileURL(path.join(_fp, file)).href)
           .then((_content) => _content.default)
           .catch((e: unknown) => {
             console.log(e);
@@ -87,14 +87,14 @@ export default class Base {
     let ext = path.extname(filepath);
     if (!ext) filepath += ".js";
     const _fp = path.join(__filepath, filepath);
-    return (await import(_fp)).default;
+    return (await import(pathToFileURL(_fp).href)).default;
   }
 
   static fetchSync(filepath: string): Promise<unknown> {
     let ext = path.extname(filepath);
     if (!ext) filepath += ".js";
     const _fp = path.join(__filepath, filepath);
-    return import(_fp);
+    return import(pathToFileURL(_fp).href);
   }
 
   static mergeObjects<T extends object>(target: T, sources: Partial<T>): T {
@@ -107,7 +107,7 @@ export default class Base {
       ext = ext == ".mw" ? "" : ext;
       if (!ext) filepath += __testMode() ? ".ts" : ".js";
       const _fp = path.join(__filepath, filepath);
-      const _c = await import(_fp);
+      const _c = await import(pathToFileURL(_fp).href);
       return asDefault ? _c.default : _c;
     } catch (e: unknown) {
       console.log(e);
@@ -121,7 +121,7 @@ export default class Base {
     return await Promise.all(
       fs.readdirSync(_absDir).map(async (file: string) => {
         try {
-          const content: T = (await import(`${path.join(_p, file)}`)).default;
+          const content: T = (await import(pathToFileURL(path.join(_p, file)).href)).default;
           return content;
         } catch (e: unknown) {
           console.log(e);
@@ -139,7 +139,7 @@ export default class Base {
 
   static _resetApp(): Promise<unknown> {
     const _fp = path.join(__filepath, "server.js");
-    return import(_fp);
+    return import(pathToFileURL(_fp).href);
   }
 
   static async _fetchFilesFromDir(dir: string): Promise<Record<string, unknown>> {
@@ -148,7 +148,7 @@ export default class Base {
     await Promise.all(
       fs.readdirSync(path.join(___location, dir)).map(async (file: string) => {
         const _fn_ = file.replace(".js", "").replace(".ts", "");
-        _mods[_fn_] = await import(path.join(_fp, file))
+        _mods[_fn_] = await import(pathToFileURL(path.join(_fp, file)).href)
           .then((_content) => _content.default)
           .catch((e: unknown) => {
             console.log(e);
