@@ -2,7 +2,7 @@
  * Phase 1 — global helpers installed by src/package/helper.ts (excluding checkout
  * and the deep-* utilities, which have dedicated files).
  *
- * Covers: __testMode, _getMethods, __getRandomStr, __getRandomNum, the path refs
+ * Covers: __isTest, _getMethods, __getRandomStr, __getRandomNum, the path refs
  * (___location / __devDirname / __filepath / __devFilepath) and that Logger + Caveat
  * are installed.
  */
@@ -19,23 +19,23 @@ describe("helper › globals", () => {
     await ready;
   });
 
-  describe("__testMode", () => {
-    const prev = process.env["testMode"];
+  describe("__isTest", () => {
+    const prev = process.env["NODE_ENV"];
     afterEach(() => {
-      if (prev === undefined) delete process.env["testMode"];
-      else process.env["testMode"] = prev;
+      if (prev === undefined) delete process.env["NODE_ENV"];
+      else process.env["NODE_ENV"] = prev;
     });
 
-    it("is true only when process.env.testMode === 'enabled'", () => {
-      process.env["testMode"] = "enabled";
-      expect(g.__testMode()).toBe(true);
+    it("is true only when process.env.NODE_ENV === 'test'", () => {
+      process.env["NODE_ENV"] = "test";
+      expect(g.__isTest()).toBe(true);
     });
 
     it("is false for any other value or when unset", () => {
-      process.env["testMode"] = "disabled";
-      expect(g.__testMode()).toBe(false);
-      delete process.env["testMode"];
-      expect(g.__testMode()).toBe(false);
+      process.env["NODE_ENV"] = "production";
+      expect(g.__isTest()).toBe(false);
+      delete process.env["NODE_ENV"];
+      expect(g.__isTest()).toBe(false);
     });
   });
 

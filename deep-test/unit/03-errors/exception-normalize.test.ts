@@ -60,12 +60,14 @@ describe("Exception base", () => {
     expect(ex.property.showStack).toBe(false);
   });
 
-  // DISCOVERY (4.1.2 fragility): setInvoker() filters out every stack line that
-  // contains the message as a substring. A message like "x" appears in almost
-  // every stack frame path, leaving zero lines and crashing on `stack.split`.
-  // Pinned as actual behavior so a future hardening of setInvoker flips this red.
-  it("throws when the message is a common substring of the stack (setInvoker fragility)", () => {
-    expect(() => new ChasiException({ message: "x" })).toThrow(TypeError);
+  // Previously a 4.1.2 fragility: setInvoker() could filter out every stack line
+  // and then crash on `undefined.split(...)`. It is now hardened to fall back to
+  // the constructor name, so constructing an exception never throws regardless of
+  // the message/stack content.
+  it("does not crash when no usable invoker frame remains (hardened setInvoker)", () => {
+    let ex!: ChasiException;
+    expect(() => (ex = new ChasiException({ message: "x" }))).not.toThrow();
+    expect(typeof ex.invoker).toBe("string");
   });
 });
 

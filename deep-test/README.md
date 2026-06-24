@@ -127,8 +127,10 @@ still imports — and skips — cleanly where the dep is absent.
 ### Gotchas worth knowing
 
 - **`.env.test` presets** `ServerPort=3099`, `database=test`, `oauthkey=chasi-deep-test`,
-  `testMode=enabled`, `Log_Level=0`. Config tests that assert *fallback* values delete the
-  relevant var first; `Log_Level=0` keeps the framework's writers silent.
+  `NODE_ENV=test`, `CHASI_COMPILER=false`, `Log_Level=0`. (`testMode` was removed in
+  v4.2.0 — `NODE_ENV=test` drives test-only behavior and `CHASI_COMPILER=false` skips the
+  Vite build.) Config tests that assert *fallback* values delete the relevant var first;
+  `Log_Level=0` keeps the framework's writers silent.
 - **Config env-permutation pattern:** configs read `process.env` at module-eval time, so
   permutations use `vi.resetModules()` + env mutation, then `await import(...)` the config.
 - **Import cycles:** `Collector↔Registry↔Router` and `App↔Consumer↔Handler` are circular.
@@ -173,7 +175,6 @@ relevant test red:
 |-------|-----------|
 | `Handler.ts` | The documented `status` state machine (`off→initializing→instantiating→initialized`) is never wired — only the numeric `_state` is mutated. |
 | `helper.ts` `__deepMerge` | Mutates its `target` in place and **replaces** (not element-wise merges) array values. |
-| `Exception.setInvoker()` | Crashes when the message is a common substring of the stack (e.g. `"x"`): the line filter empties and `stack.split` throws. |
 | `ErrorHandler/loggers/Http.ts` | Empty stub — not a registered ExceptionLogger channel (only database/terminal/textfile). |
 | `Endpoint.except()` | Discards its `this.middlewares.filter(...)` result; the middleware list isn't mutated — exclusion is enforced later via `excludeFromMw`. |
 | `Registry.sanitizeRoute("/x/")` | Leaves a trailing slash: after stripping the leading slash it re-indexes using the stale original `length`. |
@@ -185,12 +186,13 @@ relevant test red:
 
 ## Regressions found & fixed
 
-Unlike the pinned quirks above, one issue this suite surfaced was a genuine regression and
-was **fixed in the framework** rather than pinned:
+Unlike the pinned quirks above, these issues the suite surfaced were genuine bugs and were
+**fixed in the framework** rather than pinned:
 
-| Where | Regression | Fix |
+| Where | Regression / bug | Fix |
 |-------|-----------|-----|
 | `Base.ts` dynamic `import()` | v4.1.3 wrapped every dynamic import in `pathToFileURL(_fp).href` to fix the Windows ESM loader error (`ERR_UNSUPPORTED_ESM_URL_SCHEME`). On POSIX this percent-encodes spaces (`%20`) in the resolved path, which Vite's loader (used by Vitest) cannot resolve — so any project whose path contains a space (e.g. `chasi-ts implement/`) failed to load controllers, events, and auth drivers (`Observer.setup()`, `Authentication.createDrivers()`). | Introduced `importSpecifier(p, platform?)` in `Base.ts`: it emits a `file://` URL **only on Windows** (where it's required) and passes the raw absolute path on POSIX. Windows behavior is byte-for-byte identical to v4.1.3. The `platform` arg is injectable so all three OS branches are testable from one host. |
+| `Exception.setInvoker()` | Filtered out every stack line matching a `commonInvoker`; if none survived, it crashed on `undefined.split(...)` for certain messages/stacks. | Hardened to fall back to the constructor name when no usable frame remains — constructing an exception never throws. Pinned by `unit/03-errors/exception-normalize.test.ts`. |
 
 Pinned by `unit/01-foundation/import-specifier.test.ts` — per-OS coverage (macOS / Linux /
 Windows): POSIX paths (incl. spaces) pass through raw with no `%20`; Windows drive paths are

@@ -1,5 +1,12 @@
 /**
- * Phase 7 — JWTDriver.authorize() sign/verify round-trip and failure modes.
+ * Phase 7 — the BUNDLED JWT auth driver scenario.
+ *
+ * chasi auth is driver-agnostic: JWTDriver is one pluggable implementation, not
+ * "authentication" itself. These assertions (sign/verify round-trip, the
+ * `request.auth` attachment, 401 failure modes) are specific to THIS driver — a
+ * custom driver may behave differently. The generic, driver-agnostic pieces
+ * (driver registry, route exceptions, the pass-through Auth middleware) are
+ * covered separately.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import jwt from "jsonwebtoken";

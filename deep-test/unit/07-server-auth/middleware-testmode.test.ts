@@ -1,15 +1,15 @@
 /**
  * Phase 7 — container/middlewares/TestMode.mw.ts.
- * Active only when process.env.testMode === "enabled" (the danger-route guard).
+ * Active only during a test run (NODE_ENV === "test") — the danger-route guard.
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import "../../harness/globals.ts";
 import testModeMw from "../../../src/container/middlewares/TestMode.mw.js";
 
-const prev = process.env.testMode;
+const prev = process.env.NODE_ENV;
 afterEach(() => {
-  if (prev === undefined) delete process.env.testMode;
-  else process.env.testMode = prev;
+  if (prev === undefined) delete process.env.NODE_ENV;
+  else process.env.NODE_ENV = prev;
 });
 
 function makeRes() {
@@ -18,8 +18,8 @@ function makeRes() {
 }
 
 describe("TestMode middleware", () => {
-  it("passes through when test mode is enabled", async () => {
-    process.env.testMode = "enabled";
+  it("passes through during a test run (NODE_ENV=test)", async () => {
+    process.env.NODE_ENV = "test";
     const res = makeRes();
     const next = vi.fn();
     await testModeMw({} as any, res, next);
@@ -27,8 +27,8 @@ describe("TestMode middleware", () => {
     expect(res.status).not.toHaveBeenCalled();
   });
 
-  it("returns 404 when test mode is off", async () => {
-    process.env.testMode = "off";
+  it("returns 404 when not a test run", async () => {
+    process.env.NODE_ENV = "production";
     const res = makeRes();
     const next = vi.fn();
     await testModeMw({} as any, res, next);

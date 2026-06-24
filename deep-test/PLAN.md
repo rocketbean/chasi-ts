@@ -73,8 +73,8 @@ target in place and replaces — not element-wise merges — array values.
 
 **Functionalities & scenarios:**
 - **Globals** (`helper.ts`): `checkout(val, backup)` — returns value, falls back on
-  `undefined`/`null`, falls back behavior on empty string/0/false; `__testMode()` toggles
-  by env; `_getMethods(obj)` enumerates prototype methods; `__getRandomStr(len)` length &
+  `undefined`/`null`, falls back behavior on empty string/0/false; `__isTest()` toggles
+  by `NODE_ENV`; `_getMethods(obj)` enumerates prototype methods; `__getRandomStr(len)` length &
   charset; `__getRandomNum(min,max)` bounds; `__deepEqual` true/false cases incl. nested
   & arrays; `__deepMerge` shallow vs nested merge, array handling, immutability of inputs;
   path refs (`___location`, `__devDirname`, `__filepath`) are absolute & exist; `Logger`
@@ -330,8 +330,8 @@ TestMode middlewares.
   `auth:false` router disables auth entirely.
 - **Authorization static** — resolve user from token; failure → 401/throws.
 - **Auth middleware** — passes valid, rejects invalid, skips exceptions.
-- **TestMode middleware** — only active when `__testMode()`; gates the `/forget` style
-  danger routes.
+- **TestMode middleware** — only active during a test run (`__isTest()` / `NODE_ENV=test`);
+  gates the `/forget` style danger routes.
 - **Authorize event** — emitted with auth context (cross-check Phase 4).
 
 **Tier:** unit (jwt round-trips real; cert/fs/model mocked) **+** integration (http-e2e
@@ -387,8 +387,8 @@ to fire with correct effects against mocks.
 
 ## Phase 9 — Modules: Compiler, ApiSpec, SdkBuilder ✅
 
-**Delivered:** `unit/09-modules/*` (7 files, 28 assertions). CompilerEngine no-op under
-testMode/disabled (vite libs mocked); ApiSpec SchemaCollection (collect + mapFieldType +
+**Delivered:** `unit/09-modules/*` (7 files, 28 assertions). CompilerEngine no-op when
+disabled (`compiler.enabled=false`; vite libs mocked); ApiSpec SchemaCollection (collect + mapFieldType +
 keyFormat plain/prefixed + driver/model include-exclude), RouterCollection (path
 conversion, security, x-middlewares), Compiler.compile + write (temp file) + ApiSpec.init;
 SdkBuilder RouteCollector (router filter/exclude/protected/deriveNames) + terser formatter.

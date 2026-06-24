@@ -18,11 +18,27 @@ import compiler from "../../../src/config/compiler.js";
 import { Builder } from "../../../src/container/modules/compilerEngine/compiler.js";
 
 describe("config/compiler", () => {
-  it("is enabled with a single 'web' engine", () => {
-    expect(compiler.enabled).toBe(true);
+  it("has a single 'web' engine", () => {
     expect(Array.isArray(compiler.engines)).toBe(true);
     expect(compiler.engines).toHaveLength(1);
     expect(compiler.engines[0].name).toBe("web");
+  });
+
+  it("enabled is env-driven via CHASI_COMPILER (on by default, off only when 'false')", async () => {
+    const prev = process.env.CHASI_COMPILER;
+    try {
+      vi.resetModules();
+      delete process.env.CHASI_COMPILER;
+      expect((await import("../../../src/config/compiler.js")).default.enabled).toBe(true);
+
+      vi.resetModules();
+      process.env.CHASI_COMPILER = "false";
+      expect((await import("../../../src/config/compiler.js")).default.enabled).toBe(false);
+    } finally {
+      if (prev === undefined) delete process.env.CHASI_COMPILER;
+      else process.env.CHASI_COMPILER = prev;
+      vi.resetModules();
+    }
   });
 
   it("the web engine targets prod with SSR entry and mount", () => {

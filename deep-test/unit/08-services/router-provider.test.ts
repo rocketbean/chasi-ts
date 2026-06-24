@@ -35,10 +35,13 @@ describe("RouterServiceProvider.boot", () => {
 });
 
 describe("RouterServiceProvider.beforeRoute", () => {
-  it("attaches cors, json body parser and static serving to the app", async () => {
+  it("attaches cors, json body parser, the req.body shield, the .well-known allow-list and static serving", async () => {
     (Provider as any).config = { server: { cors: { origin: "*" } } };
     const $app = { use: vi.fn() };
     await new RouterServiceProvider().beforeRoute($app);
-    expect($app.use).toHaveBeenCalledTimes(3);
+    // cors + bodyParser + body-shield + "/.well-known" (dotfiles:allow) + public static
+    expect($app.use).toHaveBeenCalledTimes(5);
+    expect($app.use).toHaveBeenCalledWith("/.well-known", expect.any(Function));
   });
+
 });

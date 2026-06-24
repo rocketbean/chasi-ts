@@ -1,7 +1,7 @@
 /**
  * Phase 9 — CompilerEngine (Vite lib modules mocked).
- * setupEngines is a no-op under testMode (the framework never triggers a Vite
- * build during tests) and when disabled.
+ * setupEngines is gated solely by `config.enabled` — a no-op when disabled
+ * (tests set CHASI_COMPILER=false to skip the Vite build).
  */
 import { describe, it, expect, vi } from "vitest";
 
@@ -26,12 +26,6 @@ describe("CompilerEngine", () => {
     const c = make();
     c.setInvoker({ marker: true });
     expect((c as any).$app).toEqual({ marker: true });
-  });
-
-  it("setupEngines is a no-op under testMode", async () => {
-    const c = make({ enabled: true, engines: [{ name: "web" }] });
-    await c.setupEngines();
-    expect(c.builders).toEqual([]);
   });
 
   it("setupEngines is a no-op when disabled", async () => {
