@@ -1,6 +1,6 @@
 import { RouteGroupProperty, paramType } from "Chasi/Router";
 import { ObjectId } from "mongodb";
-import Models, { ModelCollection } from "../Database/Models.js";
+import Models from "../Database/Models.js";
 import Route from "./Route.js";
 export default class Group {
   public property: RouteGroupProperty = {
@@ -71,7 +71,7 @@ export default class Group {
       if (property.prefix && property.prefix.includes(":")) {
         if (!property?.spec.parameters) property.spec.parameters = [];
         let str = property.prefix.split("/");
-        str.forEach((s, i) => {
+        str.forEach((s, _i) => {
           if (!s.includes(":")) return;
           let name = s.replace(":", "");
 

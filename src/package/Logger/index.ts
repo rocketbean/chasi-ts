@@ -1,8 +1,6 @@
-import chalk from "chalk";
 import Writer, { Writable } from "./types/Writer.js";
 import * as writers from "./types/writers.js";
 import { inspect } from "util";
-import cluster from "cluster";
 const _writers: { [key: string]: any } = writers;
 
 export default class Logger {

@@ -1,9 +1,6 @@
 import {
   serverConfig,
-  AppException,
   Iobject,
-  ServiceProviderInterface,
-  ProviderInterface,
   RouterMountable,
 } from "../Interfaces.js";
 import exception from "../ErrorHandler/Exception.js";
@@ -13,7 +10,30 @@ import Express, { Application, Request, Response, NextFunction } from "express";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
-import process from "process";
+
+/**
+ * Translate legacy Express-4 wildcard route syntax to Express-5 (path-to-regexp
+ * v8) so user-defined catch-all routes keep working across the upgrade — Express
+ * 5 throws on a bare "*".
+ *
+ *   "*"        → "/{*splat0}"      (matches the root "/" AND everything below)
+ *   "/*"       → "/{*splat0}"
+ *   "/files/*" → "/files/{*splat0}"
+ *
+ * Each "*" becomes a uniquely-named OPTIONAL wildcard ("{*splatN}"); the optional
+ * form is what lets a root catch-all still match "/". Paths without "*" — and
+ * paths that already use the named form ("{*name}") — are returned unchanged.
+ * Applied only at the Express binding, so the original `ep.path` is preserved for
+ * ApiSpec/SDK generation.
+ */
+export function toExpressPath(p: string): string {
+  if (typeof p !== "string" || !p.includes("*")) return p;
+  if (p.includes("{*")) return p; // already an Express-5 named wildcard
+  let i = 0;
+  const out = p.replace(/\*/g, () => `{*splat${i++}}`);
+  return out.startsWith("/") ? out : "/" + out;
+}
+
 export default class Consumer {
   $server: Application = Express();
   public static servelog: string[] = [];
@@ -39,7 +59,7 @@ export default class Consumer {
     for (let r in router.$registry.routes) {
       const ep = router.$registry.routes[r];
       this.$server[ep.property.method](
-        ep.path,
+        toExpressPath(ep.path),
         ep.useAuth,
         ...ep.$middlewares,
         async (request: Request, response: Response) => {
@@ -112,7 +132,7 @@ export default class Consumer {
    * it attaches the model[collection] to the
    * request via (findById)
    */
-  async bindModel(params: Record<string, string>): Promise<void> {
+  async bindModel(params: Record<string, string | string[]>): Promise<void> {
     try {
       await Promise.all(
         Object.keys(params).map(async (mod) => {
@@ -177,9 +197,9 @@ export default class Consumer {
    *
    */
   async consumeLayers(
-    options: Iobject,
-    engine?: Iobject,
-    compiler?: any
+    _options: Iobject,
+    _engine?: Iobject,
+    _compiler?: any
   ): Promise<void> {
     await this.beforeRouteConsume();
 
@@ -194,7 +214,7 @@ export default class Consumer {
       if (router.property?.mount) await this.mounts(router);
     }
 
-    this.$server.use((req: Request, res: Response, next: NextFunction) => {
+    this.$server.use((_req: Request, res: Response, _next: NextFunction) => {
       res.status(404).send(Consumer._defaultResponses["404"]);
     });
   }

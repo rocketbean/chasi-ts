@@ -1,4 +1,4 @@
-import { Iobject, serviceClusterConfig } from "../Interfaces.js";
+import { serviceClusterConfig } from "../Interfaces.js";
 import Session from "./Session.js";
 import cluster, { Worker as ClusterWorker } from "cluster";
 import Storage from "./Storage.js";
@@ -77,8 +77,7 @@ export default class ServiceCluster {
    * after specifying the lead
    * thread.
    */
-  setPrimeSession(process: string | number, pids?: string[]): void {
-    const threads = Object.keys(cluster.workers ?? {}).length;
+  setPrimeSession(_process: string | number, _pids?: string[]): void {
   }
 
   /**
@@ -183,7 +182,7 @@ export default class ServiceCluster {
     }
   }
 
-  async handleServiceActions(worker: ClusterWorker, _prop: ServicePipeProp): Promise<void> {
+  async handleServiceActions(_worker: ClusterWorker, _prop: ServicePipeProp): Promise<void> {
     setTimeout(async () => {
       try {
         await this.broadcast(

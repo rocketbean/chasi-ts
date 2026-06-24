@@ -36,7 +36,7 @@ OR
 
 | Tool | Minimum version |
 |------|----------------|
-| Node.js | `>=20.0.0` |
+| Node.js | `>=20.19.0` |
 | NPM | `>=8.0.0` |
 | Git | `>=2.0.0` |
 
@@ -79,13 +79,13 @@ npm install
    # ServerPort=3010,3011,3012  # explicit list
    environment=local
 
-   # Database
-   database=local
-   databaseName=mydb
-   dbConStringLocal=mongodb://localhost:27017/
+   # Database — selects the active "dev" connection (see src/config/database.ts)
+   database=dev
+   devDatabaseName=devdb
+   dbConStringDev=mongodb://localhost:27017/
 
    # Auth
-   oauthkey=your-secret-key
+   oauthkey=chasi
    ```
 
 2. Start the development server:
@@ -367,6 +367,8 @@ connections: {
 
 Use `$getConnection("connectionName")` inside a controller to switch connections at runtime; falls back to the `default` connection if the name doesn't exist.
 
+> **Design note:** chasi follows a *uniform plumbing, native queries* model — it manages connections/lifecycle uniformly across drivers, but you query each store with its native API (Mongoose models, `Model.prisma()`, `Model.drizzle()`). The Mongoose integration (`Model.connect`, `this.models`) is a Mongoose-specific convenience. The roadmap for a more uniform driver contract is in [`docs/rfc/0001-database-uniformity.md`](docs/rfc/0001-database-uniformity.md).
+
 ---
 
 ## Observer & Events
@@ -439,12 +441,14 @@ export default class Authorize extends Event implements EventInterface {
 ### Emitting and listening
 
 ```ts
-// In a controller — response can return before the event finishes (no await)
-this.$observer.emit("authorized", { userId: req.user.id });
-return this.res.json({ ok: true });
+// Inside a controller method(request, response). Controllers RETURN the body —
+// the Consumer serializes it; there is no this.res.json(). The authenticated
+// user is on request.auth (set by the JWT driver), not req.user.
+this.$observer.emit("authorized", { userId: request.auth.user._id });
+return { ok: true };
 
 // Or block until the event completes
-await this.$observer.emit("authorized", { userId: req.user.id });
+await this.$observer.emit("authorized", { userId: request.auth.user._id });
 
 // In a service provider — subscribe to lifecycle or custom events
 Provider.$observer.when("__ready__", async (_prop, params) => {
@@ -673,7 +677,7 @@ JWT authentication is configured per-router driver in `src/config/authentication
 Exempt specific routes from the auth guard:
 ```ts
 AuthRouteExceptions: [
-  { url: "/api/users/login", m: "post" },
+  { url: "/api/users/signin", m: "post" },
   { url: "/api/users/signup", m: "post" },
 ]
 ```
@@ -691,13 +695,21 @@ npx vitest run test/app.test.ts       # run a single file
 
 Set up a dedicated test environment file at `test/.env.test`:
 ```env
-testMode=enabled
+NODE_ENV=test
+CHASI_COMPILER=false
 environment=local
 ServerPort=3010
 database=test
 testDatabaseName=mydb_test
 dbConStringTest=mongodb://localhost:27017/
 ```
+
+> **Deprecated (v4.2.0):** the old `testMode=enabled` flag is removed. It was
+> overloaded — it both skipped the Vite compiler and switched module resolution
+> to `.ts`. It is replaced by two clear signals: `CHASI_COMPILER=false` skips the
+> compiler, and `NODE_ENV=test` enables test-only behavior (Vitest sets this
+> automatically). Module resolution is now auto-detected from disk, so no flag is
+> needed for that. See **Release Notes → v4.2.0**.
 
 Configure `vitest.config.ts` to load it:
 ```ts
@@ -715,7 +727,7 @@ export default defineConfig({
 })
 ```
 
-> Compiler engines are automatically skipped when `process.env.testMode === "enabled"`.
+> Compiler engines are skipped when the compiler is disabled — set `CHASI_COMPILER=false` (test envs do this) or `compiler.enabled = false` for API-only servers.
 
 ---
 
@@ -764,7 +776,7 @@ const config: CompilerEngineConfig = {
 
 | Property | Type | Description |
 |---|---|---|
-| `enabled` | `boolean` | Master switch. Set `false` for API-only servers with no frontend. Engines are also skipped when `process.env.testMode === "enabled"`. |
+| `enabled` | `boolean` | Master switch. Set `false` for API-only servers with no frontend. Defaults to `true` unless `CHASI_COMPILER=false` (test envs set this to skip the build). |
 | `engines` | `builderConfig[]` | One entry per Vite project. All engine hooks run in parallel via `Promise.all` during `server.hooks.beforeApp`. |
 
 ### `builderConfig` — per-engine options
@@ -1015,6 +1027,20 @@ formatter: (code) => prettier.format(code, { parser: "babel" })
 ---
 
 ## Release Notes
+
+### v4.2.0
+- **Express 5 support.** Upgraded Express 4→5; the framework absorbs the breaking changes so your app code keeps working:
+  - **Routing (path-to-regexp v8):** the built-in catch-all routes use the root-matching `/{*splat}`, and `Consumer` auto-translates legacy `"*"` / `"/foo/*"` route paths to the Express-5 named-wildcard form — so a bare `"*"` route no longer throws.
+  - **`req.body`:** Express 5 leaves it `undefined` for non-JSON requests; chasi defaults it back to `{}`, keeping controllers that destructure `request.body` on the graceful validation path (e.g. 422) instead of crashing (500).
+  - **`express.static` dotfiles:** the default is now `"ignore"`; chasi explicitly serves `/.well-known` (`dotfiles: "allow"`) for Apple/Android app links and ACME challenges, while keeping other dotfiles private.
+  - Async errors in controllers/middleware are handled by chasi's own wrapper (controllers never needed `try/catch`); `req.params` typing widened for the new wildcard arrays.
+- **⚠️ Deprecation — `testMode` removed.** The `testMode` env flag is gone. It was overloaded across four unrelated jobs (skip the Vite compiler, switch `.ts`/`.js` module resolution, clear the console, gate test-only routes), which made it vague and caused real bugs (e.g. `testMode` + a `dist` build resolving non-existent `.ts` files). It is replaced by purpose-specific signals:
+  - **Module resolution** — now auto-detected from disk (prefers compiled `.js`, falls back to `.ts` source). No flag needed; the old source/build mismatch class of bugs is eliminated.
+  - **Compiler on/off** — driven by `compiler.enabled` (`config/compiler.ts`), overridable via `CHASI_COMPILER=false`. Test envs set this to skip the build.
+  - **Test-only behavior** (danger-route guard, console clear) — driven by `NODE_ENV === "test"` (set automatically by Vitest).
+  - **Migration:** in `test/.env.test`, replace `testMode=enabled` with `NODE_ENV=test` and `CHASI_COMPILER=false`.
+- **Dependency upgrades** — refreshed in-range dependencies plus major bumps (`express` 4→5, `mongoose` 6→9, `mongodb` 4→7, `jsonwebtoken` 8→9, `uuid` 8→14, `bcryptjs` 2→3, `serve-static` 1→2, and others); see `package.json`.
+- **Fix — user model `apps` index** — the unique index on the optional `apps` array is now a partial index (`{ apps: { $type: "objectId" } }`), so users without an app reference no longer collide on `apps_1` (which previously broke 2nd+ user signup and blocked index builds).
 
 ### v4.1.3
 - **Windows support** — fixed `ERR_UNSUPPORTED_ESM_URL_SCHEME` on Windows; the framework's dynamic `import()` of controllers, models, service providers, routes, and config (`src/package/Base.ts`) now wraps absolute filesystem paths with `pathToFileURL(...).href` instead of passing raw `C:\…` paths to the ESM loader (a no-op on macOS/Linux)

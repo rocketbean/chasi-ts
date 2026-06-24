@@ -1,3 +1,4 @@
+import v420 from "./versions/v4.2.0.json"
 import v410 from "./versions/v4.1.0.json"
 import v400 from "./versions/v4.0.0.json"
 import v360 from "./versions/v3.6.0.json"
@@ -42,6 +43,7 @@ type subject = {
 }
 
 export const versions: Record<string, { version: string; sections: subject[] }> = {
+  "4.2.0": v420 as any,
   "4.1.0": v410 as any,
   "4.0.0": v400 as any,
   "3.6.0": v360 as any,
@@ -49,7 +51,7 @@ export const versions: Record<string, { version: string; sections: subject[] }> 
   "3.0.0": v300 as any,
 }
 
-export const defaultVersion = "4.1.0"
+export const defaultVersion = "4.2.0"
 
 export function buildData(versionKey: string) {
   const versionData = versions[versionKey] ?? versions[defaultVersion]

@@ -1,4 +1,3 @@
-import { Iobject } from "../Interfaces.js";
 
 export default class Controller {
   static $compiler: any;

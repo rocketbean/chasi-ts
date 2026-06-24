@@ -54,7 +54,7 @@ declare global {
 
   var __devFilepath: string;
 
-  var __testMode: Function;
+  var __isTest: Function;
 
   /**
    * the Chasi::configuration
@@ -86,7 +86,7 @@ export default (async () => {
   var configPath = "config";
   global._configpath_ = configPath;
 
-  global.__testMode = () => process.env["testMode"] == "enabled";
+  global.__isTest = () => process.env["NODE_ENV"] === "test";
   global.checkout = (val: any, backup: any) => {
     if (val == undefined || val == null) return backup;
     else return val;

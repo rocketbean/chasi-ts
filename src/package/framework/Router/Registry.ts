@@ -57,7 +57,7 @@ export default class Registry extends Base {
       this.property.auth === null ||
       this.property.auth === ""
     )
-      endpoint.useAuth = (req, res, next) => {
+      endpoint.useAuth = (_req, _res, next) => {
         next();
       };
     else {
@@ -91,7 +91,7 @@ export default class Registry extends Base {
    */
   async expand() {
     await Promise.all(
-      this.routes.map(async (ep: Endpoint, index: number) => {
+      this.routes.map(async (ep: Endpoint, _index: number) => {
         if (!ep.registered) {
           try {
             await this.setRouterLayer(ep);
@@ -226,7 +226,7 @@ export default class Registry extends Base {
    * if the route is appointed to a controller
    * @param ep [Endpoint] class that handles the route
    */
-  sanitizeRoute(str: string, log: boolean = false) {
+  sanitizeRoute(str: string, _log: boolean = false) {
     let length = str.length;
     if (str[0] === "/") str = str.substring(1, str.length);
     if (str[length - 1] === "/") {

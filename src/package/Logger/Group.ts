@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import Logger from "./index.js";
 import { Writable } from "./types/Writer.js";
 

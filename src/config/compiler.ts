@@ -21,16 +21,18 @@ let dirpath = environment == "dev" ? __devDirname : ___location;
 
 /**
  * Compiler engine configuration.
- * Compiler engines are skipped entirely when `process.env.testMode === "enabled"`,
+ * Compiler engines are skipped when `enabled` is false (set `CHASI_COMPILER=false`),
  * so tests never trigger a Vite build.
  */
 const config: CompilerEngineConfig = {
   /**
    * Master switch for the compiler engine.
    * Set to `false` to disable all Vite compilation (e.g. API-only servers
-   * that serve no frontend assets).
+   * that serve no frontend assets, or test runs that boot the app from source).
+   * Overridable via the `CHASI_COMPILER=false` env var (test envs set this to
+   * skip the build — replacing the old `testMode` coupling).
    */
-  enabled: true,
+  enabled: process.env.CHASI_COMPILER !== "false",
 
   /**
    * List of Vite engine instances to manage.

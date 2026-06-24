@@ -91,7 +91,7 @@ export default class Database implements ModuleInterface {
 
   async log(): Promise<void> {
     await Promise.all(
-      Object.keys(this.$databases).map(async (db: string) => {})
+      Object.keys(this.$databases).map(async (_db: string) => {})
     );
   }
 

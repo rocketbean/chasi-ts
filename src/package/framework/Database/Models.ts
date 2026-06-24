@@ -1,7 +1,6 @@
 import Base from "../../Base.js";
 import { DatabaseDrivers, PrismaOptions } from "Chasi/Database";
 import { Iobject } from "../Interfaces.js";
-import path from "path";
 
 export type PrismaSchemaEntry = {
   client: string;
@@ -48,7 +47,6 @@ export default class Models extends Base {
     let dirs = Models.config.modelsDir;
     //mongodb model collection
     for (let dir in dirs) {
-      let base = path.join(___location, dirs[dir]);
       (await Models._fsFetchDir<any>(dirs[dir])).map((content) => {
         Models.collection[content?.modelName?.toLowerCase()] = content;
       });

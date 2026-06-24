@@ -1,4 +1,3 @@
-import { Iobject } from "../../framework/Interfaces.js";
 import chalk from "chalk";
 import Writer, { Writable } from "./Writer.js";
 export default class Reporter extends Writer implements Writable {
@@ -6,7 +5,7 @@ export default class Reporter extends Writer implements Writable {
     return message;
   }
 
-  customFormat(message: string, obs: any) {
+  customFormat(_message: string, obs: any) {
     let bar: number = this.cols * 0.6;
     let str = "\r";
     let rssPer = bar;

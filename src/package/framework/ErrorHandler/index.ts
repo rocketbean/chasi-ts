@@ -5,7 +5,7 @@ import APIException from "./exceptions/APIException.js";
 import ChasiException from "./exceptions/ChasiException.js";
 import ExceptionLogger from "./ExceptionLogger.js";
 import Observer from "../../Observer/index.js";
-import { genericImport, ExceptionProperty, Iobject } from "../Interfaces.js";
+import { ExceptionProperty, Iobject } from "../Interfaces.js";
 import { Handler } from "../../Handler.js";
 
 export default class ErrorHandler extends Base {
@@ -17,7 +17,6 @@ export default class ErrorHandler extends Base {
   public config: Iobject;
   public logger: ExceptionLogger;
   public $observer: Observer;
-  private $app: Handler;
 
   /**
    * Error Response types: [2] as default
@@ -81,6 +80,8 @@ export default class ErrorHandler extends Base {
       console.error(reason);
     });
   }
+
+  private $app: Handler;
 
   async init(config: Iobject, $app: Handler): Promise<void> {
     this.config = config;

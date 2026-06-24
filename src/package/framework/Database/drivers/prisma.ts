@@ -1,4 +1,4 @@
-import DB, { DBProperty, PrismaOptions } from "Chasi/Database";
+import DB, { DBProperty } from "Chasi/Database";
 import { Writable } from "../../../Logger/types/Writer.js";
 import Driver from "./drivers.js";
 import chalk from "chalk";

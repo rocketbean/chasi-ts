@@ -28,7 +28,6 @@ export default class App extends Consumer {
   };
   protocol: typeof http | typeof https;
   private auth: Authentication;
-  private _basepath: string;
   constructor(
     public config: serverConfig,
     private loggers: { [key: string]: Writable },
