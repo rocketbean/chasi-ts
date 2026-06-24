@@ -66,14 +66,6 @@ var userSchema = new mongoose.Schema<UserInterface, UserModel>(
   }
 );
 
-// Enforce app uniqueness only among users that actually reference an app.
-// A plain `unique` index on this optional array indexes a user-less `apps` as
-// `null`, so a second user without apps collides (E11000 apps_1 dup key) — and
-// the index can't even build once such rows exist. `sparse` is NOT enough here:
-// signup stores `apps: []`, and a sparse multikey index still indexes an empty
-// array as null (so empty-array users keep colliding). A partial index keyed on
-// docs that hold an actual ObjectId skips both missing AND empty `apps`, while
-// still enforcing uniqueness for real app references.
 userSchema.index(
   { apps: 1 },
   { unique: true, partialFilterExpression: { apps: { $type: "objectId" } } },
