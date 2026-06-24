@@ -20,7 +20,7 @@ export default {
       clusterFile: "package/framework/Chasi/storage/cluster.chasi",
     },
     hooks: {
-      beforeApp(getConfig) {
+      beforeApp(_getConfig) {
       },
     },
   },

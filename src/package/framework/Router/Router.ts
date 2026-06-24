@@ -7,7 +7,6 @@ import { Express } from "express";
 import path from "path";
 import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
-import { RouterSpec } from "Chasi/Router";
 export default class Router extends Collector {
   /**
    * static Controllers

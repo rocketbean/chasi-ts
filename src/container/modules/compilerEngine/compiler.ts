@@ -98,7 +98,7 @@ export default class CompilerEngine {
   }
 
   async setupEngines() {
-    if (this.config.enabled && process.env["testMode"] != "enabled") {
+    if (this.config.enabled) {
       this.builders = await Promise.all(
         this.config.engines.map(async (engine): Promise<Builder> => {
           return await new Builder(this.$app, engine).setup();

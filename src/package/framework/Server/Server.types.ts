@@ -1,4 +1,3 @@
-import { Iobject } from "../Interfaces.js";
 
 
 export type ServerHooks = {

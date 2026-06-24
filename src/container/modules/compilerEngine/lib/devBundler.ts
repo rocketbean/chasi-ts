@@ -17,7 +17,10 @@ export default class devBundler extends Bundler implements BundlerInterface {
 
   async connectMws() {
     this.$app.use(this.base, this.$server.middlewares);
-    this.$app.all(this.base + "*", async (req, res, next) => {
+    // express 5 (path-to-regexp v8): bare "*" throws; "{*splat}" is the optional
+    // named wildcard that matches the base root AND everything under it.
+    const wildcard = (this.base.endsWith("/") ? this.base : this.base + "/") + "{*splat}";
+    this.$app.all(wildcard, async (req, res, next) => {
       const _base = this.base.endsWith("/") ? this.base.slice(0, -1) : this.base;
       if (req.originalUrl === _base || req.originalUrl.startsWith(_base + "/")) {
         try {

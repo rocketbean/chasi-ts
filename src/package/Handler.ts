@@ -44,8 +44,6 @@ export class Handler extends Base {
    *  [instantiating] - on <= [async instantiate()];
    *  [initialized] - on > [async boot()];
    */
-  private status: "off" | "initializing" | "instantiating" | "initialized" =
-    "off";
 
   /* * *
    * [loggers] Log Handlers
@@ -288,7 +286,7 @@ export class Handler extends Base {
     Handler._instance = new Handler(config, pipe);
     global.$app = Handler._instance;
     await Handler._instance.start();
-    if (__testMode()) console.clear();
+    if (__isTest()) console.clear();
     return Handler._instance;
   }
 }

@@ -51,7 +51,7 @@ export default class Builder implements BuilderInterface {
     ctx: builderConfig,
   ): Promise<void> {
     let conf = getConfig("compiler");
-    if (conf.enabled && !__testMode()) {
+    if (conf.enabled) {
       try {
         if (ctx.environment !== "dev") {
           let builderConfig = (await Builder.getConfigs(ctx)) as UserConfig;
@@ -76,13 +76,12 @@ export default class Builder implements BuilderInterface {
   /**
    * distributes the build
    * specifically to [__devDirname]
-   * if not on testMode.
-   * as testMode runs 
-   * already in /src dir
+   * skipped during test runs (NODE_ENV==="test"),
+   * which already run from the /src dir.
    * @param root dirpath
    */
   static async distribute(root): Promise<void> {
-    if(!__testMode()) {
+    if(!__isTest()) {
       let common = root.replace(___location, "");
       let rootpath = pathToFileURL(path.join(__devDirname, common)).href;
       try {

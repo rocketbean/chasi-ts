@@ -9,17 +9,10 @@ export default class RouteCollector extends Base {
   protected $endpoints: string[] = [];
   protected $groups: Group[] = [];
   protected namespace: (route: Route) => void;
-  private methods: string[];
   $route: Route;
   $registry: Registry;
-
-  private methodHandler: { apply: (target: Function, thisArg: unknown, ArgList: unknown[]) => void } = {
-    apply: (target: Function, thisArg: unknown, ArgList: unknown[]) => {
-      this.$registry.register(
-        target(...(ArgList as [string, string, object?])),
-      );
-    },
-  };
+  // Introspection: the supported HTTP verbs, derived from the methods registry.
+  private methods: string[];
 
   constructor(public property: RouterConfigInterface) {
     super();

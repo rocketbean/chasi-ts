@@ -1,8 +1,7 @@
-import { appendFile } from "fs";
 import Event from "./../../../Observer/Event.js";
 
 export default class Exception extends Event {
-  async validate(params: Record<string, unknown>, next: () => void): Promise<void> {
+  async validate(_params: Record<string, unknown>, next: () => void): Promise<void> {
     next();
   }
 
@@ -10,7 +9,7 @@ export default class Exception extends Event {
     const exc = params.exception as Record<string, unknown>;
     if (exc.interpose !== 1) {
       (() => {
-        if (($app as Record<string, unknown>).state < 4) {
+        if ((($app as Record<string, unknown>).state as number) < 4) {
           setTimeout(() => this.fire(params), 100);
         } else {
           if (!(exc.property as Record<string, unknown>).hide) {

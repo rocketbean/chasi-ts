@@ -1,6 +1,5 @@
 import Exception from "../Exception.js";
 import { AppException, ExceptionProperty } from "../../Interfaces.js";
-import chalk from "chalk";
 export default class SocketException extends Exception implements AppException {
   /**
    * [interpose] as ErrorResponse types: [2] as default

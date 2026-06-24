@@ -60,7 +60,9 @@ export default class prodBundler extends Bundler implements BundlerInterface {
         index: false,
       }),
     );
-    this.$app.all("*", async (req, res, next) => {
+    // express 5 (path-to-regexp v8): bare "*" throws; "/{*splat}" is the
+    // optional named wildcard that matches every path INCLUDING the root "/".
+    this.$app.all("/{*splat}", async (req, res, next) => {
       const _base = this.base.endsWith("/") ? this.base.slice(0, -1) : this.base;
       if (req.originalUrl === _base || req.originalUrl.startsWith(_base + "/")) {
         try {

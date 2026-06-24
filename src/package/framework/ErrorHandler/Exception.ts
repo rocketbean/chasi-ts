@@ -29,7 +29,6 @@ export default class Exception extends Error {
     else this.stack = new Error(property.message).stack;
 
     if (!property.hasOwnProperty("showStack")) this.property.showStack = true;
-    const actualProto = new.target.prototype;
     this.commonInvoker.push(this.constructor.name);
     this.commonInvoker.push(property.message);
     this.invoker = this.setInvoker();
@@ -47,12 +46,16 @@ export default class Exception extends Error {
    * @returns Invoker as ErrorConstructor
    */
   setInvoker(): string {
-    let stack = this.stack
+    let stack = (this.stack ?? "")
       .split("\n")
       .filter(
         (line: string) =>
           !this.commonInvoker.find((common) => line.includes(common)),
       )[0];
+    // Harden: if the filter leaves no usable frame (e.g. every stack line
+    // matched a commonInvoker), fall back to the constructor name instead of
+    // crashing on `undefined.split(...)`.
+    if (!stack) return this.constructor.name;
     let checkPath = stack.split(/[/\\]/);
     if (checkPath.length > 0) {
       let path = checkPath[checkPath.length - 1]

@@ -4,7 +4,6 @@ import { PassThrough } from "stream";
 import { EventEmitter } from "events"
 import cluster from "cluster";
 
-const tunnel = new PassThrough();
 
 class WriteStream extends Writable {
   public fd: number;
@@ -23,7 +22,7 @@ class WriteStream extends Writable {
     });
   }
 
-  _write(chunk: unknown, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+  _write(chunk: unknown, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
     this.sink.write(chunk as Buffer | string, callback);
   }
 }

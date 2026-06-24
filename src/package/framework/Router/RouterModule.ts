@@ -41,7 +41,7 @@ export default class RouterModule implements ModuleInterface {
       await module.collect();
       await module.consume();
       // await module.logRouter();
-      module.routers.map((router: Router) => {});
+      module.routers.map((_router: Router) => {});
       Logger.writers["Left"].endGroup("RouteRegistry");
       return module;
     } catch(e: any) {

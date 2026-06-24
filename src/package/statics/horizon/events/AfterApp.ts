@@ -1,9 +1,7 @@
-import { exit } from "process";
 import Event from "./../../../Observer/Event.js";
-import RouterModule from "../../../framework/Router/RouterModule.js";
 
 export default class AfterApp extends Event {
-  async validate(params: Record<string, unknown>, next: () => void): Promise<void> {
+  async validate(_params: Record<string, unknown>, next: () => void): Promise<void> {
     next();
   }
 

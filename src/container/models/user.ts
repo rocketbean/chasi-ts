@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import CustomError from "../errors/CustomError.js";
 
 export interface UserInterface extends Document {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   name: string;
   password: string;
   alias: string;
@@ -27,7 +27,7 @@ export interface UserModel extends mongoose.Model<UserInterface> {
   findByCredentials(email: string, pass: string): UserInterface;
 }
 
-var userSchema = new mongoose.Schema<UserInterface>(
+var userSchema = new mongoose.Schema<UserInterface, UserModel>(
   {
     name: {
       type: String,
@@ -39,7 +39,7 @@ var userSchema = new mongoose.Schema<UserInterface>(
       type: String,
       trim: true,
       minlength: 6,
-      validate(v) {
+      validate(v: string) {
         if (v.toLowerCase().includes("password"))
           throw new Error("entry with the word 'password' cannot be used. ");
       },
@@ -58,7 +58,7 @@ var userSchema = new mongoose.Schema<UserInterface>(
       required: true,
     },
     apps: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "userapp", unique: true },
+      { type: mongoose.Schema.Types.ObjectId, ref: "userapp" },
     ],
   },
   {
@@ -66,12 +66,24 @@ var userSchema = new mongoose.Schema<UserInterface>(
   }
 );
 
-userSchema.pre("save", async function (next) {
+// Enforce app uniqueness only among users that actually reference an app.
+// A plain `unique` index on this optional array indexes a user-less `apps` as
+// `null`, so a second user without apps collides (E11000 apps_1 dup key) — and
+// the index can't even build once such rows exist. `sparse` is NOT enough here:
+// signup stores `apps: []`, and a sparse multikey index still indexes an empty
+// array as null (so empty-array users keep colliding). A partial index keyed on
+// docs that hold an actual ObjectId skips both missing AND empty `apps`, while
+// still enforcing uniqueness for real app references.
+userSchema.index(
+  { apps: 1 },
+  { unique: true, partialFilterExpression: { apps: { $type: "objectId" } } },
+);
+
+userSchema.pre("save", async function () {
   const user = this;
   if (user.isModified("password")) {
     user.password = await bc.hash(user.password, 8);
   }
-  next();
 });
 
 userSchema.set("toJSON", {

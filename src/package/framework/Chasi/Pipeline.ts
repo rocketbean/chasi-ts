@@ -11,7 +11,7 @@ export default class PipeLine extends Duplex {
 
   _read(_size: number): void {}
 
-  _write(chunk: unknown, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+  _write(chunk: unknown, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
     const canContinue = this.push(chunk);
     if (!canContinue) {
       this.once("drain", callback);

@@ -15,13 +15,14 @@ export default class Session {
   public static _conf;
   public writer: SessionWriter;
   public nodeVer: number;
-  private $app: Handler;
 
   static nodeVer = Number(process.version.match(/^v(\d+\.\d+)/)[1]);
 
   constructor(public config: Iobject) {
     this.config = config;
   }
+
+  private $app: Handler;
 
   attachApp($app: Handler) {
     this.$app = $app;

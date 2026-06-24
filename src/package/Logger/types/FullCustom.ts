@@ -1,4 +1,3 @@
-import { exit } from "process";
 import { Iobject } from "../../framework/Interfaces.js";
 import Writer, { Writable } from "./Writer.js";
 import chalk from "chalk";
