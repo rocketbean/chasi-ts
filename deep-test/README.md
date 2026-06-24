@@ -47,7 +47,7 @@ fully hermetic and green with no setup. Optionally wire these into the root
 
 ### What you get
 
-- **Unit tier:** ~380 assertions across 81 files (Phases 1–10), runs in a few seconds with
+- **Unit tier:** ~407 assertions across 83 files (Phases 1–10), runs in a few seconds with
   zero infrastructure.
 - **Integration tier:** 11 opt-in files (Phases 11–12) — HTTP e2e, live Mongo CRUD, ws
   round-trip, cluster fork, config matrix — that skip cleanly until `DEEP_INTEGRATION=1`.
@@ -71,7 +71,7 @@ deep-test/
 │   ├── mocks.ts                ← mock factories (req/res/next, mongoose, drizzle, socket)
 │   └── fixtures/               ← shared test data
 ├── unit/                       ← TIER 1: mock-first, zero infrastructure (always runs)
-│   ├── 01-foundation/   globals, checkout, deep-merge/equal, Base, Handler, Session, Logger
+│   ├── 01-foundation/   globals, checkout, deep-merge/equal, Base, importSpecifier (per-OS path resolve), Handler, Session, Logger
 │   ├── 02-config/       one file per src/config/*.ts + permutations.test.ts (cross-config matrix)
 │   ├── 03-errors/       CustomError, Exception, API/Chasi/Socket, logger channels
 │   ├── 04-observer/     Event, Listener, Observer emit (sync/async), horizon, Authorize
@@ -145,7 +145,7 @@ still imports — and skips — cleanly where the dep is absent.
 | Phase | Area | Status | Files |
 |-------|------|--------|-------|
 | 0 | Harness & scaffolding | ✅ | harness/, config, smoke |
-| 1 | Foundation, globals, bootstrap | ✅ | `unit/01-foundation` (7) |
+| 1 | Foundation, globals, bootstrap | ✅ | `unit/01-foundation` (8) |
 | 2 | Config loaders & scenarios | ✅ | `unit/02-config` (10 per-file + `permutations` cross-config matrix) |
 | 3 | Errors & exception handling | ✅ | `unit/03-errors` (9) |
 | 4 | Observer & events | ✅ | `unit/04-observer` (6) |
@@ -180,4 +180,23 @@ relevant test red:
 | `Chasi/storage/index.ts` | `class Stomp {}` — an empty placeholder; the real session storage is `Storage.ts`. |
 | `Chasi/checks/filewrites.ts` | Only creates the file on a Windows-specific `errno (-4058)`; on POSIX a missing file is not created. |
 | `package.json` | Version field still reads `4.0.1` though the merged code is 4.1.2 (the lock here tracks the code/intent). |
-```
+
+---
+
+## Regressions found & fixed
+
+Unlike the pinned quirks above, one issue this suite surfaced was a genuine regression and
+was **fixed in the framework** rather than pinned:
+
+| Where | Regression | Fix |
+|-------|-----------|-----|
+| `Base.ts` dynamic `import()` | v4.1.3 wrapped every dynamic import in `pathToFileURL(_fp).href` to fix the Windows ESM loader error (`ERR_UNSUPPORTED_ESM_URL_SCHEME`). On POSIX this percent-encodes spaces (`%20`) in the resolved path, which Vite's loader (used by Vitest) cannot resolve — so any project whose path contains a space (e.g. `chasi-ts implement/`) failed to load controllers, events, and auth drivers (`Observer.setup()`, `Authentication.createDrivers()`). | Introduced `importSpecifier(p, platform?)` in `Base.ts`: it emits a `file://` URL **only on Windows** (where it's required) and passes the raw absolute path on POSIX. Windows behavior is byte-for-byte identical to v4.1.3. The `platform` arg is injectable so all three OS branches are testable from one host. |
+
+Pinned by `unit/01-foundation/import-specifier.test.ts` — per-OS coverage (macOS / Linux /
+Windows): POSIX paths (incl. spaces) pass through raw with no `%20`; Windows drive paths are
+transformed into loader-safe, round-trippable `file://` URLs.
+
+> **Caveat:** Node's `pathToFileURL` is bound to the host OS, so a real `C:\…` drive path
+> can't be byte-for-byte converted on a non-Windows runner. The Windows cases assert the
+> *contract* (a `file://` URL is produced and decodes back to the input); for true on-Windows
+> verification, run the unit tier on a `windows-latest` CI job.
