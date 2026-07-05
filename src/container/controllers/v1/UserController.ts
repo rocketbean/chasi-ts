@@ -1,6 +1,7 @@
 import Controller from "../../../package/statics/Controller.js";
 import Model from "../../../package/statics/Model.js";
 import bc from "bcryptjs";
+import type { User } from "Chasi/Http/v1";
 
 export default class UserController extends Controller {
   get user() {
@@ -12,7 +13,7 @@ export default class UserController extends Controller {
    * @param {request} [ExpressRequest] Object
    * @return {} translated as [ExpressResponse] Object
    * */
-  async create(request, response) {
+  async create(request: User.CreateRequest, response) {
     // maybe add some validations here ?
     let {email} = request.body;
     if (await this.user.findOne({email})) {
@@ -71,7 +72,7 @@ export default class UserController extends Controller {
    * @param {request} [ExpressRequest] Object
    * @return {Object} translated as [ExpressResponse] Object
    * */
-  async signin (request, response) {
+  async signin (request: User.SigninRequest, response) {
     try {
       let {email, pass} = request?.body
       let user = await this.user.findByCredentials(email, pass)

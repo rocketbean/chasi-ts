@@ -33,6 +33,8 @@ export interface ProviderInterface {
 export interface ServiceProviderInterface {
   boot(a?: any, b?: any): void;
   ServerBoot?(a?: any, b?: any): void;
+  /** Build-mode hook — runs only when booted via src/build.ts (npm run build). */
+  build?(a?: any, b?: any): void | Promise<void>;
 }
 
 export interface BootableInterface {

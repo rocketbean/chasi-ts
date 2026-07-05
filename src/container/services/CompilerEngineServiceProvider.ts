@@ -19,4 +19,16 @@ export default class CompilerEngineServiceProvider extends Provider implements S
     this.compiler.setInvoker($app);
     await this.compiler.setupEngines();
   }
+
+  async build(): Promise<void> {
+    const config = Provider.config.compiler;
+    if (!config?.enabled) return;
+    // Run each engine's hook (distribute + prodSetup = copy source + Vite build)
+    // — the same work beforeApp does at runtime, which build mode otherwise skips.
+    // (setupEngines only instantiates the builders; it does not build.)
+    const getConfig = (name: string) => Provider.config[name];
+    await Promise.all(
+      config.engines.map((engine: any) => engine.hook(getConfig, engine))
+    );
+  }
 }

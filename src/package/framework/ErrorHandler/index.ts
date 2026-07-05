@@ -65,6 +65,9 @@ export default class ErrorHandler extends Base {
 
   static async handleProcessError(): Promise<void> {
     process.on("exit", (code: number) => {
+      // Build/headless mode is a one-shot process — there's no server to
+      // "re-establish", so skip this server-oriented exit notice.
+      if (globalThis.__chasiBuild) return;
       console.error(
         chalk.yellow(
           `\n----♦ process exited with code [${code}], waiting for re establishing instance`,

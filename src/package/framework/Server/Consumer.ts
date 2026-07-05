@@ -7,6 +7,7 @@ import exception from "../ErrorHandler/Exception.js";
 import Router from "../Router/Router.js";
 import Endpoint from "../Router/Endpoint.js";
 import Express, { Application, Request, Response, NextFunction } from "express";
+import fs from "fs";
 import Models from "../Database/Models.js";
 import APIException from "../ErrorHandler/exceptions/APIException.js";
 import { Handler } from "../../Handler.js";
@@ -169,6 +170,37 @@ export default class Consumer {
   }
 
   /** *
+   * Build-mode phase — runs only when booted via src/build.ts (npm run build).
+   * Invokes EVERY provider's optional build() hook so any module can emit its
+   * artifacts (an SDK bundle, an OpenAPI spec, a compiled frontend, …) with the
+   * route registry fully loaded.
+   *
+   * Runs the hooks SEQUENTIALLY (one after another) so each artifact's output
+   * forms a clean, ordered block in the terminal instead of interleaving —
+   * build artifacts are easier to monitor step-by-step. A hook that throws is
+   * recorded (prefixed with its provider name) but does not abort the rest.
+   * Returns the list of failure messages (empty = success) so the caller can
+   * report them and exit with a non-zero (CI-failing) code.
+   */
+  async buildFromProviders(): Promise<string[]> {
+    const mods = Handler.Instance.$modules.services["$container"];
+    const errors: string[] = [];
+    for (const [name, service] of Object.entries(mods) as [string, any][]) {
+      if (!service.instance?.build) continue;
+      console.log(`[chasi:build] ▸ ${name}`);
+      globalThis.__chasiBuildPhase = true; // let this provider's own logs through
+      try {
+        await service.instance.build(this.$server);
+      } catch (e) {
+        errors.push(`${name}: ${(e as Error)?.message ?? String(e)}`);
+      } finally {
+        globalThis.__chasiBuildPhase = false;
+      }
+    }
+    return errors;
+  }
+
+  /** *
    * invoked before consuming routes
    * exposing the express instance
    * where they can use methods like
@@ -201,12 +233,30 @@ export default class Consumer {
     _engine?: Iobject,
     _compiler?: any
   ): Promise<void> {
+    // Build/headless mode: the route registry is already loaded — run provider
+    // build() hooks and exit (0 on success, 1 if any hook failed). None of the
+    // serve path (route binding, beforeServerBoot, mounts, 404) runs.
+    if (globalThis.__chasiBuild) {
+      const errors = await this.buildFromProviders();
+      if (errors.length) {
+        // Synchronous write: process.exit() does not flush async stdout/stderr,
+        // so the failure reason must be written synchronously to survive it.
+        fs.writeSync(
+          process.stderr.fd,
+          `[chasi:build] ${errors.length} build() hook(s) failed:\n` +
+            errors.map((e) => `  - ${e}\n`).join("")
+        );
+      }
+      process.exit(errors.length ? 1 : 0);
+    }
+
     await this.beforeRouteConsume();
 
     for (let r in this.$routers) {
       let router = this.$routers[r];
       await this.consume(router);
     }
+
     await this.bootFromProviders();
 
     for (let r in this.$routers) {

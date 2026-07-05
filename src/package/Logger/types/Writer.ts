@@ -73,6 +73,19 @@ export default abstract class Writer {
     return { start, stop };
   }
 
+  /**
+   * Whether framework output should be silenced for this write.
+   * - `Log_Level <= 0` → fully silenced (explicit).
+   * - build/headless mode → chasi's lifecycle narration is silenced, EXCEPT
+   *   while a provider build() hook runs (`__chasiBuildPhase`), so build output
+   *   stays visible without the blunt Log_Level=0.
+   */
+  static silenced(): boolean {
+    if (Number(checkout(process.env["Log_Level"], 2)) <= 0) return true;
+    if (globalThis.__chasiBuild && !globalThis.__chasiBuildPhase) return true;
+    return false;
+  }
+
   write(message: any, display: string = "clear", subject?: string): void {
     if (subject == undefined || subject == null || !subject)
       subject = this.subject;
@@ -85,7 +98,7 @@ export default abstract class Writer {
         colors: true,
       });
     }
-    if(Number(checkout( process.env["Log_Level"], 2)) > 0 ) Writer.log(message, subject);
+    if (!Writer.silenced()) Writer.log(message, subject);
   }
 
   drawAs(
@@ -97,7 +110,7 @@ export default abstract class Writer {
     let parsedStr: any = message;
     if (!subject) subject = this.subject;
     if (formatStr) parsedStr = this.format(message);
-    if(Number(checkout( process.env["Log_Level"], 2)) > 0 ) Writer.log(draw(parsedStr), subject);
+    if (!Writer.silenced()) Writer.log(draw(parsedStr), subject);
   }
 
   group(label: string = " ") {

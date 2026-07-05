@@ -57,6 +57,20 @@ declare global {
   var __isTest: Function;
 
   /**
+   * True when the app is booted in build/headless mode (via src/build.ts).
+   * Read across the boot to force single-process, skip the compiler, run
+   * provider build() hooks, and exit instead of listening.
+   */
+  var __chasiBuild: boolean;
+
+  /**
+   * True only while a provider's build() hook is executing (set by
+   * Consumer.buildFromProviders). In build mode, chasi's own lifecycle logs are
+   * silenced except during this window, so provider build output stays visible.
+   */
+  var __chasiBuildPhase: boolean;
+
+  /**
    * the Chasi::configuration
    * path directory
    */

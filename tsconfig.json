@@ -35,11 +35,13 @@
     "src/package/framework/Commands",
     "chasi.js",
     "**/*.sdk.js",
+    "**/*.sdk.d.ts",
     "**/*.spec.json",
     "test",
     "vitest.config.ts",
     ".vscode",
     "train/*",
-    "deep-test"
+    "deep-test",
+    "sdk"
   ]
 }

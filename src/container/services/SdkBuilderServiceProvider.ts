@@ -9,13 +9,30 @@ export default class SdkBuilderServiceProvider
 {
   async boot(): Promise<void> {}
 
+  /**
+   * Runtime generation (server boot). Skipped in build mode — build() handles it.
+   * Cluster-safe: only the sole process or the lead worker generates, and it's
+   * fire-and-forget so it never blocks the server from coming up.
+   */
   async beforeServerBoot(): Promise<void> {
+    if (globalThis.__chasiBuild) return; // build mode → handled by build()
+
     const config: SdkBuilderConfig = Provider.config.sdkbuilder;
+    if (!config?.output?.length) return;
 
-    if (!config?.enabled) return;
+    const clustered = Provider.config.server?.serviceCluster?.enabled;
+    const runsOnce = !clustered || process.env.lead === "1";
+    if (runsOnce) void SdkBuilder.build(config); // fire-and-forget at runtime
+  }
 
-    await SdkBuilder.init(config);
-    await SdkBuilder.instance.compile();
-    SdkBuilder.instance.clearSdkHandlers();
+  /**
+   * Build-mode generation (npm run build). Awaited so the build waits for the
+   * files to be written before the process exits.
+   */
+  async build(): Promise<void> {
+    const config: SdkBuilderConfig = Provider.config.sdkbuilder;
+    if (!config?.output?.length) return;
+
+    await SdkBuilder.build(config);
   }
 }

@@ -23,7 +23,7 @@ export default class RouterServiceProvider
         auth: "dev",
         prefix: "/api",
         namespace: "container/http/api.js",
-        ControllerDir: ["container/controllers"],
+        ControllerDir: ["container/controllers/v2"],
         middleware: [],
         AuthRouteExceptions: [
           { m: "post", url: "/api/users/signin" },
@@ -56,7 +56,7 @@ export default class RouterServiceProvider
             exec: CompilerEngine.instance,
           },
         ],
-        displayLog: 1,
+        displayLog: 0,
       }),
     ];
   }

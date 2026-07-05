@@ -1,5 +1,6 @@
 import http from "http";
 import https from "https";
+import cluster from "cluster";
 import path from "path";
 import Consumer from "./Consumer.js";
 import Base from "../../Base.js";
@@ -256,7 +257,15 @@ export default class App extends Consumer {
 
   async bootup(): Promise<void> {
     await this.install();
-    const port = await this._tryListen(this._resolvePorts());
+    // Cluster workers all share ONE port (the primary owns the socket), so a
+    // worker must NOT scan the range — each listen() re-enters cluster's shared-
+    // handle setup and leaks a "listening" listener per attempt (one per port,
+    // → MaxListenersExceededWarning). Only a standalone process scans for a
+    // free port; a worker listens once on the first candidate.
+    const candidates = this._resolvePorts();
+    const port = await this._tryListen(
+      cluster.isWorker ? candidates.slice(0, 1) : candidates,
+    );
     this.config.port = port;
     process.env.ServerPort = String(port);
     global.__basepath = `${this.mode.protocol}://localhost:${port}`;
@@ -282,5 +291,27 @@ export default class App extends Consumer {
         });
     });
     this.loggers.EndTraceFull.write("╟", "systemRead", "boot");
+
+    // A cluster worker drains gracefully when the primary disconnects it (or on
+    // a direct SIGTERM): stop accepting, finish in-flight requests, then exit —
+    // releasing the port. The primary's SIGKILL is the hard fallback.
+    if (cluster.isWorker) this._registerWorkerDrain();
+  }
+
+  /**
+   * Worker-only graceful shutdown. On `disconnect` (the primary called
+   * worker.disconnect()) or a direct SIGTERM, drop idle keep-alives, close the
+   * HTTP server so the port is released once in-flight requests finish, and
+   * force-exit anything still hanging. (Standalone/programmatic shutdown uses
+   * Handler.close() instead — left intact for external callers.)
+   */
+  private _registerWorkerDrain(): void {
+    const drain = (): void => {
+      this.$httpServer.closeIdleConnections?.();
+      this.$httpServer.close(() => process.exit(0));
+      setTimeout(() => process.exit(0), 4000).unref();
+    };
+    process.once("disconnect", drain);
+    process.once("SIGTERM", drain);
   }
 }

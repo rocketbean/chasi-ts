@@ -3,32 +3,76 @@ import RouterModule from "../../../../package/framework/Router/RouterModule.js";
 import Authentication from "../../../../package/framework/Server/Authentication.js";
 import Endpoint from "../../../../package/framework/Router/Endpoint.js";
 import type { RouteExceptions } from "Chasi/Router";
-import type { SdkBuilderConfig, SdkRouteEntry } from "../SdkBuilder.types.js";
+import type { SdkBuilderOutput, SdkBuilderTyped, SdkRouteEntry, SdkRouterFilter, SdkRouterSelector } from "../SdkBuilder.types.js";
 
 // ─── RouteCollector ───────────────────────────────────────────────────────────
 
 export default class RouteCollector {
-  static entries: SdkRouteEntry[] = [];
+  entries: SdkRouteEntry[] = [];
+
+  /** Typed-output context, populated only in build mode when typed.enabled. */
+  private typed: SdkBuilderTyped | null = null;
+  private signatures: (typeof import("./Signatures.js"))["default"] | null = null;
 
   get routes(): SdkRouteEntry[] {
-    return RouteCollector.entries;
+    return this.entries;
   }
 
-  async init(config: SdkBuilderConfig): Promise<void> {
-    RouteCollector.entries = [];
+  async init(output: SdkBuilderOutput): Promise<void> {
+    this.entries = [];
+    await this.prepareTyped(output);
 
     const routerModule = ($app as { $modules: { RouterModule: RouterModule } })
       .$modules.RouterModule;
 
-    for (const router of routerModule.routers) {
-      if (config.routers?.length && !config.routers.includes(router.property.name)) continue;
-      this.collectFromRouter(router, config);
+    const selectors = this.normalizeSelectors(output.routers);
+
+    // No selectors → include every registered router (whole router, no filter).
+    if (!selectors.length) {
+      for (const router of routerModule.routers) {
+        this.collectFromRouter(router, output);
+      }
+    } else {
+      for (const selector of selectors) {
+        const router = routerModule.routers.find(
+          (r) => r.property.name === selector.router
+        );
+        if (!router) {
+          Logger.log(
+            `[SdkBuilder] router "${selector.router}" not found — skipping selector`
+          );
+          continue;
+        }
+        this.collectFromRouter(
+          router,
+          output,
+          selector.filter,
+          selector.namespace,
+          selector.naming
+        );
+      }
     }
+
+    this.reportUntyped();
+  }
+
+  /** Normalises the mixed `string | object` routers config into selector objects. */
+  private normalizeSelectors(
+    routers: SdkBuilderOutput["routers"]
+  ): SdkRouterSelector[] {
+    if (!routers?.length) return [];
+    return routers.map((r) => (typeof r === "string" ? { router: r } : r));
   }
 
   // ─── Per-router ────────────────────────────────────────────────────────────
 
-  private collectFromRouter(router: Router, config: SdkBuilderConfig): void {
+  private collectFromRouter(
+    router: Router,
+    output: SdkBuilderOutput,
+    filter?: SdkRouterFilter,
+    routerNamespace?: string,
+    naming?: SdkRouterSelector["naming"]
+  ): void {
     const routerAuth = router.property.auth;
     const routerExceptions: RouteExceptions[] = router.property.AuthRouteExceptions ?? [];
 
@@ -43,10 +87,30 @@ export default class RouteCollector {
     for (const endpoint of router.$registry.routes) {
       const method = endpoint.property.method as string;
 
-      if (this.isExcluded(endpoint.path, method, config.exclude ?? [])) continue;
+      if (this.isExcluded(endpoint.path, method, output.exclude ?? [])) continue;
+      if (filter && !this.passesFilter(filter, endpoint)) continue;
 
-      const entry = this.buildEntry(endpoint, router, routerAuth, allExceptions);
-      RouteCollector.entries.push(entry);
+      const entry = this.buildEntry(
+        endpoint,
+        router,
+        routerAuth,
+        allExceptions,
+        routerNamespace,
+        naming
+      );
+      this.entries.push(entry);
+    }
+  }
+
+  /** Runs a selector's filter defensively — a throw excludes the endpoint (logged). */
+  private passesFilter(filter: SdkRouterFilter, endpoint: Endpoint): boolean {
+    try {
+      return !!filter(endpoint);
+    } catch (err) {
+      Logger.log(
+        `[SdkBuilder] router filter threw for ${endpoint.path} — excluding endpoint: ${err}`
+      );
+      return false;
     }
   }
 
@@ -56,7 +120,9 @@ export default class RouteCollector {
     ep: Endpoint,
     router: Router,
     routerAuth: string | boolean | null,
-    exceptions: RouteExceptions[]
+    exceptions: RouteExceptions[],
+    routerNamespace?: string,
+    naming?: SdkRouterSelector["naming"]
   ): SdkRouteEntry {
     const method = ep.property.method as string;
     const isPublic =
@@ -67,13 +133,20 @@ export default class RouteCollector {
       (mw) => !ep.excludeFromMw.includes(mw)
     );
 
-    const { namespace, functionName } = this.deriveNames(
+    const namespace = this.deriveResourceNamespace(
       ep.path,
-      router.property.prefix,
-      method
+      router.property.prefix
     );
+    // Function name source: "http" → verb; "controller" (default) → controller
+    // method, falling back to the verb for function-bound routes.
+    const functionName =
+      naming === "http"
+        ? method.toLowerCase()
+        : ep.method && ep.method !== "Function"
+          ? ep.method
+          : method.toLowerCase();
 
-    return {
+    const entry: SdkRouteEntry = {
       path: ep.path,
       method,
       isProtected: !isPublic,
@@ -83,7 +156,63 @@ export default class RouteCollector {
       requiredFields: this.extractRequiredFields(ep),
       namespace,
       functionName,
+      routerNamespace,
     };
+
+    // Typed output (build mode only): resolve request/response FQNs. Manifest
+    // entries win over parser-derived types; misses leave the fields undefined
+    // so the Compiler emits fallback types.
+    if (this.typed && this.signatures) {
+      const key = `${method.toLowerCase()} ${ep.path}`;
+      const override = this.typed.manifest?.[key] ?? {};
+      const parsed = this.signatures.resolve(ep, ep.method, this.typed);
+      entry.reqType = override.req ?? parsed.req;
+      entry.resType = override.res ?? parsed.res;
+    }
+
+    return entry;
+  }
+
+  // ─── Typed output (build-mode only) ──────────────────────────────────────────
+
+  /**
+   * Load the signature parser when typed output is enabled AND we're in build
+   * mode. `Signatures` statically imports `typescript`, so it is imported here
+   * dynamically — never on the server-boot runtime path.
+   */
+  private async prepareTyped(output: SdkBuilderOutput): Promise<void> {
+    this.typed = null;
+    this.signatures = null;
+    if (!globalThis.__chasiBuild || !output.typed?.enabled) return;
+    try {
+      const mod = await import("./Signatures.js");
+      mod.default.reset();
+      this.signatures = mod.default;
+      this.typed = output.typed;
+    } catch (err) {
+      Logger.log(
+        `[SdkBuilder] typed output enabled but the signature parser failed to load — emitting untyped: ${err}`
+      );
+    }
+  }
+
+  /**
+   * Summarise included routes that fell back to untyped (a body route with no
+   * request type, or any route with no response type). Logs one line; when
+   * `typed.strict` is set, throws instead so `npm run build` fails (exit 1).
+   */
+  private reportUntyped(): void {
+    if (!this.typed) return;
+    const bodyless = new Set(["get", "delete", "head"]);
+    const fell = this.entries.filter((e) => {
+      const needsBody = !bodyless.has(e.method.toLowerCase());
+      return (needsBody && !e.reqType) || !e.resType;
+    });
+    if (!fell.length) return;
+    const list = fell.map((e) => `${e.method.toUpperCase()} ${e.path}`).join(", ");
+    const msg = `[SdkBuilder] ${fell.length} route(s) fell back to untyped: ${list}`;
+    if (this.typed.strict) throw new Error(`${msg} (typed.strict)`);
+    Logger.log(msg);
   }
 
   // ─── Required field extraction from spec ───────────────────────────────────
@@ -101,43 +230,37 @@ export default class RouteCollector {
   // ─── Namespace + function name derivation ──────────────────────────────────
 
   /**
-   * Derives the SDK namespace and function name from an Express path.
+   * Resource namespace derivation. Strips the router prefix (tolerating a
+   * leading-slash mismatch), then takes the first non-param segment as the
+   * resource, nested under a leading version segment when present. Deeper path
+   * segments fold in (they're distinguished by the function name):
    *
-   * The router prefix is stripped first, then each segment is camelCased.
-   * The last non-param segment becomes the function name; everything before
-   * it becomes the namespace path.
-   *
-   * Examples (router prefix "/api"):
-   *   /api/users/signin    → namespace: ["users"], fn: "signin"
-   *   /api/users/pg-signup → namespace: ["users"], fn: "pgSignup"
-   *   /api/users/:user     → namespace: ["users"], fn: "get" (method fallback)
-   *   /api/health          → namespace: [],        fn: "health"
+   *   prefix "api", /api/users/signin         → ["users"]
+   *   prefix "api", /api/v2/organisations      → ["v2", "organisations"]
+   *   prefix "api", /api/v2/orgs/roles/:type   → ["v2", "orgs"]
    */
-  private deriveNames(
-    path: string,
-    routerPrefix: string,
-    method: string
-  ): { namespace: string[]; functionName: string } {
-    const stripped = path.startsWith(routerPrefix)
-      ? path.slice(routerPrefix.length)
-      : path;
+  private deriveResourceNamespace(path: string, routerPrefix: string): string[] {
+    const normPath = path.replace(/^\/+/, "");
+    const normPrefix = (routerPrefix ?? "").replace(/^\/+|\/+$/g, "");
 
-    const segments = stripped
+    let rest = normPath;
+    if (
+      normPrefix &&
+      (normPath === normPrefix || normPath.startsWith(normPrefix + "/"))
+    ) {
+      rest = normPath.slice(normPrefix.length).replace(/^\/+/, "");
+    }
+
+    const segs = rest
       .split("/")
       .filter((s) => s.length > 0 && !s.startsWith(":"))
       .map(this.toCamelCase);
 
-    if (segments.length === 0) {
-      return { namespace: [], functionName: method.toLowerCase() };
-    }
-    if (segments.length === 1) {
-      return { namespace: [], functionName: segments[0] };
-    }
+    if (segs.length === 0) return [];
 
-    return {
-      namespace: segments.slice(0, -1),
-      functionName: segments[segments.length - 1],
-    };
+    const version = /^v\d+$/i.test(segs[0]) ? segs[0] : null;
+    const resource = version ? segs[1] ?? segs[0] : segs[0];
+    return [version, resource].filter((s): s is string => !!s);
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────

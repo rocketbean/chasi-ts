@@ -121,10 +121,11 @@ export default class Endpoint {
    * threads the string controller
    * and dispatches the string to
    * the class[Endpoint] Vars
+   * returns the :self instance for chaining
    * @params {exc} String | Array
-   * @returns :void
+   * @returns Endpoint
    */
-  except(exception: string | string[]) {
+  except(exception: string | string[]): Endpoint {
     if (Array.isArray(exception)) {
       exception.map((middleware: string): void => {
         this.middlewares.filter((mw) => mw != middleware);
@@ -134,11 +135,13 @@ export default class Endpoint {
       this.middlewares.filter((mw) => mw != exception);
       this.excludeFromMw.push(exception);
     }
+    return this;
   }
 
-  middleware(mw: string | string[]) {
+  middleware(mw: string | string[]): Endpoint {
     if (typeof mw === "string") mw = [mw];
     this.middlewares = mw;
+    return this;
   }
 
   /***

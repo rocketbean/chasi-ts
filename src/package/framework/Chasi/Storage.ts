@@ -9,6 +9,25 @@ import cluster from "cluster";
 import { chasiVersion } from "../../version.js";
 
 export default class SessionStorage {
+  /**
+   * switchable state;
+   * defaults to 0 "collection" mode
+   * 0 - on collect mode, logs will only be collected without write/s
+   * 1 - ready state mode, prints chasi header then move to appendLine.
+   * 2 - continous writing mode, now using appendLine, adding clearLine to every message [scrollTop]
+   * 3 - continous writing mode, without scrolling.
+   */
+  public static state: 0 | 1 | 2 | 3 = 0;
+
+  /**
+   * Option to lock terminal display on scrollToTop
+   * on every message emitted.
+   * defaults to 1;
+   * 0 - new message always on top
+   * 1 - continous flow
+   */
+  public static displayScrollLock: 0 | 1 = 1;
+
   public data: SessionStorageData = {
     threads: [],
     reports: {},
@@ -20,7 +39,6 @@ export default class SessionStorage {
     logs: [],
     workers: [],
   };
-
   public strData: string = "";
   public clusterData: Iobject = {};
   public enabled: boolean;
@@ -116,6 +134,7 @@ export default class SessionStorage {
   }
 
   private _redraw(): void {
+    if(SessionStorage.state < 1) return;
     // Debounce: collapse rapid bursts (worker pipe messages, resize events)
     // into a single repaint ~60 ms after the last trigger.
     if (this._redrawTimer) clearTimeout(this._redrawTimer);
@@ -125,7 +144,18 @@ export default class SessionStorage {
       //             the user can still scroll up to read previous output).
       // \x1b[H   — move cursor to row 1, col 1.
       process.stdout.write("\x1b[2J\x1b[H" + this.format(this.data));
+      SessionStorage.state = 2;
     }, 50);
+  }
+
+  private _appendLine(message: any): void {
+    if(SessionStorage.state > 1) {
+      if(SessionStorage.state === 2) {
+        message = "\x1b[2J\x1b[H" + message;
+        if(SessionStorage.displayScrollLock === 1)  SessionStorage.state = 3
+      }
+      process.stdout.write(message);
+    }
   }
 
   private get _cols(): number {
@@ -181,12 +211,12 @@ export default class SessionStorage {
       routeRegistry: { icon: "▸", style: chalk.hex("a78bfa"),     label: "ROUTE REGISTRY" },
       services:      { icon: "◈", style: chalk.yellow,            label: "SERVICES"       },
       boot:          { icon: "◆", style: chalk.greenBright,       label: "BOOT"           },
-      exceptions:    { icon: "✖", style: chalk.redBright,         label: "EXCEPTIONS"     },
-      logs:          { icon: "◎", style: chalk.hex("64748b"),     label: "LOGS"           },
       workers:       { icon: "◌", style: chalk.blueBright,        label: "WORKERS"        },
+      logs:          { icon: "◎", style: chalk.hex("64748b"),     label: "LOGS"           },
+      exceptions:    { icon: "✖", style: chalk.redBright,         label: "EXCEPTIONS"     },
     };
 
-    const order = ["threads", "reports", "database", "routeRegistry", "services", "boot", "exceptions", "logs", "workers"];
+    const order = ["threads", "reports", "database", "routeRegistry", "services", "boot", "workers", "logs","exceptions"];
 
     for (const group of order) {
       if (!(group in data)) continue;
@@ -228,7 +258,8 @@ export default class SessionStorage {
       if (cluster.isPrimary) {
         if (!Array.isArray(this.data[target])) this.data[target] = [];
         this.data[target].push(message);
-        this._redraw();
+        if(SessionStorage.state === 1) this._redraw()
+        else this._appendLine(message);
       } else {
         // Exceptions surface from every worker; all other log sections
         // forward only from the lead worker to keep the dashboard noise-free.
@@ -242,7 +273,8 @@ export default class SessionStorage {
     } else {
       if (!Array.isArray(this.data[target])) this.data[target] = [];
       this.data[target].push(message);
-      this._redraw();
+        if(SessionStorage.state === 1) this._redraw()
+        else this._appendLine(message);
     }
   }
 }
