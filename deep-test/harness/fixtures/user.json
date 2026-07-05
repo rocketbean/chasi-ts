@@ -1,0 +1,21 @@
+{
+  "valid": {
+    "name": "Deep Test User",
+    "email": "deeptest@example.com",
+    "alias": "deeptester",
+    "password": "securepass123"
+  },
+  "missingPassword": {
+    "name": "No Pass",
+    "email": "nopass@example.com",
+    "alias": "nopass"
+  },
+  "credentials": {
+    "email": "deeptest@example.com",
+    "pass": "securepass123"
+  },
+  "wrongCredentials": {
+    "email": "deeptest@example.com",
+    "pass": "totallywrong"
+  }
+}
