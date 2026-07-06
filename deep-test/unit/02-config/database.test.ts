@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import "../../harness/globals.ts";
 
-const KEYS = ["database"];
+const KEYS = ["database", "DEEP_TEST_MODELS"];
 const snapshot: Record<string, string | undefined> = {};
 for (const k of KEYS) snapshot[k] = process.env[k];
 
@@ -75,7 +75,16 @@ describe("config/database › connections", () => {
 });
 
 describe("config/database › modelsDir", () => {
-  it("scans the container models directory", async () => {
+  it("scans the container models dir, and appends fixtures via DEEP_TEST_MODELS", async () => {
+    // Production: no DEEP_TEST_MODELS → only the shipped models directory.
+    set("DEEP_TEST_MODELS", undefined);
     expect((await load()).modelsDir).toEqual(["./container/models/"]);
+
+    // deep-test opt-in: DEEP_TEST_MODELS appends the fixture models directory.
+    set("DEEP_TEST_MODELS", "../deep-test/harness/fixtures/models");
+    expect((await load()).modelsDir).toEqual([
+      "./container/models/",
+      "../deep-test/harness/fixtures/models",
+    ]);
   });
 });

@@ -75,13 +75,13 @@ describe("config matrix › local / single-process / mongo-test / apispec on", (
   it("ServerPort propagates into apispec.servers and sdkbuilder.host", async () => {
     applyEnv(env);
     expect((await load("apispec")).definition.servers[0].url).toBe("http://localhost:3010");
-    expect((await load("sdkbuilder")).host).toBe("http://localhost:3010");
+    expect((await load("sdkbuilder")).output[0].host).toBe("http://localhost:3010");
   });
 
   it("apispec + sdkbuilder default to enabled; auth key reads oauthkey", async () => {
     applyEnv(env);
     expect((await load("apispec")).enabled).toBe(true);
-    expect((await load("sdkbuilder")).enabled).toBe(true);
+    expect((await load("sdkbuilder")).output[0].enabled).toBe(true);
     expect((await load("authentication")).drivers.dev.key).toBe("secretA");
   });
 
@@ -115,7 +115,7 @@ describe("config matrix › dev / clustered / apispec+sdk off / named app", () =
   it("apispec + sdkbuilder are disabled together", async () => {
     applyEnv(env);
     expect((await load("apispec")).enabled).toBe(false);
-    expect((await load("sdkbuilder")).enabled).toBe(false);
+    expect((await load("sdkbuilder")).output[0].enabled).toBe(false);
   });
 
   it("APPNAME propagates into container.name and apispec title", async () => {
@@ -126,7 +126,7 @@ describe("config matrix › dev / clustered / apispec+sdk off / named app", () =
 
   it("sdkbuilder.host falls back to the configured ServerPort when SDK_HOST is unset", async () => {
     applyEnv(env);
-    expect((await load("sdkbuilder")).host).toBe("http://localhost:8080");
+    expect((await load("sdkbuilder")).output[0].host).toBe("http://localhost:8080");
     // auth key falls back to the built-in default (oauthkey unset)
     expect((await load("authentication")).drivers.dev.key).toBe("chasi-dev");
   });
@@ -135,8 +135,8 @@ describe("config matrix › dev / clustered / apispec+sdk off / named app", () =
 describe("config matrix › explicit SDK host overrides the port-derived default", () => {
   it("uses SDK_HOST verbatim while server.port stays independent", async () => {
     applyEnv({ ServerPort: "3010", SDK_HOST: "https://cdn.example", SDKBUILDER_ENABLED: "true" });
-    expect((await load("sdkbuilder")).host).toBe("https://cdn.example");
-    expect((await load("sdkbuilder")).enabled).toBe(true);
+    expect((await load("sdkbuilder")).output[0].host).toBe("https://cdn.example");
+    expect((await load("sdkbuilder")).output[0].enabled).toBe(true);
     expect((await load("server")).port).toBe("3010");
   });
 });

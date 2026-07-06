@@ -35,13 +35,13 @@ describe("RouterServiceProvider.boot", () => {
 });
 
 describe("RouterServiceProvider.beforeRoute", () => {
-  it("attaches cors, json body parser, the req.body shield, the .well-known allow-list and static serving", async () => {
+  it("attaches cors, json body parser, the req.body shield and static serving", async () => {
     (Provider as any).config = { server: { cors: { origin: "*" } } };
     const $app = { use: vi.fn() };
     await new RouterServiceProvider().beforeRoute($app);
-    // cors + bodyParser + body-shield + "/.well-known" (dotfiles:allow) + public static
-    expect($app.use).toHaveBeenCalledTimes(5);
-    expect($app.use).toHaveBeenCalledWith("/.well-known", expect.any(Function));
+    // cors + bodyParser + body-shield + public static.
+    // (The "/.well-known" allow-list was removed with the deprecated public.ts in v4.3.0.)
+    expect($app.use).toHaveBeenCalledTimes(4);
   });
 
 });

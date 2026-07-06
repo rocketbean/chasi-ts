@@ -1,5 +1,8 @@
 /**
  * Phase 9 — SdkBuilder RouteCollector (collect) + terser formatter (format).
+ *
+ * `entries` is a per-collector instance field, and function names now derive from
+ * the controller method (endpoint.method), so fixtures carry one.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import "../../harness/globals.ts";
@@ -9,25 +12,24 @@ import Authentication from "../../../src/package/framework/Server/Authentication
 
 const prevApp = (globalThis as any).$app;
 
-function ep(method: string, path: string, mw: string[] = []) {
-  return { property: { method }, path, spec: {}, $sdkHandlers: [], middlewares: mw, excludeFromMw: [] };
+function ep(verb: string, path: string, mw: string[] = [], method?: string) {
+  return { property: { method: verb }, path, method, spec: {}, $sdkHandlers: [], middlewares: mw, excludeFromMw: [] };
 }
 
 beforeEach(() => {
-  RouteCollector.entries = [];
   (Authentication as any).$drivers = {};
   const api = {
     property: { name: "api", auth: "dev", prefix: "/api", AuthRouteExceptions: [{ url: "/api/users/signin", m: "post" }] },
     $registry: {
       routes: [
-        ep("get", "/api/users/:user", ["auth"]),
-        ep("post", "/api/users/signin"),
-        ep("post", "/api/users/forget"),
-        ep("post", "/api/users/pg-signup"),
+        ep("get", "/api/users/:user", ["auth"], "index"),
+        ep("post", "/api/users/signin", [], "signin"),
+        ep("post", "/api/users/forget", [], "forget"),
+        ep("post", "/api/users/pg-signup", [], "pgSignup"),
       ],
     },
   };
-  const admin = { property: { name: "admin", auth: false, prefix: "/admin" }, $registry: { routes: [ep("get", "/admin/x")] } };
+  const admin = { property: { name: "admin", auth: false, prefix: "/admin" }, $registry: { routes: [ep("get", "/admin/x", [], "x")] } };
   (globalThis as any).$app = { $modules: { RouterModule: { routers: [api, admin] } } };
 });
 afterEach(() => {
@@ -36,8 +38,9 @@ afterEach(() => {
 
 describe("SdkBuilder RouteCollector.init", () => {
   it("collects only the configured routers and skips excluded routes", async () => {
-    await new RouteCollector().init({ routers: ["api"], exclude: [{ m: "post", url: "/api/users/forget" }] } as any);
-    const paths = RouteCollector.entries.map((e) => e.path);
+    const collector = new RouteCollector();
+    await collector.init({ routers: ["api"], exclude: [{ m: "post", url: "/api/users/forget" }] } as any);
+    const paths = collector.entries.map((e) => e.path);
     expect(paths).toContain("/api/users/:user");
     expect(paths).toContain("/api/users/signin");
     expect(paths).not.toContain("/api/users/forget"); // excluded
@@ -45,18 +48,20 @@ describe("SdkBuilder RouteCollector.init", () => {
   });
 
   it("marks protected vs public and derives namespace/function names", async () => {
-    await new RouteCollector().init({ routers: ["api"], exclude: [] } as any);
-    const signin = RouteCollector.entries.find((e) => e.path === "/api/users/signin")!;
+    const collector = new RouteCollector();
+    await collector.init({ routers: ["api"], exclude: [] } as any);
+
+    const signin = collector.entries.find((e) => e.path === "/api/users/signin")!;
     expect(signin.isProtected).toBe(false); // AuthRouteException
     expect(signin.namespace).toEqual(["users"]);
-    expect(signin.functionName).toBe("signin");
+    expect(signin.functionName).toBe("signin"); // controller method
 
-    const protectedEp = RouteCollector.entries.find((e) => e.path === "/api/users/:user")!;
+    const protectedEp = collector.entries.find((e) => e.path === "/api/users/:user")!;
     expect(protectedEp.isProtected).toBe(true);
     expect(protectedEp.middlewares).toEqual(["auth"]);
 
-    const camel = RouteCollector.entries.find((e) => e.path === "/api/users/pg-signup")!;
-    expect(camel.functionName).toBe("pgSignup");
+    const named = collector.entries.find((e) => e.path === "/api/users/pg-signup")!;
+    expect(named.functionName).toBe("pgSignup"); // controller method
   });
 });
 

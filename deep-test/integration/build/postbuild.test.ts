@@ -1,7 +1,7 @@
 /**
- * Phase 12 — `postbuild` script integrity (cpy-cli).
+ * Phase 12 — `copy:assets` script integrity (cpy-cli).
  *
- * `postbuild` does two copies that prod relies on:
+ * `copy:assets` (formerly `postbuild`) does two copies that prod relies on:
  *   1. the SSR frontend  src/container/html  → dist/container/html
  *      In prod the compiler resolves its engine roots from the RUN dir (dist),
  *      i.e. dist/container/html/<engine>; if this copy is missing or flattened
@@ -11,7 +11,7 @@
  *
  * This guards the cpy-cli v7 migration (v7 errors on no-match and dropped
  * `--parents`; a stray trailing space in the glob also broke it). Opt-in:
- * DEEP_INTEGRATION=1 — shells out to `npm run postbuild` and writes under dist/.
+ * DEEP_INTEGRATION=1 — shells out to `npm run copy:assets` and writes under dist/.
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { execSync } from "node:child_process";
@@ -24,13 +24,13 @@ const distHtml = path.join(root, "dist/container/html");
 const prismaSrc = path.join(root, "src/container/prisma/client");
 const prismaDist = path.join(root, "dist/container/prisma/client");
 
-const postbuild = () => execSync("npm run postbuild", { cwd: root, stdio: "pipe" });
+const copyAssets = () => execSync("npm run copy:assets", { cwd: root, stdio: "pipe" });
 
-describe.skipIf(!RUN)("integration › postbuild script", () => {
+describe.skipIf(!RUN)("integration › copy:assets script", () => {
   describe("SSR frontend copy (so the prod compiler can find it)", () => {
     beforeAll(() => {
       fs.rmSync(distHtml, { recursive: true, force: true });
-      postbuild();
+      copyAssets();
     });
 
     it("copies the engine's index.html and ssr.config.js into dist", () => {
@@ -52,7 +52,7 @@ describe.skipIf(!RUN)("integration › postbuild script", () => {
 
     it("succeeds when no Prisma client exists (default app — tolerant of no-match)", () => {
       fs.rmSync(prismaSrc, { recursive: true, force: true });
-      expect(() => postbuild()).not.toThrow();
+      expect(() => copyAssets()).not.toThrow();
     });
 
     it("copies a generated Prisma client into dist, preserving structure", () => {
@@ -61,7 +61,7 @@ describe.skipIf(!RUN)("integration › postbuild script", () => {
       fs.writeFileSync(path.join(prismaSrc, "runtime/lib.js"), "export const r = 2;");
       fs.rmSync(prismaDist, { recursive: true, force: true });
 
-      postbuild();
+      copyAssets();
 
       expect(fs.existsSync(path.join(prismaDist, "index.js"))).toBe(true);
       expect(fs.existsSync(path.join(prismaDist, "runtime/lib.js"))).toBe(true);
