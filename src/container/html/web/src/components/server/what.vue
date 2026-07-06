@@ -46,7 +46,28 @@
         environment variable — set it to <code>0</code> to silence all output.
       </div>
     </section>
-    <list :items="loggerData.list" />
+    <list :items="loggerList" />
+
+    <!-- LoggerBindings section (v4.3.0) — its own concept, not a write method -->
+    <section class="section">
+      <div class="pan-title">
+        <div class="x-center is-size-3">
+          <span><hook id="loggerBindings" /> LoggerBindings</span>
+          <span class="tag is-info is-light is-medium">&lt;LoggerBinding[]&gt;</span>
+        </div>
+        <small>
+          <span class="subtitle">[src/config/container.ts]</span>
+        </small>
+      </div>
+      <div class="sub-text">
+        <strong>v4.3.0.</strong> Register functions that run on <em>every</em> Logger write method
+        (<code>.log</code> / <code>.info</code> / <code>.warn</code> / <code>.error</code>) — tee logs to a file,
+        ship warnings or errors to an external service (Sentry, Datadog, a log aggregator), or gather metrics,
+        all without importing the Logger anywhere. Declared as an array on
+        <code>container.LoggerBindings</code>; each fires after every write, in declaration order.
+      </div>
+    </section>
+    <list :items="bindingsList" />
 
     <!-- Terminal Dashboard section -->
     <section class="section">
@@ -60,9 +81,11 @@
         </small>
       </div>
       <div class="sub-text">
-        Chasi renders a live dashboard directly in the terminal. It tracks database connections,
-        registered routes, booted services, worker status, exceptions, and performance — all in
-        a single persistent display that redraws on new log entries and on terminal resize.
+        On the primary process Chasi renders a live dashboard during <strong>boot</strong> — a branded header plus
+        structured sections (threads, performance, database, route registry, services, boot, workers, logs,
+        exceptions). Once the server is ready it switches to a <strong>continuous log-flow</strong>: new entries are
+        appended as they arrive (no full repaint), with an optional scroll-lock. The dashboard runs on the primary
+        only; workers pipe their structured data to it.
       </div>
     </section>
     <list :items="dashboardData.list" />
@@ -89,8 +112,11 @@
   </div>
 </template>
 <script setup>
-import {reactive} from "vue";
+import {reactive, computed} from "vue";
 import container from "./Container.vue"
+import { useControlStore } from "@/stores/ControlStore.js"
+
+const controlStore = useControlStore()
 
 const loggerData = reactive({
   list: [
@@ -136,6 +162,55 @@ const loggerData = reactive({
     }
   ]
 })
+
+// LoggerBindings is its own concept (not a write method) — rendered as a dedicated section.
+const bindingsData = reactive({
+  list: [
+    {
+      hook: "lb-usage",
+      title: "Usage & signature",
+      sub: "[method + args]",
+      tag: "(method, ...args) => void",
+      desc: `Each binding receives the method name (<code>"log"</code> | <code>"info"</code> | <code>"warn"</code> |
+            <code>"error"</code>) followed by the exact arguments the caller passed — so one binding can serve every
+            level and branch on it. Register one or many.<br/><br/>
+            <code>LoggerBindings: [(method, ...args) =&gt; { if (method === "error") report(args) }]</code>`
+    },
+    {
+      hook: "lb-effects",
+      title: "Effects & guarantees",
+      sub: "[synchronous · swallowed]",
+      desc: `Bindings fire on <strong>every</strong> write, <strong>synchronously</strong> and in declaration order,
+            right after the message is written — and <em>independently of terminal silencing</em>: a log muted by
+            <code>Log_Level=0</code> or by build mode still fires its bindings, so you capture all logging activity.
+            A binding that throws is caught and swallowed, so a faulty tap can never break logging or crash the app;
+            return values are ignored. Keep them light — heavy or async work belongs on the Observer (below).`
+    },
+    {
+      hook: "lb-observer",
+      title: "Pair with Events / Observer",
+      sub: "[isolate async work]",
+      desc: `Bindings run inline on the process/thread that produced the log, and the Logger does <strong>not</strong>
+            await them — so an <strong>async / Promise</strong> binding runs <em>detached</em> (fire-and-forget),
+            risking unhandled rejections, out-of-order effects, and back-pressure on the hot logging path. For anything
+            beyond a trivial synchronous tap — file/DB writes, network calls, batching — hand off to Chasi's
+            <strong>Observer</strong> instead: have the binding <code>emit()</code> a registered event and do the real
+            work in that event's async <code>fire()</code>. This isolates the work onto the Observer's managed
+            AsyncEventEmitter pipeline (separate from request/logging timing), keeps logging fast and non-blocking, and
+            gives async work a proper awaited lifecycle instead of a stray promise.<br/><br/>
+            <code>LoggerBindings: [(method, ...args) =&gt; { if (method === "error") Handler.Instance?.$observer?.emit("logError", { method, args }) }]</code>
+            <br/>— with a <code>logError</code> event registered in <code>config/observer.ts</code> whose async
+            <code>fire()</code> does the shipping/persistence.`
+    }
+  ]
+})
+
+const loggerList = computed(() =>
+  loggerData.list.filter((i) => controlStore._data?.dictionary?.[i.hook])
+)
+const bindingsList = computed(() =>
+  bindingsData.list.filter((i) => controlStore._data?.dictionary?.[i.hook])
+)
 
 const data = reactive({
   list: [
@@ -260,21 +335,23 @@ const dashboardData = reactive({
       hook: "td-sections",
       title: "Dashboard sections",
       sub: "[Storage]",
-      tag: "THREADS · PERFORMANCE · DATABASE · ROUTE REGISTRY · SERVICES · BOOT · EXCEPTIONS · LOGS · WORKERS",
-      desc: `Each section only renders when it contains at least one entry. Sections render
-        in a fixed order. The <strong>EXCEPTIONS</strong> section surfaces unhandled errors
-        from all workers; all other structured sections forward only from the lead worker
-        to keep the display clean.`
+      tag: "THREADS · PERFORMANCE · DATABASE · ROUTE REGISTRY · SERVICES · BOOT · WORKERS · LOGS · EXCEPTIONS",
+      desc: `Each section only renders when it holds at least one entry, in this fixed order:
+        THREADS → PERFORMANCE → DATABASE → ROUTE REGISTRY → SERVICES → BOOT → WORKERS → LOGS → EXCEPTIONS.
+        The <strong>EXCEPTIONS</strong> section surfaces unhandled errors from <em>every</em> worker; all other
+        structured sections forward only from the lead worker to keep the display clean.`
     },
     {
       hook: "td-redraw",
-      title: "Debounced redraw",
-      sub: "[Storage._redraw()]",
-      tag: "~50 ms debounce",
-      desc: `Rapid log writes during boot are collapsed into a single repaint ~50 ms after
-        the last write. The visible screen is erased with <code>\\x1b[2J\\x1b[H</code>
-        (erase + cursor home) so the scrollback buffer is never cleared — previous
-        terminal output remains accessible by scrolling up.`
+      title: "Display states",
+      sub: "[SessionStorage.state]",
+      tag: "0 collect · 1 dashboard · 2/3 continuous",
+      desc: `The display runs a small state machine: <strong>0</strong> collect (logs buffered, nothing written) →
+        <strong>1</strong> dashboard (header + sections, debounced repaints during boot) →
+        <strong>2 / 3</strong> continuous writing (each entry <code>appendLine</code>d as it arrives, no full
+        repaint). Repaints erase only the visible screen with <code>\\x1b[2J\\x1b[H</code> so the scrollback
+        buffer is preserved — earlier output stays reachable by scrolling up. <code>displayScrollLock</code>
+        chooses between a continuous flow (default) and pinning new messages to the top.`
     },
     {
       hook: "td-resize",

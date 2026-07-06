@@ -257,6 +257,21 @@ connections: {
 `
     },
     drizzle: {
+      install: `
+# Install the drizzle-orm core, then the client package that
+# matches your connection's adapter (see DrizzleAdapter):
+$ npm i drizzle-orm
+
+# node-postgres
+$ npm i pg @types/pg
+# postgres-js
+$ npm i postgres
+# mysql2
+$ npm i mysql2
+# better-sqlite3
+$ npm i better-sqlite3 @types/better-sqlite3
+# libsql / Turso
+$ npm i @libsql/client`,
       connection: `
 // src/config/database.ts
 connections: {
@@ -373,6 +388,122 @@ const db = Model.drizzle("pg");
 const allUsers  = await db.select().from(users);
 const oneUser   = await db.select().from(users).where(eq(users.id, 1));
 const [created] = await db.insert(users).values({ name: "Alice", email: "alice@example.com" }).returning();`
+    },
+    prisma: {
+      install: `
+# Prisma 7 client + CLI
+$ npm i @prisma/client
+$ npm i -D prisma
+
+# A Prisma driver adapter for your database
+# (Prisma 7 connects through an adapter, not a datasource url):
+$ npm i @prisma/adapter-pg             # PostgreSQL
+# $ npm i @prisma/adapter-libsql       # SQLite / Turso
+# $ npm i @prisma/adapter-planetscale  # MySQL / PlanetScale`,
+      config: `
+// prisma.config.ts  (project root — Prisma 7)
+import { defineConfig, env } from "prisma/config";
+
+export default defineConfig({
+  schema: "src/container/prisma/schema.prisma",
+  // Prisma 7 reads the datasource URL here, NOT inside schema.prisma:
+  datasource: { url: env("PG_URL") },
+});
+
+
+// src/container/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"          // -> src/container/prisma/client
+}
+
+datasource db {
+  provider = "postgresql"        // no url field — it lives in prisma.config.ts
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  name  String
+}`,
+      connection: `
+// src/config/database.ts
+import { PrismaPg } from "@prisma/adapter-pg";
+
+connections: {
+  // PostgreSQL via Prisma 7 (driver adapter)
+  pg: {
+    driver: "prisma",
+    url: process.env.PG_URL,                  // shown in logs; datasource URL lives in prisma.config.ts
+    options: {
+      client: "container/prisma/client",      // generated client dir, relative to src/
+      schema: "./src/container/prisma/schema.prisma",
+      useDynamicPrismaClient: true,
+      // Prisma 7 connects through the adapter — spread into new PrismaClient({ ...globals }):
+      globals: { adapter: new PrismaPg({ connectionString: process.env.PG_URL }) },
+    },
+  },
+}`,
+      generate: `
+# Generate the Prisma client into schema.prisma's output dir
+$ npx prisma generate
+
+# Push the schema to the database (or use migrations)
+$ npx prisma db push
+# $ npx prisma migrate dev --name init`,
+      query: `
+import Controller from "../../package/statics/Controller.js";
+
+export default class UserController extends Controller {
+
+  // Prisma model delegates for the "pg" connection.
+  // Model names are lower-cased: model User -> this.models.pg.user
+  get users() { return this.models.pg.user; }
+
+  async list(request, response) {
+    return await this.users.findMany();
+  }
+
+  async index(request, response) {
+    return await this.users.findUnique({
+      where: { id: Number(request.params.id) },
+    });
+  }
+
+  async create(request, response) {
+    return await this.users.create({ data: request.body });
+  }
+
+  async update(request, response) {
+    return await this.users.update({
+      where: { id: Number(request.params.id) },
+      data: request.body,
+    });
+  }
+
+  async delete(request, response) {
+    await this.users.delete({ where: { id: Number(request.params.id) } });
+    return { deleted: true };
+  }
+}`,
+      modelMethod: `
+// Use Model.prisma() anywhere outside a controller —
+// service providers, event handlers, scripts, etc.
+
+import Model from "../../package/statics/Model.js";
+
+// Returns the live Prisma client for the "pg" connection
+const db = Model.prisma("pg");
+
+const allUsers = await db.user.findMany();
+const oneUser  = await db.user.findUnique({ where: { id: 1 } });
+const created  = await db.user.create({ data: { name: "Alice", email: "alice@example.com" } });
+
+// Prisma niceties are available on the client too:
+await db.$transaction([
+  db.user.create({ data: { name: "Bob",  email: "bob@example.com" } }),
+  db.user.create({ data: { name: "Cara", email: "cara@example.com" } }),
+]);`
     }
   },
   testing:{
@@ -599,5 +730,133 @@ Provider.$observer.when("__ready__", async (_prop, params) => {
   Logger.info("HTTP server listening", server?.address());
 });`,
     }
+  },
+  sdkbuilder: {
+    config: `// src/config/sdkbuilder.ts — one or more independent SDKs
+export default <SdkBuilderConfig>{
+  output: [
+    {
+      namespace: "api",
+      enabled: true,
+      host: "http://localhost:3010",
+      routers: ["api"],                                   // string, or a SdkRouterSelector
+      httpClient: "fetch",
+      exclude: [{ m: "post", url: "/api/users/forget" }], // RouteExceptions[]
+      filename: "sdk/chasi.sdk.js",
+      formatter: terserFormatter,
+      typed: { enabled: true, emit: "inline" },           // opt-in typed .d.ts sidecar
+    },
+
+    // a second, filtered SDK built from the same routes:
+    {
+      namespace: "admin",
+      enabled: true,
+      host: "http://localhost:3010",
+      routers: [
+        {                                                 // SdkRouterSelector
+          router: "api",
+          namespace: "Admin",                             // -> Admin.<resource>.<fn>
+          filter: (e) => e.path.includes("/admin"),       // subset of endpoints
+          naming: "controller",                           // "controller" (default) | "http"
+        },
+      ],
+      filename: "sdk/admin.sdk.js",
+    },
+  ],
+}`,
+    formatter: `// src/config/sdkbuilder.ts — output[].formatter
+
+// default — terser (minify + mangle)
+import { terserFormatter } from "../container/modules/SdkBuilder/formatters/terser.js"
+formatter: terserFormatter
+
+// uglify-js@3
+import UglifyJS from "uglify-js"
+formatter: (code) => UglifyJS.minify(code).code
+
+// prettier (readable formatted output)
+import prettier from "prettier"
+formatter: (code) => prettier.format(code, { parser: "babel" })
+
+// omit formatter — write raw output`,
+    sdk: `// src/container/http/api.ts — register sdk() on a route
+route.post("/signin", "UserController@signin", { spec: { ... } })
+  .sdk((params, next) => {
+    if (!params?.email) throw new Error("email is required")
+    next()
+  })
+
+// group-level sdk() runs before route-level, on every route in the group
+route.group({ prefix: "/users", sdk: [validateScope] }, () => {
+  route.post("/signin", "UserController@signin")
+  route.post("/signup", "UserController@create")
+})`,
+    consumer: `// Import from the generated bundle (ES module)
+import { users } from "./sdk/chasi.sdk.js"
+// or the default aggregate:
+import SDK from "./sdk/chasi.sdk.js"
+
+// Public route — no token needed
+const result = await users.signin({ email: "user@example.com", pass: "secret" })
+console.log(result.token)
+
+// Protected route — pass the JWT as the second argument
+const profile = await users.index({}, token)
+
+// Client-side validation runs before the request
+try {
+  await users.signup({ name: "Alice" })  // throws: Missing required field "email"
+} catch (err) {
+  console.error(err.message)
+}`,
+  },
+  apispec: {
+    example: `// src/container/http/api.ts
+route.group({ prefix: "/users" }, () => {
+
+  route.post("/signup", "v1/UserController@create", {
+    spec: {
+      summary: "Register a new user",
+      security: [],                    // public route — no JWT
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              required: ["name", "email", "password"],
+              properties: {
+                name:     { type: "string" },
+                email:    { type: "string", format: "email" },
+                password: { type: "string", format: "password", minLength: 6 },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Created user",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/test:user" },
+            },
+          },
+        },
+        400: { description: "Email already exists" },
+      },
+    },
+  });
+
+});
+
+// src/config/apispec.ts
+schemas: {
+  keyFormat: "prefixed",              // test:user, pg:properties, mysql:User
+  drivers: { exclude: ["test"] },     // skip the test DB
+  models: {
+    pg: { exclude: ["users", "userApps"] },
+  },
+}`,
   }
 }

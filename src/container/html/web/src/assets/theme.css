@@ -489,8 +489,9 @@ button, a, input, select, .w2-nav-item, .w2-theme-btn, .w2-rp-item, .w2-progress
   padding-top: 5px;
   position: relative;
 }
-/* Vertical connector line between items */
-.w2-rp-item:not(:last-child) .w2-rp-track::after {
+/* Vertical connector line — only between same-depth siblings (RightPanel flags `.w2-rp-connect`).
+   Never on the first level / section headers, and no trailing line on a group's last item. */
+.w2-rp-connect .w2-rp-track::after {
   content: '';
   position: absolute;
   top: 14px;
@@ -500,6 +501,11 @@ button, a, input, select, .w2-nav-item, .w2-theme-btn, .w2-rp-item, .w2-progress
   background: var(--w2-border-faint);
   transform: translateX(-50%);
 }
+
+/* Shiki dual-theme (CodeContainer): dark colors are inline (site default); swap to the light
+   palette under the light theme via shiki's --shiki-light / --shiki-light-bg variables. */
+html[data-theme="light"] .shiki { background-color: var(--shiki-light-bg) !important; }
+html[data-theme="light"] .shiki span { color: var(--shiki-light) !important; }
 .w2-rp-dot {
   width: 6px;
   height: 6px;
@@ -514,6 +520,23 @@ button, a, input, select, .w2-nav-item, .w2-theme-btn, .w2-rp-item, .w2-progress
   box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
 }
 .w2-rp-item:hover .w2-rp-dot { background: var(--w2-text-faint); }
+
+/* Right-nav subject icons (the plain dot above is the default when no icon is set) */
+.w2-rp-icon {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--w2-text-faint);
+  transition: color 0.12s;
+}
+/* An icon is taller than the dot — center it in a label-height line box instead of the
+   dot's top nudge, so it lines up with its label. */
+.w2-rp-track:has(.w2-rp-icon) {
+  padding-top: 0;
+  align-items: center;
+  min-height: 1.5em;
+}
+.w2-rp-item--active .w2-rp-icon { color: var(--w2-accent); }
+.w2-rp-item:hover .w2-rp-icon { color: var(--w2-text-muted); }
 
 .w2-rp-label {
   flex: 1;

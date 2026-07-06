@@ -74,8 +74,14 @@ export const useControlStore = defineStore( "ControlStore", {
     dict () {
       return this._data.dictionary;
     },
+    types () {
+      return this._data.types ?? {};
+    },
     collection () {
-      return Object.keys(this._data.dictionary).map(subject => this._data.dictionary[subject]);
+      return [
+        ...Object.keys(this._data.dictionary).map(subject => this._data.dictionary[subject]),
+        ...(this._data.typeRows ?? [])
+      ];
     },
     searchRows () {
       return this.search.rows
@@ -126,8 +132,8 @@ export const useControlStore = defineStore( "ControlStore", {
         if(cat?.group && cat.group.length > 0 && (typeof cat.group[0] === "string")) {
           cat.group = cat?.group.map( item => {
             let index = ctx.glossary.find(ind => ind.id === item)
-            if(index) return {to: index.id, label: index.label};
-          })
+            if(index) return {to: index.id, label: index.label, depth: index.depth ?? 0};
+          }).filter(Boolean)
         }
         return cat;
       })

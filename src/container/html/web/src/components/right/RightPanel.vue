@@ -5,34 +5,25 @@
       On this page
     </div>
     <nav class="w2-rp-nav">
-      <template v-for="cat in subcats" :key="cat.to">
-        <button
-          type="button"
-          class="w2-rp-item"
-          :class="{ 'w2-rp-item--active': activeId === cat.to }"
-          @click="go(cat)"
-        >
-          <span class="w2-rp-track">
-            <span class="w2-rp-dot"></span>
-          </span>
-          <span class="w2-rp-label">{{ cat.label }}</span>
-        </button>
-        <template v-if="cat.group?.length > 0">
-          <button
-            v-for="item in cat.group"
-            :key="item.to"
-            type="button"
-            class="w2-rp-item w2-rp-item--sub"
-            :class="{ 'w2-rp-item--active': activeId === item.to }"
-            @click="go(item)"
-          >
-            <span class="w2-rp-track">
-              <span class="w2-rp-dot"></span>
-            </span>
-            <span class="w2-rp-label">{{ item.label }}</span>
-          </button>
-        </template>
-      </template>
+      <button
+        v-for="(r, i) in rows"
+        :key="i"
+        type="button"
+        class="w2-rp-item"
+        :class="{
+          'w2-rp-item--sub': r.kind === 'item',
+          'w2-rp-item--active': activeId === r.to,
+          'w2-rp-connect': r.connect
+        }"
+        :style="r.kind === 'item' ? { paddingLeft: (10 + graduated(r.depth)) + 'px' } : {}"
+        @click="go(r)"
+      >
+        <span class="w2-rp-track">
+          <span v-if="r.kind === 'cat' && r.icon" class="material-symbols-rounded w2-rp-icon">{{ r.icon }}</span>
+          <span v-else class="w2-rp-dot"></span>
+        </span>
+        <span class="w2-rp-label">{{ r.label }}</span>
+      </button>
     </nav>
   </aside>
 </template>
@@ -47,7 +38,32 @@ const subcats  = computed(() => store.ctx?.subcats ?? [])
 const activeId = computed(() => store.scr?.target?.id ?? "")
 const hasItems = computed(() => subcats.value?.length > 0)
 
+// Graduated indentation: the first level is the biggest step, each deeper level a
+// slightly smaller step (cumulative px) — keeps nesting legible without runaway indent.
+const STEPS = [0, 18, 32, 43, 51]
+const graduated = (depth) => STEPS[Math.min(depth, STEPS.length - 1)]
+
+// Flatten cats + their group items, then flag which rows draw a vertical connector to the
+// next. Rule: join an item to the next ONLY when the next is a same-depth item (a sibling).
+// Section headers (cats) never connect; a lone item at its level — or the last of a group —
+// has no same-depth neighbour, so no line; connectors never cross depth levels.
+const rows = computed(() => {
+  const out = []
+  for (const cat of subcats.value) {
+    out.push({ kind: "cat", to: cat.to, label: cat.label, icon: cat.icon })
+    for (const item of (cat.group || [])) {
+      out.push({ kind: "item", to: item.to, label: item.label, depth: item.depth || 0 })
+    }
+  }
+  for (let i = 0; i < out.length; i++) {
+    const r = out[i]
+    const n = out[i + 1]
+    r.connect = r.kind === "item" && !!n && n.kind === "item" && n.depth === r.depth
+  }
+  return out
+})
+
 function go(target) {
-  EventHandler.emit("hookto", target)
+  EventHandler.emit("hookto", { to: target.to })
 }
 </script>

@@ -23,7 +23,7 @@ export default class RouterServiceProvider
         auth: "dev",
         prefix: "/api",
         namespace: "container/http/api.js",
-        ControllerDir: ["container/controllers/v2"],
+        ControllerDir: ["container/controllers/v1"],
         middleware: [],
         AuthRouteExceptions: [
           { m: "post", url: "/api/users/signin" },
@@ -39,7 +39,7 @@ export default class RouterServiceProvider
             response.set("Content-Type", "application/json");
           } catch (e) {}
         },
-        displayLog: 1,
+        displayLog: 0,
       }),
       new Router(<RouterConfigInterface>{
         name: "chasi",
@@ -56,7 +56,7 @@ export default class RouterServiceProvider
             exec: CompilerEngine.instance,
           },
         ],
-        displayLog: 0,
+        displayLog: 1,
       }),
     ];
   }

@@ -32,7 +32,7 @@ const config: CompilerEngineConfig = {
    * Overridable via the `CHASI_COMPILER=false` env var (test envs set this to
    * skip the build — replacing the old `testMode` coupling).
    */
-  enabled: checkout(process.env.CHASI_COMPILER, "false") !== "false",
+  enabled: checkout(process.env.CHASI_COMPILER, "true") !== "false",
 
   /**
    * List of Vite engine instances to manage.

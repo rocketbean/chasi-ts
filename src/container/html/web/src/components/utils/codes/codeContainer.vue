@@ -56,7 +56,17 @@ const consumeStrMap = (str: string): string => {
 
 rawCode.value = consumeStrMap(props.mapping)
 
-codeToHtml(rawCode.value, <CodeToHastOptions>props.options).then(d => {
+// Dual-theme render: dark is the default (matches the site default); a CSS rule swaps to the
+// light palette under html[data-theme="light"] via shiki's --shiki-light variables.
+const shikiOptions: any = {
+  lang: (props.options as any)?.lang || "javascript",
+  themes: {
+    dark: (props.options as any)?.theme || "vitesse-dark",
+    light: "vitesse-light",
+  },
+  defaultColor: "dark",
+}
+codeToHtml(rawCode.value, shikiOptions).then(d => {
   codeTemp.value = d
 })
 

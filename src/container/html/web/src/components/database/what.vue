@@ -23,6 +23,7 @@
     <db-config/>
     <db-model/>
     <db-drizzle/>
+    <db-prisma/>
 
   </div>
 </template>
@@ -32,6 +33,7 @@ import { useControlStore } from "@/stores/ControlStore"
 import DbConfig from "./config.vue"
 import DbModel from "./model.vue"
 import DbDrizzle from "./drizzle.vue"
+import DbPrisma from "./prisma.vue"
 
 const ctx = useControlStore();
 const db = ctx.dict["database"]

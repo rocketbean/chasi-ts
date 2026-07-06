@@ -1,5 +1,5 @@
 <template>
-  <li class = "row-item has-background-dark has-text-primary-light" @click = "activateAndScroll">
+  <li class = "row-item" @click = "activateAndScroll">
     <div class = "row-container">
       <div class = "item-top">
         <span class = "is-size-5">
@@ -11,7 +11,7 @@
           </span>
         </div>
       </div>
-      <div class = "item-content is-size-7 has-text-grey-light">
+      <div class = "item-content is-size-7">
         {{textLimit(props.item.text)}}
       </div>
     </div>
@@ -59,12 +59,17 @@ const activateAndScroll = () => {
   display: flex;
   padding:10px;
   max-height: 200px;
+  background: var(--w2-bg-card);
+  color: var(--w2-text);
+  border: 1px solid var(--w2-border-faint);
 }
 
 .row-item:hover {
-  background-color: #41969e !important;
+  background: var(--w2-bg-hover) !important;
+  border-color: var(--w2-accent);
   cursor: pointer;
 }
+.item-content { color: var(--w2-text-muted); }
 
 .row-container {
   display: grid;

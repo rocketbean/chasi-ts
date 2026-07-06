@@ -5,6 +5,59 @@ All notable changes to **chasi-ts** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0] - 2026-07-06
+
+A developer-tooling and lifecycle release: a typed, multi-output SDK; a headless
+`npm run build` artifact layer; Logger write-method bindings; per-router
+controller resolution; and a compiler that is on by default.
+
+### Added
+
+- **Typed SDK output.** `SdkBuilder` can emit a sibling `.d.ts` next to the `.js`
+  (opt-in `output[].typed.enabled`) — full request/response types with **zero
+  runtime change** (the `.js` is byte-identical). `typed.emit: "inline"` (default)
+  copies the referenced types in for a self-contained, portable artifact;
+  `"import"` references a shared `typeModule` barrel. Request types are read from
+  controller method signatures; a verified `<Name>Response` sibling becomes the
+  response type, else `any`.
+- **Multi-output SDK.** `sdkbuilder.output` is now an array of independent outputs
+  — each with its own `namespace`, `enabled`, `host`, `routers`, `httpClient`,
+  `exclude`, `filename`, `formatter`, and `typed` — so one project can emit
+  several SDKs in a single build.
+- **Router selectors.** `output[].routers` entries may be
+  `{ router, namespace?, filter?, naming? }` — pick a subset of endpoints, wrap
+  them under a namespace, and choose `naming: "controller"` (default,
+  controller-method names, nested `namespace.<resource>.<method>`) or `"http"`.
+- **`npm run build` build layer.** Compiles `dist`, then runs each provider's new
+  `build()` hook so modules (SdkBuilder, ApiSpec, the compiler) emit their
+  artifacts headlessly — no server boot — exiting non-zero on failure (CI).
+- **`LoggerBindings`** (`container.ts`) — functions run on every Logger write
+  method (`.log`/`.info`/`.warn`/`.error`) with the method name + the exact args,
+  in declaration order; a throwing binding can't break logging.
+- **Per-router `ControllerDir`.** A bare controller name (`"UserController@…"`)
+  now resolves within the router's own `ControllerDir` — a router pointing at
+  `container/controllers/v2` no longer needs the `v2/` prefix.
+- **Multi-directory `modelsDir`** plus a `DEEP_TEST_MODELS`-gated entry so the
+  deep-test suite can load fixture models that never ship.
+
+### Changed
+
+- **Compiler on by default.** `compiler.enabled` now defaults on
+  (`checkout(CHASI_COMPILER, "true")`); set `CHASI_COMPILER=false` to disable
+  (API-only servers, tests booting from source).
+- Model/controller loader (`Base.getFileDirectories`) now only picks up
+  `.ts`/`.js` sources, so stray artifacts (e.g. macOS `.DS_Store`) can no longer
+  abort boot.
+- `postbuild` npm script renamed to `copy:assets` (run by `npm run build`).
+
+### Fixed
+
+- **Cluster shutdown.** SIGINT/SIGTERM no longer re-fork exiting workers, so the
+  runtime stops cleanly and releases its port; workers drain in-flight requests
+  on disconnect, with a SIGKILL fallback.
+- **Cluster port binding.** Workers listen once on the shared port instead of
+  scanning the range, removing the `MaxListenersExceededWarning`.
+
 ## [4.2.0] - 2026-06-24
 
 A dependency-modernization release moving the framework onto the current majors of

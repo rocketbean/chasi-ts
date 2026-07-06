@@ -105,9 +105,10 @@ npm install
 | `npm run dev` | Watch-mode TypeScript compile + auto-restart server |
 | `npm run dev:html` | Same as above, also watches HTML/CSS/JS via nodemon |
 | `npm run start` | Compile TypeScript and run the production server |
+| `npm run build` | Compile `dist`, then run each provider's `build()` hook to emit artifacts (SDK bundle + `.d.ts`, OpenAPI spec, compiled frontend) headlessly — exits non-zero on failure (CI-friendly) |
 | `npm run test` | Run the Vitest test suite |
 
-TypeScript compiles to `dist/` (ES modules — `NodeNext`, ESNext target). The `postbuild` step automatically copies HTML templates from `src/container/html/` to `dist/container/html/`.
+TypeScript compiles to `dist/` (ES modules — `NodeNext`, ESNext target). The `copy:assets` step (run by `dev:html` and `build`) copies HTML templates from `src/container/html/` to `dist/container/html/`, plus any generated Prisma client.
 
 ---
 
@@ -909,7 +910,7 @@ Tags are auto-derived from the enclosing `route.group` prefix (e.g. `/users` →
 
 ## SDK Builder
 
-The `SdkBuilder` module generates a **JavaScript SDK bundle** from your registered routes, ready to be consumed by a frontend or mobile app with no extra tooling.
+The `SdkBuilder` module generates a **client SDK** from your registered routes, ready to consume from a frontend or mobile app with no extra tooling. As of v4.3.0 it supports **multiple independent outputs**, an opt-in **typed `.d.ts` sidecar** (self-contained by default), per-selector router filters/namespaces, and controller-method naming. The `.js` is refreshed at server boot; the `.d.ts` is written by `npm run build`.
 
 ### Enable
 
@@ -920,19 +921,27 @@ import type { SdkBuilderConfig } from "../container/modules/SdkBuilder/SdkBuilde
 import { terserFormatter } from "../container/modules/SdkBuilder/formatters/terser.js";
 
 export default <SdkBuilderConfig>{
-  enabled: true,
-  host: `http://localhost:${checkout(process.env.ServerPort, "3010")}`,
-  output: {
-    filename: "sdk/chasi.sdk.js",
-    formatter: terserFormatter,   // minify + mangle via terser (default)
-  },
-  httpClient: "fetch",            // "fetch" (default) or "axios"
-  routers: ["api"],               // which routers to include
-  exclude: [
-    { m: "post", url: "/api/users/forget" },
+  // One or more independent SDKs — each output entry is self-contained.
+  output: [
+    {
+      namespace: "api",                 // unique id (also labels the build logs)
+      enabled: true,
+      host: `http://localhost:${checkout(process.env.ServerPort, "3010")}`,
+      routers: ["api"],                 // a name, or { router, filter?, namespace?, naming? }
+      httpClient: "fetch",              // "fetch" (default) or "axios"
+      exclude: [{ m: "post", url: "/api/users/forget" }],
+      filename: "sdk/chasi.sdk.js",
+      formatter: terserFormatter,       // minify + mangle via terser (default)
+      // Opt-in typed .d.ts sidecar (written by `npm run build`):
+      typed: { enabled: true, emit: "inline" }, // "inline" = self-contained, or "import"
+    },
   ],
 };
 ```
+
+### Typed output (`.d.ts`)
+
+Set `typed.enabled` to emit a sibling `chasi.sdk.d.ts` beside the `.js` on `npm run build` — full request/response types with **zero runtime change** (the `.js` is byte-identical). By default (`emit: "inline"`) the referenced types are **copied into** the `.d.ts`, so the artifact is self-contained and drops into any frontend with nothing to install or path-map. Use `emit: "import"` in a monorepo to reference a shared `typeModule` barrel instead. Types are read from your controller method signatures (e.g. `create(req: User.CreateRequest, res)`) — see [`src/container/modules/SdkBuilder/README.md`](src/container/modules/SdkBuilder/README.md).
 
 ### Add validation with `.sdk()`
 
@@ -1076,28 +1085,3 @@ formatter: (code) => prettier.format(code, { parser: "babel" })
 - **Test suite** — fixed 8 bugs in the Vitest test setup: `async describe` preventing synchronous test registration, orphaned top-level `$app` instance shadowing the parameter in `routes.test.ts`, incorrect `/forget` and `/signin` route URLs, invalid `"update"` HTTP method type in `Helper`, and `authenticate()` sending `password` instead of the expected `pass` field
 - **Controller loading in test mode** — fixed dynamic `import()` of controllers when the project path contains spaces; `pathToFileURL` was URL-encoding the space as `%20`, causing Vite to fail resolving the module at test time; the raw filesystem path is now passed directly to `import()` in test mode
 
-### v4.0.0
-- Added **ApiSpec** module — generates an OpenAPI 3.x JSON spec file on every boot from registered routes and auto-collected model schemas (MongoDB, Prisma, Drizzle)
-- Added `src/config/apispec.ts` — fully typed `ApiSpecConfig` with output path, schema filters (`drivers`, `models`, `keyFormat`), shared components, and global security
-- Schema keys support two formats: `"plain"` (`user`) or `"prefixed"` (`test:user`) controlled by `schemas.keyFormat`; every schema includes an `x-driver` extension field
-- Route-level OpenAPI spec declared inline as a `spec` option on route definitions — tags auto-derived from group prefix, auth auto-resolved from `AuthRouteExceptions`
-- Added **SdkBuilder** module — generates a JavaScript ES module SDK bundle from registered routes, consumed directly by frontend or mobile apps
-- Added `src/config/sdkbuilder.ts` — fully typed `SdkBuilderConfig` with host, output path, HTTP client (`fetch` / `axios`), router and route exclude filters
-- Added `.sdk()` method on `Endpoint` — accepts a single `SdkMiddlewareFn` or an array; handlers run at build time (route validation) and are serialised into the generated bundle as client-side validators
-- Added `sdk` property to `RouteGroupProperty` and `RouterConfigInterface` — group/router-level sdk handlers propagate to all child endpoints in order (router → group → route)
-- sdk() handlers are cleared from all endpoints after compilation — they never run during server operation
-- Added `SdkBuilderFormatter` type — formatter function `(code: string) => string | Promise<string>` applied to the bundle before writing; built-in `terserFormatter` (terser minify + mangle) is the default
-- Added `terser` to dependencies for the built-in SDK formatter
-- Added `ApiSpec` and `SDK Builder` pages to the built-in documentation UI (v4.0.0 default version)
-- Updated `tsconfig.json` to exclude `**/*.sdk.js` and `**/*.spec.json` generated output files from TypeScript compilation
-
-### v3.6.0
-- Added **Drizzle ORM** database driver — supports PostgreSQL (`node-postgres`, `postgres-js`), MySQL (`mysql2`), SQLite (`better-sqlite3`), and Turso (`libsql`) alongside existing MongoDB/Prisma connections
-- Added `Model.drizzle(connection)` static accessor for retrieving the live Drizzle query client outside of controllers
-- Added `DrizzleOptions` and `DrizzleAdapter` types to `DatabaseConfig` — full TypeScript coverage for Drizzle connection config
-- All `src/config/` files now have TypeScript types with full JSDoc on every property (`src/config/types.ts` centralizes `AuthenticationConfig`, `ContainerConfig`, `ExceptionsConfig`)
-- Version-aware requirements in documentation — `intro.vue` reads node/npm/git versions from the active version JSON instead of hardcoded values
-- Requirements now indexed in global search — searchable by keyword (`node`, `npm`, `git`, `requirements`, `version`)
-- Drizzle ORM entries added to the database section of the built-in docs (searchable adapter, schema, globals, querying, and `Model.drizzle` glossary items)
-- Documentation frontend updated to v3.6.0 as default version
-- Added **Observer** documentation page (Observer vs Events, `ObserverConfig` / `events` types, config file reference)
