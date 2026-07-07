@@ -199,10 +199,14 @@ export default class Registry extends Base {
     try {
       if (typeof ep.property.controller == "string") {
         if (!ep.controller.includes("/")) {
-          ep.controller = Router.defaultControllerDir + "/" + ep.controller;
+          // Resolve a bare controller name within THIS router's own
+          // ControllerDir(s) — not the global default — so a router that points
+          // its ControllerDir at e.g. "container/controllers/v2" finds
+          // v2/UserController without the caller hard-coding the "v2/" prefix.
+          ep.controller = this.resolveControllerDir(ep.controller);
         }
 
-        let controller = Object.keys(Router.Controllers).find((key) => 
+        let controller = Object.keys(Router.Controllers).find((key) =>
           key.toLowerCase().includes(ep.controller.toLowerCase()));
         ep.$controller = Router.Controllers[controller].instance;
         ep.$method = Router.Controllers[controller].instance[ep.method].bind(
@@ -226,6 +230,31 @@ export default class Registry extends Base {
    * if the route is appointed to a controller
    * @param ep [Endpoint] class that handles the route
    */
+  /***
+   * Resolve a bare controller name against this router's own `ControllerDir(s)`
+   * (the same dirs its controllers were registered from), so per-router
+   * ControllerDir overrides actually take effect. Returns the first configured
+   * dir that has a matching registered controller; falls back to the global
+   * default dir when the router declares none / none match.
+   * @param name bare controller name, e.g. "UserController"
+   */
+  resolveControllerDir(name: string): string {
+    const configured = this.property.ControllerDir;
+    const dirs = Array.isArray(configured)
+      ? configured
+      : configured
+        ? [configured]
+        : [];
+    const registered = Object.keys(Router.Controllers);
+    for (const dir of dirs) {
+      const candidate = `${dir}/${name}`;
+      if (registered.some((key) => key.toLowerCase().includes(candidate.toLowerCase()))) {
+        return candidate;
+      }
+    }
+    return `${Router.defaultControllerDir}/${name}`;
+  }
+
   sanitizeRoute(str: string, _log: boolean = false) {
     let length = str.length;
     if (str[0] === "/") str = str.substring(1, str.length);

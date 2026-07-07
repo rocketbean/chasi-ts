@@ -1,4 +1,5 @@
 import { RouteExceptions } from "../package/framework/Interfaces.js";
+import type { LoggerBinding } from "../package/Logger/index.js";
 
 // ─── Authentication ───────────────────────────────────────────────────────────
 
@@ -102,6 +103,15 @@ export type ContainerConfig = {
    * Add new service providers here to have them participate in the lifecycle.
    */
   ServiceBootstrap: Record<string, string>;
+
+  /**
+   * Functions run on every Logger write method (`.log()`, `.info()`, `.warn()`,
+   * `.error()`). Each receives the method name followed by the exact arguments
+   * the method was called with, and they run in declaration order — tee logs to
+   * a file, forward errors to an external service, collect metrics, etc. A
+   * binding that throws is swallowed so it can never break logging.
+   */
+  LoggerBindings?: LoggerBinding[];
 
   /**
    * Map of middleware aliases to their file paths.

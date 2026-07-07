@@ -204,6 +204,13 @@ export class Handler extends Base {
    * recieve requests
    */
   protected async boot(): Promise<void> {
+    // Build/headless mode exits in consumeLayers after running build() hooks.
+    // Reaching here means that phase never ran (e.g. an earlier boot error) —
+    // abort with a failure code instead of starting the server.
+    if (globalThis.__chasiBuild) {
+      console.error("[chasi:build] build did not complete before the serve stage — aborting");
+      process.exit(1);
+    }
     this.loggers.system.group("BOOT");
     await this.$app.bootup();
     await this.$observer.emit("__ready__", {

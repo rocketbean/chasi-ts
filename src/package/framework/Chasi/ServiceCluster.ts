@@ -20,6 +20,7 @@ export default class ServiceCluster {
   public ids: string[] = [];
   public workers: ClusterWorker[] = [];
   private leadWorkerId: number | null = null;
+  private shuttingDown = false;
   // cluster.fork(env) expects a flat key/value object — nesting an "env" key
   // inside it would stringify to "[object Object]" in the worker's process.env.
   private forkOpts: Record<string, string> = {
@@ -89,19 +90,11 @@ export default class ServiceCluster {
   setupPrimaryThread() {
     cluster.schedulingPolicy =
       this.config.schedulingPolicy == 1 ? cluster.SCHED_NONE : cluster.SCHED_RR;
-    if (Session.nodeVer < 16) {
-      cluster.setupMaster({
-        ...this.config.settings,
-        silent: true,
-        stdio: [null, null, null, "pipe", "pipe", "ipc"],
-      });
-    } else {
       cluster.setupPrimary({
         ...this.config.settings,
         silent: true,
         stdio: [null, null, null, "pipe", "pipe", "ipc"],
       });
-    }
   }
 
   /**
@@ -250,6 +243,9 @@ export default class ServiceCluster {
           this.workers = this.workers.filter((w) => w.id !== deadWorker.id);
           this.pids = this.pids.filter((p) => p !== `${deadWorker.process.pid}`);
           this.ids = this.ids.filter((id) => id !== `${deadWorker.id}`);
+          // During shutdown an exiting worker must NOT be replaced — otherwise
+          // the re-fork keeps rebinding the port and the runtime never stops.
+          if (this.shuttingDown) return;
           // Restore the correct lead flag before re-forking so the replacement
           // worker inherits the same role as the one that crashed.
           process.env["lead"] = deadWorker.id === this.leadWorkerId ? "1" : "0";
@@ -258,9 +254,20 @@ export default class ServiceCluster {
         });
 
         const shutdown = () => {
-          for (const worker of this.workers) worker.disconnect();
+          if (this.shuttingDown) return; // idempotent (SIGINT + SIGTERM)
+          this.shuttingDown = true;      // stop on("exit") from re-forking
           this.storage.destroy();
-          setTimeout(() => process.exit(0), 5000).unref();
+          for (const worker of this.workers) {
+            try { worker.disconnect(); } catch { /* already gone */ }
+          }
+          // Force-kill any worker still holding its port after a drain window,
+          // then exit so the primary never lingers or orphans workers.
+          setTimeout(() => {
+            for (const worker of this.workers) {
+              try { worker.process.kill("SIGKILL"); } catch { /* already gone */ }
+            }
+            process.exit(0);
+          }, 5000).unref();
         };
         process.once("SIGTERM", shutdown);
         process.once("SIGINT", shutdown);

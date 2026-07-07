@@ -59,6 +59,22 @@ export default <ContainerConfig>{
   },
 
   /**
+   * Functions run on every Logger write method (`Logger.log()`, `.info()`,
+   * `.warn()`, `.error()`). Each receives the method name followed by the exact
+   * arguments passed to that method, and they run in declaration order — so you
+   * can tee logs to a file, forward errors to an external service, gather
+   * metrics, and so on. A binding that throws is swallowed so it can never break
+   * logging.
+   *
+   * @example
+   * LoggerBindings: [
+   *   (method, ...args) => appendFileSync("app.log", `[${method}] ${args.join(" ")}\n`),
+   *   (method, ...args) => { if (method === "error") reportError(args); },
+   * ]
+   */
+  LoggerBindings: [],
+
+  /**
    * Options for the internal Chasi boot session.
    */
   session: {

@@ -9,7 +9,7 @@ export default class ApiSpecServiceProvider
 {
   async boot(): Promise<void> {}
 
-  async beforeServerBoot(): Promise<void> {
+  async build(): Promise<void> {
     const config: ApiSpecConfig = Provider.config.apispec;
 
     if (!config?.enabled) return;

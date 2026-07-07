@@ -90,9 +90,15 @@ export default class Base {
       return fs
         .readdirSync(distPath)
         .filter((file: string) => {
-          const stat = fs.statSync(path.join(distPath, file)).isDirectory();
-          if (!stat) _mods[path.join(distPath, file.replace(".js", ""))] = file;
-          if (stat) return fs.statSync(path.join(distPath, file)).isDirectory();
+          const isDir = fs.statSync(path.join(distPath, file)).isDirectory();
+          if (isDir) return true; // recurse into subdirectories
+          // Only pick up source modules — skip dotfiles (e.g. macOS .DS_Store),
+          // type declarations, and any other non-.ts/.js artifact, so a stray
+          // file in a scanned directory can't abort controller/module loading.
+          if (/\.(ts|js)$/.test(file) && !file.endsWith(".d.ts")) {
+            _mods[path.join(distPath, file.replace(".js", ""))] = file;
+          }
+          return false;
         })
         .reduce<string[]>((all, subDir) => {
           return [

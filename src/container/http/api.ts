@@ -3,10 +3,10 @@ import specs from "./specs/api.spec.js"
 
 export default (route: Route) => {
   route.group({ prefix: "/users" }, () => {
-    route.post("/signin", "v1/UserController@signin", {
+    route.post("/signin", "UserController@signin", {
       spec: specs.signin,
     })
-    route.post("/signup", "v1/UserController@create", {
+    route.post("/signup", "UserController@create", {
       spec: specs.signup,
     });
   });

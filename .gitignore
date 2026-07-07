@@ -20,3 +20,6 @@ sdk/*
 api.spec.json
 .claude
 train
+
+# macOS Finder artifacts
+.DS_Store

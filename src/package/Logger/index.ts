@@ -3,10 +3,23 @@ import * as writers from "./types/writers.js";
 import { inspect } from "util";
 const _writers: { [key: string]: any } = writers;
 
+/**
+ * A function bound to the Logger's write methods via container config
+ * (`LoggerBindings`). Runs after each write method with the method's name
+ * followed by the exact arguments that method received.
+ */
+export type LoggerBinding = (method: string, ...args: unknown[]) => void;
+
 export default class Logger {
   static AllowPadding: string[] = ["warning", "severe", "subsystem"];
 
   static instance: Logger;
+
+  /** Write methods that fire the configured bindings. */
+  static readonly WriteMethods = ["log", "info", "warn", "error"] as const;
+
+  /** Functions run after every write method, in declaration order (from config). */
+  static bindings: LoggerBinding[] = [];
 
   public writers: { [key: string]: Writable } = {};
 
@@ -117,9 +130,52 @@ export default class Logger {
     return new _writers[writer](subject);
   }
 
+  /**
+   * Register functions (from container config `LoggerBindings`) to run after
+   * every Logger write method. Each is invoked with the method name and the
+   * exact arguments the method received, in declaration order. Safe to call at
+   * any time; a later call replaces the current set. Non-functions are ignored.
+   */
+  static setBindings(bindings?: LoggerBinding[] | LoggerBinding): void {
+    Logger.bindings = !bindings
+      ? []
+      : (Array.isArray(bindings) ? bindings : [bindings]).filter(
+          (fn): fn is LoggerBinding => typeof fn === "function",
+        );
+  }
+
+  /** Run every binding for a write; a throwing binding never breaks logging. */
+  private static fire(method: string, args: unknown[]): void {
+    for (const fn of Logger.bindings) {
+      try {
+        fn(method, ...args);
+      } catch {
+        /* a binding must never break logging */
+      }
+    }
+  }
+
+  /**
+   * Wrap each write method (once, on the singleton) so it fires the configured
+   * bindings with the method name + its exact args after the write completes.
+   */
+  private applyBindings(): void {
+    for (const name of Logger.WriteMethods) {
+      const self = this as Record<string, any>;
+      const original = self[name];
+      if (typeof original !== "function") continue;
+      self[name] = (...args: unknown[]): unknown => {
+        const result = original.apply(this, args);
+        Logger.fire(name, args);
+        return result;
+      };
+    }
+  }
+
   static init(): Logger {
     if (Logger.instance) return Logger.instance;
     Logger.instance = new Logger();
+    Logger.instance.applyBindings();
     return Logger.instance;
   }
 }

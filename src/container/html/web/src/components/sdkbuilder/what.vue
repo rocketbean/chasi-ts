@@ -3,204 +3,137 @@
     <section class="section">
       <div class="pan-title">
         <div class="x-center is-size-3">
-          <span>
-            <hook id="sdkbuilder" />
-            {{ sdkbuilder.label }}
-          </span>
+          <span><hook id="sdkbuilder" /> {{ sdkbuilder.label }}</span>
         </div>
         <small><span class="subtitle">{{ sdkbuilder.text }}</span></small>
       </div>
     </section>
 
+    <!-- Configuration = the fields of one SdkBuilderOutput -->
     <section class="section">
       <div class="pan-title">
+        <div class="x-center is-size-3">
+          <span><hook id="sdkbuilderConfig" /> {{ config.label }}</span>
+          <tag :name="'<SdkBuilderOutput>'" type="SdkBuilderOutput" inline />
+        </div>
+        <small><span class="subtitle">{{ config.sublabel }}</span></small>
+      </div>
+      <span class="sub-text">
+        {{ config.text }} The config is <code>{ output: SdkBuilderOutput[] }</code> — one entry
+        per SDK. <code>output</code> is the only top-level field; every field below is a field of
+        each <code>SdkBuilderOutput</code>.
+      </span>
+    </section>
+    <list :items="configItems" />
+    <code-container mapping="sdkbuilder/config" :options="codeOpts">
+      <template #comment><p>Two independent SDKs generated from one route set.</p></template>
+      <template #notes>The typed .d.ts sidecar is written only by npm run build.</template>
+    </code-container>
+
+    <section class="section">
+      <div class="pan-title">
+        <div class="x-center is-size-3">
+          <span><hook id="sdkbuilderOutput" /> {{ output.label }}</span>
+        </div>
+      </div>
+      <span class="sub-text">{{ output.text }}</span>
+    </section>
+    <list :items="outputItems" />
+    <code-container mapping="sdkbuilder/formatter" :options="codeOpts">
+      <template #comment><p>Swap the formatter per output — or omit it for raw output.</p></template>
+    </code-container>
+
+    <!-- Referenced types, each its own list — reached by clicking the type in a tag above -->
+    <section class="section" v-for="t in typeBlocks" :key="t.head.id">
+      <div class="pan-title">
         <div class="x-center is-size-5">
-          <span>
-            <hook id="sdkbuilderConfig" />
-            {{ config.label }}
-          </span>
+          <span><hook :id="t.head.id" /> <tag :name="t.head.label" :type="typeName(t.head.label)" inline /></span>
         </div>
-        <small class="sublabel-text">{{ config.sublabel }}</small>
-        <p class="sub-text">{{ config.text }}</p>
+        <small><span class="subtitle">referenced type</span></small>
       </div>
-      <div class="glossary-list">
-        <div v-for="item in configProps" :key="item.id" class="glossary-item">
-          <hook :id="item.id" />
-          <span class="item-label">{{ item.label }}</span>
-          <span v-if="item.type" class="tag is-info is-light item-type">{{ item.type }}</span>
-          <p class="sub-text">{{ item.text }}</p>
-        </div>
-      </div>
+      <span class="sub-text">{{ t.head.text }}</span>
+      <list :items="t.items" />
     </section>
 
     <section class="section">
       <div class="pan-title">
-        <div class="x-center is-size-5">
-          <span>
-            <hook id="sdkbuilderOutput" />
-            {{ output.label }}
-          </span>
-        </div>
-        <p class="sub-text">{{ output.text }}</p>
-      </div>
-      <div class="glossary-list">
-        <div v-for="item in outputProps" :key="item.id" class="glossary-item">
-          <hook :id="item.id" />
-          <span class="item-label">{{ item.label }}</span>
-          <span v-if="item.type" class="tag is-success is-light item-type">{{ item.type }}</span>
-          <small v-if="item.sublabel" class="sublabel-text">{{ item.sublabel }}</small>
-          <p class="sub-text">{{ item.text }}</p>
+        <div class="x-center is-size-3">
+          <span><hook id="sdkbuilderSdk" /> {{ sdkMethod.label }}</span>
         </div>
       </div>
-      <div class="code-block mt-4">
-        <pre><code>{{ formatterExamples }}</code></pre>
-      </div>
+      <span class="sub-text">{{ sdkMethod.text }}</span>
     </section>
+    <list :items="sdkItems" />
+    <code-container mapping="sdkbuilder/sdk" :options="codeOpts">
+      <template #comment><p>Validation handlers run at build time and are serialized into the bundle.</p></template>
+    </code-container>
 
     <section class="section">
       <div class="pan-title">
-        <div class="x-center is-size-5">
-          <span>
-            <hook id="sdkbuilderSdk" />
-            {{ sdkMethod.label }}
-          </span>
-        </div>
-        <p class="sub-text">{{ sdkMethod.text }}</p>
-      </div>
-      <div class="glossary-list">
-        <div v-for="item in sdkProps" :key="item.id" class="glossary-item">
-          <hook :id="item.id" />
-          <span class="item-label">{{ item.label }}</span>
-          <span v-if="item.type" class="tag is-warning is-light item-type">{{ item.type }}</span>
-          <p class="sub-text">{{ item.text }}</p>
+        <div class="x-center is-size-3">
+          <span><hook id="sdkbuilderGenerated" /> {{ generated.label }}</span>
         </div>
       </div>
+      <span class="sub-text">{{ generated.text }}</span>
     </section>
+    <list :items="genItems" />
 
     <section class="section">
       <div class="pan-title">
-        <div class="x-center is-size-5">
-          <span>
-            <hook id="sdkbuilderGenerated" />
-            {{ generated.label }}
-          </span>
-        </div>
-        <p class="sub-text">{{ generated.text }}</p>
-      </div>
-      <div class="glossary-list">
-        <div v-for="item in generatedProps" :key="item.id" class="glossary-item">
-          <hook :id="item.id" />
-          <span class="item-label">{{ item.label }}</span>
-          <p class="sub-text">{{ item.text }}</p>
+        <div class="x-center is-size-3">
+          <span><hook id="sdkbuilderExample" /> {{ example.label }}</span>
         </div>
       </div>
     </section>
-
-    <section class="section">
-      <div class="pan-title">
-        <div class="x-center is-size-5">
-          <span>
-            <hook id="sdkbuilderExample" />
-            {{ example.label }}
-          </span>
-        </div>
-      </div>
-      <div class="code-block">
-        <pre><code>{{ exampleCode }}</code></pre>
-      </div>
-      <p class="sub-text mt-4">Consuming the generated bundle in a frontend app:</p>
-      <div class="code-block mt-2">
-        <pre><code>{{ consumerCode }}</code></pre>
-      </div>
-    </section>
+    <code-container mapping="sdkbuilder/consumer" :options="codeOpts">
+      <template #comment><p>Consuming the generated bundle in a frontend app.</p></template>
+    </code-container>
   </div>
 </template>
 
 <script setup>
 import { useControlStore } from "@/stores/ControlStore"
 import hook from "@/components/utils/hook.vue"
+import list from "@/components/utils/list/list.vue"
+import codeContainer from "@/components/utils/codes/codeContainer.vue"
+import tag from "@/components/utils/tag/tag.vue"
 
-const ctx = useControlStore()
-const d = (id) => ctx.dict[id] ?? { label: id, text: '', sublabel: '', type: '' }
+const store = useControlStore()
+const codeOpts = { lang: "ts", theme: "vitesse-dark" }
 
-const sdkbuilder  = d("sdkbuilder")
-const config      = d("sdkbuilderConfig")
-const output      = d("sdkbuilderOutput")
-const sdkMethod   = d("sdkbuilderSdk")
-const generated   = d("sdkbuilderGenerated")
-const example     = d("sdkbuilderExample")
+const d = (id) => store.dict[id] ?? { id, label: id, text: "", sublabel: "", type: "" }
+const typeName = (label) => (label || "").replace(/[<>]/g, "")
+const esc = (s) => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+// Map dictionary entries → <list> items (version-aware: unknown ids are dropped).
+const toItems = (ids, parent) =>
+  ids
+    .filter((id) => store.dict[id])
+    .map((id) => {
+      const e = store.dict[id]
+      const field = (e.label || "").replace(/\?$/, "")
+      return { hook: e.id, title: e.label, sub: parent && e.type ? `[${parent}.${field}]` : "", tag: e.type || "", desc: esc(e.text) }
+    })
 
-const configProps    = ["sdb-enabled","sdb-host","sdb-output","sdb-httpClient","sdb-routers","sdb-exclude"].map(d)
-const outputProps    = ["sdb-filename","sdb-formatter","sdb-terser"].map(d)
-const sdkProps       = ["sdb-sdk-method","sdb-sdk-array","sdb-sdk-chain","sdb-sdk-group","sdb-sdk-router"].map(d)
-const generatedProps = ["sdb-gen-structure","sdb-gen-validate","sdb-gen-request","sdb-gen-runsdk"].map(d)
+const sdkbuilder = d("sdkbuilder")
+const config     = d("sdkbuilderConfig")
+const output     = d("sdkbuilderOutput")
+const sdkMethod  = d("sdkbuilderSdk")
+const generated  = d("sdkbuilderGenerated")
+const example    = d("sdkbuilderExample")
 
-const formatterExamples = `// src/config/sdkbuilder.ts
+const configItems = toItems(["sdb-output", "sdb-namespace", "sdb-enabled", "sdb-host", "sdb-routers", "sdb-httpClient", "sdb-exclude", "sdb-typed"], "output[]")
+const outputItems = toItems(["sdb-filename", "sdb-formatter", "sdb-terser"], "SdkBuilderOutput")
+const sdkItems    = toItems(["sdb-sdk-method", "sdb-sdk-array", "sdb-sdk-chain", "sdb-sdk-group", "sdb-sdk-router"])
+const genItems    = toItems(["sdb-gen-structure", "sdb-gen-validate", "sdb-gen-request", "sdb-gen-runsdk"])
 
-// default — terser (minify + mangle)
-import { terserFormatter } from "../container/modules/SdkBuilder/formatters/terser.js"
-output: { filename: "sdk/chasi.sdk.js", formatter: terserFormatter }
-
-// uglify-js@3
-import UglifyJS from "uglify-js"
-output: { filename: "sdk/chasi.sdk.js", formatter: (code) => UglifyJS.minify(code).code }
-
-// prettier (readable formatted output)
-import prettier from "prettier"
-output: { filename: "sdk/chasi.sdk.js", formatter: (code) => prettier.format(code, { parser: "babel" }) }
-
-// no formatting — write raw output
-output: { filename: "sdk/chasi.sdk.js" }`
-
-const exampleCode = `// src/config/sdkbuilder.ts
-export default {
-  enabled: true,
-  host: "http://localhost:3010",
-  output: { filename: "sdk/chasi.sdk.js", formatter: terserFormatter },
-  httpClient: "fetch",
-  routers: ["api"],
-  exclude: [{ m: "post", url: "/api/users/forget" }],
-}
-
-// src/container/http/api.ts — register sdk() on a route
-route.post("/signin", "v1/UserController@signin", { spec: { ... } })
-  .sdk((params, next) => {
-    if (!params?.email) throw new Error("email is required")
-    next()
-  })
-
-// sdk() on a group — applied to ALL routes in the group
-route.group({ prefix: "/users", sdk: [validateScope] }, () => {
-  route.post("/signin", ...)
-  route.post("/signup", ...)
-})`
-
-const consumerCode = `// Import from generated bundle (ES module)
-import { users } from "./sdk/chasi.sdk.js"
-// or
-import SDK from "./sdk/chasi.sdk.js"
-
-// Public route — no token needed
-const result = await users.signin({ email: "user@example.com", pass: "secret" })
-console.log(result.token)
-
-// Protected route — pass the JWT as second argument
-const profile = await users.index({}, token)
-
-// Validation runs before the request
-try {
-  await users.signup({ name: "Alice" })  // throws: Missing required field "email"
-} catch (err) {
-  console.error(err.message)
-}`
+// Isolated referenced-type lists (skipped on versions that lack them).
+const typeBlocks = [
+  { head: d("sdb-selector"),   items: toItems(["sel-router", "sel-namespace", "sel-filter", "sel-naming"], "SdkRouterSelector") },
+  { head: d("sdb-exceptions"), items: toItems(["exc-url", "exc-m"], "RouteExceptions") },
+  { head: d("sdb-typedef"),    items: toItems(["ty-enabled", "sdb-emit", "sdb-typeModule", "sdb-build"], "SdkBuilderTyped") },
+].filter((t) => t.items.length)
 </script>
 
 <style scoped>
-.glossary-list    { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
-.glossary-item    { padding: 10px 14px; border-left: 3px solid #48c78e; background: rgba(72,199,142,.04); border-radius: 4px; }
-.item-label       { font-weight: 600; font-size: .95rem; }
-.item-type        { margin-left: 8px; font-family: monospace; font-size: .75rem; }
-.sublabel-text    { color: #888; font-size: .8rem; display: block; margin-bottom: 4px; }
-.code-block       { background: #1e1e2e; border-radius: 8px; padding: 20px; overflow-x: auto; }
-.code-block pre   { color: #cdd6f4; font-size: .82rem; margin: 0; }
+.sub-text { display: block; padding: 0 35px; }
 </style>

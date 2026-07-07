@@ -146,5 +146,8 @@ export default <DatabaseConfig>{
    * is registered and made available inside controllers as `this.models.{ModelName}`.
    * Paths are relative to `src/` (or `dist/` after compilation).
    */
-  modelsDir: ["./container/models/"],
+  modelsDir: [
+    "./container/models/",
+    ...(process.env.DEEP_TEST_MODELS ? [process.env.DEEP_TEST_MODELS] : []),
+  ],
 };

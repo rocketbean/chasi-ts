@@ -9,6 +9,7 @@ import { Handler } from "../../Handler.js";
 import { Iobject } from "./../Interfaces.js";
 import PipeHandler from "./PipeHandler.js";
 import Logger from "../../Logger/index.js";
+import SessionStorage from "./Storage.js";
 
 export default class Session {
   public id = uuidv4();
@@ -60,23 +61,38 @@ export default class Session {
   static async beforeSessionHook(config: Iobject) {
     if (Session.checkMainThread()) {
       Session._conf = { ...config };
+      // Build/headless mode skips the pre-app hook (e.g. the Vite compiler) —
+      // artifacts come from provider build() hooks and the process never serves.
+      if (globalThis.__chasiBuild) return;
       await config.server.hooks.beforeApp(Session.getConfig);
     }
   }
 
   static async initialize(config: Iobject) {
     config = <Iobject>Base.mergeObjects(horizon, config);
+    // Register the developer's Logger write-method bindings (container config)
+    // before boot logging begins, so they fire on every Logger.log/info/warn/error.
+    Logger.setBindings(config.container?.LoggerBindings);
+    // Build/headless mode is always single-process — force clustering off so the
+    // registry + provider build() hooks run once in this process, then it exits.
+    if (globalThis.__chasiBuild) config.server.serviceCluster.enabled = false;
     await Session.beforeSessionHook(config);
-    if (!config.server.serviceCluster.enabled) await Session.validates(config);
+    if (!config.server?.serviceCluster?.enabled) await Session.validates(config);
     let session = new Session(config);
     let cluster = new ServiceCluster(session);
     await cluster.createStorage();
     Writer.log = cluster.storage.write.bind(cluster.storage);
+    // Build mode: write straight to stdout (no cluster storage aggregation), so
+    // the provider build() output the Writer gate lets through actually prints
+    // and isn't truncated by the process.exit(0) at the end of the build.
+    if (globalThis.__chasiBuild)
+      Writer.log = (msg: any) => process.stdout.write(String(msg));
     if (config.server.serviceCluster.enabled) {
       let pipe = new PipeHandler();
       global.Logger = Logger.init()
       if (Session.checkMainThread()) {
         await cluster.createCluster();
+        SessionStorage.state = 1; // set storage on ready state, for logging
       } else {
         await cluster.storage.setPipe(pipe);
         return await Session.createHandler(session, config, pipe);

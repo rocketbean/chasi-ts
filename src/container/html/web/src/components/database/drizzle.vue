@@ -115,6 +115,52 @@
         </template>
       </code-container>
     </section>
+
+    <!-- Setup guide -->
+    <section class="section">
+      <div class="pan-title">
+        <div class="x-center is-size-4">
+          <span>
+            <hook id="drizzle-setup" />
+            Setup guide
+          </span>
+        </div>
+      </div>
+      <span class="sub-text">
+        {{ setup.text }}
+      </span>
+
+      <ol class="setup-steps">
+        <li>
+          <strong>Install the client package for your adapter.</strong>
+          <code-container mapping="database/drizzle/install" :options="shellOpts">
+            <template v-slot:comment>
+              <p>Pick the peer package that matches your connection's <code>adapter</code></p>
+            </template>
+          </code-container>
+        </li>
+        <li>
+          <strong>Create a schema module that exports your tables as named exports.</strong>
+          <code-container mapping="database/drizzle/schema" :options="codeOpts">
+            <template v-slot:comment>
+              <p>Named exports only — no default export</p>
+            </template>
+          </code-container>
+        </li>
+        <li>
+          <strong>Declare a <code>driver: "drizzle"</code> connection with <code>options: { adapter, schema }</code>.</strong>
+          <code-container mapping="database/drizzle/connection" :options="codeOpts">
+            <template v-slot:comment>
+              <p>Point <code>schema</code> at the module from step 2</p>
+            </template>
+          </code-container>
+        </li>
+        <li>
+          <strong>Query via <code>Model.drizzle("name")</code> or <code>this.models.name</code>.</strong>
+          <small class="grey-text">See the sections above.</small>
+        </li>
+      </ol>
+    </section>
   </div>
 </template>
 
@@ -128,8 +174,10 @@ const drizzle      = ctx.dict["drizzle"]       || {};
 const schema       = ctx.dict["drizzle-schema"] || {};
 const query        = ctx.dict["drizzle-query"]  || {};
 const modelMethod  = ctx.dict["drizzle-model-method"] || {};
+const setup        = ctx.dict["drizzle-setup"] || {};
 
-const codeOpts = { lang: "ts", theme: "vitesse-dark" };
+const codeOpts  = { lang: "ts", theme: "vitesse-dark" };
+const shellOpts = { lang: "bash", theme: "vitesse-dark" };
 
 // Config property items (adapter, schema path, globals)
 const configItems = reactive(
@@ -146,4 +194,16 @@ const configItems = reactive(
 );
 </script>
 
-<style scoped></style>
+<style scoped>
+.setup-steps {
+  list-style: decimal;
+  padding-left: 28px;
+  margin: 10px 0 0;
+}
+.setup-steps > li {
+  margin-bottom: 22px;
+}
+.grey-text {
+  color: grey;
+}
+</style>

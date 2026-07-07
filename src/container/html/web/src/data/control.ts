@@ -1,3 +1,4 @@
+import v430 from "./versions/v4.3.0.json"
 import v420 from "./versions/v4.2.0.json"
 import v410 from "./versions/v4.1.0.json"
 import v400 from "./versions/v4.0.0.json"
@@ -43,6 +44,7 @@ type subject = {
 }
 
 export const versions: Record<string, { version: string; sections: subject[] }> = {
+  "4.3.0": v430 as any,
   "4.2.0": v420 as any,
   "4.1.0": v410 as any,
   "4.0.0": v400 as any,
@@ -51,13 +53,15 @@ export const versions: Record<string, { version: string; sections: subject[] }> 
   "3.0.0": v300 as any,
 }
 
-export const defaultVersion = "4.2.0"
+export const defaultVersion = "4.3.0"
 
 export function buildData(versionKey: string) {
   const versionData = versions[versionKey] ?? versions[defaultVersion]
   const result = {
     collection: {} as Record<string, subject>,
     dictionary: {} as Record<string, glossary>,
+    types: (versionData as any).types ?? {},
+    typeRows: [] as any[],
     default: "intro",
     version: versionData.version,
   }
@@ -89,6 +93,27 @@ export function buildData(versionKey: string) {
           text: req.text ?? `Minimum required version: ${req.value}`,
         }
       })
+    }
+  })
+
+  // types registry → searchable rows, so Ctrl+K finds a type by its exact name.
+  result.typeRows = Object.entries(result.types).map(([name, t]: [string, any]) => {
+    const def = Object.values(result.dictionary).find((e: any) => e.label === `<${name}>`)
+    const ref = def || Object.values(result.dictionary).find((e: any) => (e.type || "").includes(name))
+    const propNames = (t.properties || []).map((p: any) => (p.name || "").replace(/\?$/, ""))
+    let loc = (ref as any)?.loc
+    if (!loc) {
+      if (/^(Drizzle|Prisma|Mongo|DB|Database|drivers)/.test(name)) loc = "database@database"
+      else if (/^(Sdk|Route)/.test(name)) loc = "sdkbuilder@sdkbuilder"
+      else if (/^ApiSpec/.test(name)) loc = "apispec@apispec"
+    }
+    return {
+      id: `type:${name}`,
+      label: name,
+      reference: ["type"],
+      keywords: [name, "type", ...propNames],
+      text: t.text || t.signature || "",
+      loc,
     }
   })
 
